@@ -1,0 +1,6 @@
+[submodule "extern/csbq"]
+	path = extern/csbq
+	url = https://github.com/dmalhotra/CSBQ.git
+[submodule "extern/pvfmm"]
+	path = extern/pvfmm
+	url = https://github.com/dmalhotra/pvfmm.git
