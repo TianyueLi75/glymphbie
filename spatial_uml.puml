@@ -1,0 +1,63 @@
+@startuml csbq
+
+class SlenderBodyElem {
+    - cheb_order
+    - fourier_order
+    - comm
+    - radius
+    - coord
+    - elem_dsp
+
+    constructor()
+    destructor()
+    sctl::Vector CenterlineNodes()
+    sctl::Long Size()
+    void GetNodeCoord()
+    void Write()
+    void Read()
+    void WriteVTK()
+
+}
+
+class BoundaryIntegralOp {
+    constructor()
+    destructor()
+    void SetAccuracy()
+    void AddElemList()
+    void SetTargetCoord()
+    void SetTargetNormal()
+
+    void ComputePotential()
+}
+
+class Annular {
+    - Xc_inner
+    - Xc_outer
+    - r_inner
+    - r_outer
+    - X_inner 
+    - X_outer
+    - Xn_inner
+    - Xn_outer 
+    - aspect_ratio
+
+    constructor() 
+    destructor()
+
+    SetInnerXc()
+    SetOuterXc()
+    SetInnerR()
+    SetOuterR()
+    SetInnerSEL() 
+    SetOuterSEL() 
+    GetInnerCoord()
+    GetOuterCoord()
+    GetCoord()
+    GetCenterLine()
+    GetAspectRatio()
+}
+
+Annular --> SlenderBodyElem
+
+
+@enduml
