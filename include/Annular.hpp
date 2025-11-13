@@ -22,7 +22,7 @@ template <class Real> class Annular {
         void GetOuterCoord(sctl::Vector<Real>* X_out);
         void GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn); // TODO: enable comm support later.
         sctl::Vector<Real> GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_);
-        Real GetAspectRatio();
+        Real GetMinRadius();
 
         // TODO: add read/write and plotting support
 
@@ -33,7 +33,7 @@ template <class Real> class Annular {
     private:
         sctl::Vector<Real> Xc_inner, Xc_outer, r_inner, r_outer; // input values
         sctl::Vector<Real> X_inner, X_outer, Xn_inner, Xn_outer; // computed values from CSBQ
-        Real aspect_ratio; // computed value
+        Real min_radius; // computed value
         sctl::Long Nelem_inner, Nelem_outer, ElemOrder_inner, ElemOrder_outer, FourierOrder_inner, FourierOrder_outer; 
 
         sctl::SlenderElemList<Real> elem_lst_outer, elem_lst_inner;
@@ -42,6 +42,7 @@ template <class Real> class Annular {
         bool SetupOuter_bool = false;
 
         bool CheckCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const bool check_inner);
+        void InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> src_r, const sctl::Vector<Real> src_x, const sctl::Vector<Real> trg_x);
 };
 
 

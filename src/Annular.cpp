@@ -1,6 +1,9 @@
 #include "Annular.hpp"
 
-// TODO: input Xc may be z-periodic instead of x-, should add a conversion function here.
+// TODO: Implement OPENMP AND MPI (AND MAYBE KOKKOS) parallelization.
+// TODO: In setup, interpolating for radius at new centerline nodes assume r = r(x), no y and z dependency.
+// NOTE: Reinitialized centerline is at (x, 0.5, 0.5).
+
 template <class Real>
 Annular<Real>::Annular(const sctl::Vector<Real> Xc_inner_, const sctl::Vector<Real> Xc_outer_, const sctl::Vector<Real> r_inner_, const sctl::Vector<Real> r_outer_) {
     SCTL_ASSERT(Xc_inner_.Dim()==r_inner_.Dim());
@@ -14,7 +17,7 @@ Annular<Real>::Annular(const sctl::Vector<Real> Xc_inner_, const sctl::Vector<Re
 }
 
 template <class Real>
-Annular<Real>::~Annular() {} // TODO: This is it for the descrutor?
+Annular<Real>::~Annular() {} 
 
 
 template <class Real>
@@ -69,7 +72,6 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vec
     return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated);
 }
 
-//TODO: may need to add functionality for scanning to add a vector of ElemOrder, etc. Right now assumes all panels have the same orders in GL and fourier.
 template <class Real>
 bool Annular<Real>::CheckCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const bool check_inner) {
     sctl::Long expected_len = Nelem_ * ELemOrder_;
@@ -80,6 +82,15 @@ bool Annular<Real>::CheckCenterLine(const sctl::Long Nelem_, const sctl::Long El
     }
 }
 
+template <class Real>
+void Annular<Real>::InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> src_r, const sctl::Vector<Real> src_x, const sctl::Vector<Real> trg_x) {
+    sctl::Matrix<Real> Minterp(src_x.Dim(), trg_x.Dim());
+    sctl::Vector<Real> wts(src_x.Dim()*trg_x.Dim(), (sctl::Iterator<Real>)Minterp.begin(), false);
+    sctl::LagrangeInterp<Real>::Interpolate(wts, src_x, trg_x); // row-major order, Ns x Nt (stacked) so wts for all targets from first source first, from second source, etc.
+    // left multiply by source value of r to get row of target r values.
+    trg_r.ReInit(trg_x.Dim());
+    sctl::Matrix<Real>::GEMM(trg_r, sctl::Matrix<Real>(1,Nelem_*ElemOrder_,(sctl::Iterator<Real>)r_inner.begin(),false), Minterp);
+}
 
 template <class Real>
 std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_) {
@@ -96,10 +107,17 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(con
         } else {
             std::cout << "Xc_inner does not match expected number of nodes using panel-based quadrature; updating Xc_inner." << std::endl;
             Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
-            // TODO: make interpolation matrix for r
-
-            // TODO: get r_updated;
-            // r_updated = ; 
+            // TODO: NEED TO CHANGE IN THE FUTURE, BUT FOR NOW: assume r = r(x), no y and z dependency.
+            // collect src_x and trg_x
+            sctl::Vector<Real> src_x(Xc_inner.Dim()/3);
+            sctl::Vector<Real> trg_x(Xc_updated.Dim()/3);
+            for (sctl::Long node_ind = 0; node_ind < Xc_inner.Dim()/3; node_ind++) {
+                src_x[node_ind] = Xc_inner[node_ind*3];
+            }
+            for (sctl::Long node_ind = 0; node_ind < Xc_updated.Dim()/3; node_ind++) {
+                trg_x[node_ind] = Xc_updated[node_ind*3];
+            }
+            InterpR(r_updated, r_inner, src_x, trg_x);
         }
         sctl::Vector<sctl::Long> ElemOrderVec(Nelem_);
         sctl::Vector<sctl::Long> FourierOrderVec(Nelem_);
@@ -110,7 +128,8 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(con
         SetupInner_bool = true;
         Xc_inner = Xc_updated;
         r_inner = r_updated;
-        // TODO: compute aspect ratio
+        Real min_radius = sctl::omp_par::reduce(r_inner.begin(), r_inner.Dim());
+
     } else {
         // This clause is only for when called from user function; shouldn't be here from Setup().
         std::cout << "Note: Inner already setup, nothing done." << std::endl;
@@ -134,12 +153,18 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter(con
         } else {
             std::cout << "Xc_inner does not match expected number of nodes using panel-based quadrature; updating Xc_inner." << std::endl;
             Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
-            // TODO: make interpolation matrix for r
-
-            // TODO: get r_updated;
-            // r_updated = ; 
+            // TODO: NEED TO CHANGE IN THE FUTURE, BUT FOR NOW: assume r = r(x), no y and z dependency.
+            // collect src_x and trg_x
+            sctl::Vector<Real> src_x(Xc_inner.Dim()/3);
+            sctl::Vector<Real> trg_x(Xc_updated.Dim()/3);
+            for (sctl::Long node_ind = 0; node_ind < Xc_inner.Dim()/3; node_ind++) {
+                src_x[node_ind] = Xc_inner[node_ind*3];
+            }
+            for (sctl::Long node_ind = 0; node_ind < Xc_updated.Dim()/3; node_ind++) {
+                trg_x[node_ind] = Xc_updated[node_ind*3];
+            }
+            InterpR(r_updated, r_inner, src_x, trg_x);
         }
-        // TODO: add MPI functions.
         sctl::Vector<sctl::Long> ElemOrderVec(Nelem_);
         sctl::Vector<sctl::Long> FourierOrderVec(Nelem_);
         ElemOrderVec = ElemOrder_;
@@ -198,7 +223,6 @@ void Annular<Real>::GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn) 
 }
 
 // x in [0,1], reinitializes x only, set y and z to 0.5... 
-// TODO: may need to interpolate x and y? Can we start with just straight channel?
 template <class Real>
 sctl::Vector<Real> Annular<Real>::GetCenterLine(sctl::Long Nelem_, sctl::Long ElemOrder_) {
     // TODO: returns centerline nodes when x=[0,1] divided into <Nelem> panels of <ElemOrder> number of GL nodes each
@@ -217,9 +241,9 @@ sctl::Vector<Real> Annular<Real>::GetCenterLine(sctl::Long Nelem_, sctl::Long El
 }
 
 template <class Real>
-Real Annular<Real>::GetAspectRatio() {
+Real Annular<Real>::GetMinRadius() {
     SCTL_ASSERT(SetupInner_bool);
-    return aspect_ratio;
+    return min_radius;
 }
 
 template class Annular<float>;
