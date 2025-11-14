@@ -5,5 +5,7 @@
 #include "Particle.hpp"
 #include "SpatialSolver.hpp"
 #include "Wall.hpp"
+#include "FuncWall.hpp"
+#include "IntegratorWall.hpp"
 
 #endif
