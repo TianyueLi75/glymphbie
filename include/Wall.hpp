@@ -1,10 +1,7 @@
 #ifndef __GLYMPH_WALL__
 #define __GLYMPH_WALL__
 
-#include <sctl.hpp>
-
-
-
+#include <csbq.hpp>
 
 template <class Real>
 class Wall
