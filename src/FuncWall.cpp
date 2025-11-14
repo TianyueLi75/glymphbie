@@ -27,7 +27,8 @@ void FuncWall<Real>::update() {
     Real t = step * this->_dt;
     _inner_func(this->_radius_in, t);
     _outer_func(this->_radius_out, t);
-    // TODO make sure wall is physical not just radii need to check w.r.t. center coordinates.
+    // Make sure wall is physical after update
+    this->enforceGapGeometry(); 
     step++;
 
 }

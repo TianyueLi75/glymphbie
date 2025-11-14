@@ -13,7 +13,8 @@ class Wall
         size_t _n_tsteps;
         Real _dt;
         size_t _grid_size;
-
+        Real _min_gap = 1e-5;
+        Real _min_inner_radius = 1e-5;
         sctl::Vector<Real> _center_coords_out;
         sctl::Vector<Real> _center_coords_in;
 
@@ -26,7 +27,8 @@ class Wall
 
         virtual void update() = 0;
 
-
+        void enforceGapGeometry();
+        
         // Replace grid and data in case mesh is refined
         virtual void setGridAndData(size_t new_grid_size,
                                 const sctl::Vector<Real>& center_out,
