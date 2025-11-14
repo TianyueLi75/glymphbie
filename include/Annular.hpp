@@ -21,7 +21,7 @@ template <class Real> class Annular {
         void GetInnerCoord(sctl::Vector<Real>* X_out);
         void GetOuterCoord(sctl::Vector<Real>* X_out);
         void GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn); // TODO: enable comm support later.
-        sctl::Vector<Real> GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_);
+        static sctl::Vector<Real> GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_);
         Real GetMinRadius();
 
         // TODO: add read/write and plotting support

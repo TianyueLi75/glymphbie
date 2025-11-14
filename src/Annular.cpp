@@ -74,7 +74,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vec
 
 template <class Real>
 bool Annular<Real>::CheckCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const bool check_inner) {
-    sctl::Long expected_len = Nelem_ * ELemOrder_;
+    sctl::Long expected_len = Nelem_ * ElemOrder_;
     if (check_inner) {
         return Xc_inner.Dim() == expected_len;
     } else {
@@ -89,7 +89,9 @@ void Annular<Real>::InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> 
     sctl::LagrangeInterp<Real>::Interpolate(wts, src_x, trg_x); // row-major order, Ns x Nt (stacked) so wts for all targets from first source first, from second source, etc.
     // left multiply by source value of r to get row of target r values.
     trg_r.ReInit(trg_x.Dim());
-    sctl::Matrix<Real>::GEMM(trg_r, sctl::Matrix<Real>(1,Nelem_*ElemOrder_,(sctl::Iterator<Real>)r_inner.begin(),false), Minterp);
+    sctl::Matrix<Real> trg_r_mat(1, trg_r.Dim(), (sctl::Iterator<Real>)trg_r.begin(),false); 
+    sctl::Matrix<Real>::GEMM(trg_r_mat, sctl::Matrix<Real>(1,r_inner.Dim(),(sctl::Iterator<Real>)r_inner.begin(),false), Minterp);
+    // TODO: check that this assignes values to trg_r
 }
 
 template <class Real>
@@ -184,39 +186,39 @@ template <class Real>
 void Annular<Real>::GetInnerCoord(sctl::Vector<Real>* X_out) {
     // DBC: if not setup, causes assertion error.
     SCTL_ASSERT(SetupInner_bool); 
-    X_out = X_inner;
+    (*X_out) = X_inner;
 }
 
 template <class Real>
 void Annular<Real>::GetOuterCoord(sctl::Vector<Real>* X_out) {
     SCTL_ASSERT(SetupOuter_bool); 
-    X_out = X_outer;
+    (*X_out) = X_outer;
 }
 
 template <class Real>
 void Annular<Real>::GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn) {
     SCTL_ASSERT(SetupInner_bool && SetupOuter_bool); 
     if (Xn) {
-        X.ReInit(X_inner.Dim() + X_outer.Dim());
-        Xn.ReInit(Xn_inner.Dim() + Xn_outer.Dim());
+        X->ReInit(X_inner.Dim() + X_outer.Dim());
+        Xn->ReInit(Xn_inner.Dim() + Xn_outer.Dim());
         for (sctl::Long ind=0; ind<X_inner.Dim(); ind++) {
-            X[ind] = X_inner[ind];
-            Xn[ind] = Xn_inner[ind];
+            (*X)[ind] = X_inner[ind];
+            (*Xn)[ind] = Xn_inner[ind];
         }
         sctl::Long offset = X_inner.Dim();
         for (sctl::Long ind=0; ind<X_outer.Dim(); ind++) {
-            X[ind+offset] = X_outer[ind];
-            Xn[ind+offset] = Xn_outer[ind];
+            (*X)[ind+offset] = X_outer[ind];
+            (*Xn)[ind+offset] = Xn_outer[ind];
         }
     } else {
         // no need to return Xn
-        X.ReInit(X_inner.Dim() + X_outer.Dim());
+        X->ReInit(X_inner.Dim() + X_outer.Dim());
         for (sctl::Long ind=0; ind<X_inner.Dim(); ind++) {
-            X[ind] = X_inner[ind];
+            (*X)[ind] = X_inner[ind];
         }
         sctl::Long offset = X_inner.Dim();
         for (sctl::Long ind=0; ind<X_outer.Dim(); ind++) {
-            X[ind+offset] = X_outer[ind];
+            (*X)[ind+offset] = X_outer[ind];
         }
     }
     

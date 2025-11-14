@@ -17,7 +17,7 @@ TEST_CASE(test_centerline)
     Xc[6] = 0.6699905218;
     Xc[9] = 0.9305681558;
     // GL from code
-    sctl::Vector<Real> Xc_code = GlymphBIE::Annular<Real>::GetCenterLine(Nelem, ElemOrder);
+    sctl::Vector<Real> Xc_code = Annular<Real>::GetCenterLine(Nelem, ElemOrder);
     SCTL_ASSERT(Xc.Dim() == Xc_code.Dim());
     for (sctl::Long ind=0; ind<Xc.Dim(); ind++) {
         ASSERT_NEAR(Xc[ind], Xc_code[ind], 1e-8);
@@ -50,7 +50,7 @@ TEST_CASE(test_centerline)
 //     sctl::Vector<Real> r2(ElemOrder);
 //     r2 = 0.5;
 
-//     GlymphBIE::Annular<Real> straight(Xc,Xc,r1,r2);
+//     Annular<Real> straight(Xc,Xc,r1,r2);
 //     straight.Setup(Nelem, ElemOrder, FourierOrder); // TODO: there are some std::cout comments here, should also check. E.g. here "cursory check ..." should print. 
 //     sctl::Vector<Real> X_inner, X_outer, X_all, Xn_all;
 //     straight.GetInnerCoord(X_inner);
