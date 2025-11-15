@@ -18,8 +18,8 @@ template <class Real> class Annular {
         std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_);
         std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_); // TODO: Compute aspect ratio in inner setup since this will be the most limiting factor
         std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_);
-        void GetInnerCoord(sctl::Vector<Real>* X_out);
-        void GetOuterCoord(sctl::Vector<Real>* X_out);
+        void GetInnerCoord(sctl::Vector<Real>* X_out, sctl::Vector<Real>* Xn_out);
+        void GetOuterCoord(sctl::Vector<Real>* X_out, sctl::Vector<Real>* Xn_out);
         void GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn); // TODO: enable comm support later.
         static sctl::Vector<Real> GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_);
         Real GetMinRadius();
@@ -32,8 +32,8 @@ template <class Real> class Annular {
 
     private:
         sctl::Vector<Real> Xc_inner, Xc_outer, r_inner, r_outer; // input values
-        sctl::Vector<Real> X_inner, X_outer, Xn_inner, Xn_outer; // computed values from CSBQ
-        Real min_radius; // computed value
+        sctl::Vector<Real> X_inner, X_outer, Xn_inner, Xn_outer; // computed values from CSBQ; NOTE: Normal points into fluid.
+        Real min_radius = 0.; // computed value
         sctl::Long Nelem_inner, Nelem_outer, ElemOrder_inner, ElemOrder_outer, FourierOrder_inner, FourierOrder_outer; 
 
         sctl::SlenderElemList<Real> elem_lst_outer, elem_lst_inner;
@@ -41,7 +41,6 @@ template <class Real> class Annular {
         bool SetupInner_bool = false;
         bool SetupOuter_bool = false;
 
-        bool CheckCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const bool check_inner);
         void InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> src_r, const sctl::Vector<Real> src_x, const sctl::Vector<Real> trg_x);
 };
 
