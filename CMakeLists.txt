@@ -203,6 +203,7 @@ endif()
 # )
 set(GLYMPHBIE_SOURCES
     "src/Annular.cpp"
+    "src/Particle.cpp"
 )
 
 add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES})

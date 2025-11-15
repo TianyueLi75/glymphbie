@@ -60,4 +60,26 @@ class Annular {
 Annular --> SlenderBodyElem
 
 
+'' Particle class
+class Particle {
+    - X
+    - dt
+    - T
+    - Nt
+    - cur_tstep
+
+    constructor()
+    desctructor()
+
+    SetParticleCoord()
+    SetTime()
+    EvolveInTime()
+    - Euler_step()
+    - RK4_step()
+    - ResolveCollision1()
+    - ResolveCollision2()
+
+}
+
+
 @enduml
