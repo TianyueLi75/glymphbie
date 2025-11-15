@@ -249,5 +249,47 @@ Real Annular<Real>::GetMinRadius() {
     return min_radius;
 }
 
+template <class Real>
+sctl::Vector<sctl::Long> Annular<Real>::InDomain(sctl::Vector<Real> X_) {
+    sctl::Long Nnodes = X_.Dim()/3;
+    sctl::Vector<sctl::Long> in_domain(Nnodes);
+    for (sctl::Long nd = 0; nd < Nnodes; nd++) {
+        const Real x = X_[nd*3+0];
+        const Real y = X_[nd*3+1];
+        const Real z = X_[nd*3+2];
+        if (x < Xc_inner[0] || x < Xc_outer[0] || x > Xc_inner[Xc_inner.Dim()-1] || x > Xc_outer[Xc_outer.Dim()-1]) {
+            // x value already out of channel, don't consider.
+            in_domain[nd] = 0;
+        } else {
+            const auto search_panel = [](Real x, sctl::Long Nelem_, sctl::Long ElemOrder_, sctl::Vector<Real> Xc_) {
+                for (sctl::Long ind=0; ind<Nelem_; ind++) {
+                    if (x < Xc_[(ind+1)*ElemOrder_*3 - 3]) {
+                        // x smaller than right end of this interval, return element index.
+                        return ind; 
+                    }
+                }
+                std::cout << "Did not find panel, something went wrong." << std::endl;
+            };
+            // find panel x belongs to
+            sctl::Long x_inner_ind = search_panel(x, Nelem_inner, ElemOrder_inner, Xc_inner);
+            sctl::Long x_outer_ind = search_panel(x, Nelem_outer, ElemOrder_outer, Xc_outer);
+            // interpolate r to this x value
+            sctl::Vector<Real> r_inner_interp(1);
+            sctl::Vector<Real> src_r(ElemOrder_inner, (sctl::Iterator<Real>)r_inner.begin()+x_inner_ind*ElemOrder_inner, false);
+            sctl::Vector<Real> src_x(ElemOrder_inner*3, (sctl::Iterator<Real>)Xc_inner.begin() + x_inner_ind*ElemOrder_inner*3, false);
+            sctl::Vector<Real> trg_x(3, (sctl::Iterator<Real>)X_.begin() + 3*nd, false);
+            InterpR(r_inner_interp, src_r, src_x, trg_x);
+            
+            sctl::Vector<Real> r_outer_interp(1);
+            sctl::Vector<Real> src_r2(ElemOrder_outer, (sctl::Iterator<Real>)r_outer.begin()+x_outer_ind*ElemOrder_outer, false);
+            sctl::Vector<Real> src_x2(ElemOrder_outer*3, (sctl::Iterator<Real>)Xc_outer.begin() + x_outer_ind*ElemOrder_outer*3, false);
+            InterpR(r_outer_interp, src_r2, src_x2, trg_x);
+            // compare r^2 with (y^2+z^2)
+            in_domain[nd] = ((r_outer_interp[0]*r_outer_interp[0] - y*y - z*z) > 1e-5) && (y*y + z*z - (r_inner_interp[0]*r_inner_interp[0]) > 1e-5);
+        }
+    }
+    return in_domain;
+}
+
 template class Annular<float>;
 template class Annular<double>;

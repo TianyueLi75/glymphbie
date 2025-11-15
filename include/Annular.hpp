@@ -23,6 +23,7 @@ template <class Real> class Annular {
         void GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn); // TODO: enable comm support later.
         static sctl::Vector<Real> GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_);
         Real GetMinRadius();
+        sctl::Vector<sctl::Long> InDomain(sctl::Vector<Real> X_); // given a vector of x positions, return which nodes are in bewteen outer and inner channels V.S. not.
 
         // TODO: add read/write and plotting support
 
