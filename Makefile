@@ -5,8 +5,8 @@ include $(PVFMM_DIR)/MakeVariables
 
 # Directories for SCTL includes and quadrature tables
 SCTL_INCLUDE_DIR ?= $(PVFMM_DIR)/SCTL/include
-CSBQ_INCLUDE_DIR ?= ./extern/CSBQ/include
-SCTL_DATA_PATH ?= ./extern/CSBQ/data
+CSBQ_INCLUDE_DIR ?= ./extern/csbq/include
+SCTL_DATA_PATH ?= ./extern/csbq/data
 
 # Compiler settings
 CXX = $(CXX_PVFMM) # Requires g++-9 or newer, icpc (with gcc compatibility 7.5 or newer), or clang++ with llvm-10 or newer
@@ -75,17 +75,23 @@ RM = rm -f
 MKDIRS = mkdir -p
 
 # Directories for binaries, objects, includes, tests
-BINDIR = ./bin
-OBJDIR = ./obj
+BINDIR = ./build/bin
+OBJDIR = ./build/obj
 INCDIR = ./include
-TESTDIR = ./test
+SRCDIR = ./src
+TESTDIR = ./tests
 
 TEST_BIN = \
-    $(BINDIR)/test \
-    $(BINDIR)/test1
+    $(BINDIR)/Annular_tests  \
+    $(BINDIR)/StokesBIO_tests
+
+SRC_BIN = \
+    $(BINDIR)/Annular  \
+    $(BINDIR)/StokesBIO
 
 # Test target: build all test binaries
 test: $(TEST_BIN)
+src: $(SRC_BIN)
 
 # Rules for building binaries
 $(BINDIR)/%: $(OBJDIR)/%.o
@@ -94,6 +100,11 @@ $(BINDIR)/%: $(OBJDIR)/%.o
 ifeq "$(OS)" "Darwin"
 	/usr/bin/dsymutil $@ -o $@.dSYM
 endif
+
+# Rules for compiling all source files
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	-@$(MKDIRS) $(dir $@)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -I$(SCTL_INCLUDE_DIR) -I$(CSBQ_INCLUDE_DIR) -c $^ -o $@
 
 # Rules for compiling test source files
 $(OBJDIR)/%.o: $(TESTDIR)/%.cpp
