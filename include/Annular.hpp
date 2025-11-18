@@ -1,7 +1,8 @@
 #ifndef _ANNULAR_HPP_
 #define _ANNULAR_HPP_
 
-#include <csbq.hpp>
+#include "csbq.hpp"
+// #include <slender_element.hpp>
 
 template <class Real> class Annular {
 
@@ -44,7 +45,6 @@ template <class Real> class Annular {
 
         void InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> src_r, const sctl::Vector<Real> src_x, const sctl::Vector<Real> trg_x);
 };
-
 
 
 

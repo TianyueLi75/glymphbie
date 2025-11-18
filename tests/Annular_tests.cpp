@@ -89,35 +89,35 @@ TEST_CASE(straight_getnodes)
     SCTL_ASSERT(X_all.Dim() == X_inner.Dim() + X_outer.Dim());
     SCTL_ASSERT(Xn_all.Dim() == Xn_inner.Dim() + Xn_outer.Dim());
     
-    std::cout << "file inner" << std::endl;
+    // std::cout << "file inner" << std::endl;
     for (int i=0; i<X_file_inner.Dim(); i++) {
         if (i < X_inner.Dim()) {
             ASSERT_NEAR(X_inner[i], X_file_inner[i], 1e-6);
         } else {
             sctl::Long in = i - X_inner.Dim();
-            std::cout << "Xn value is " << Xn_inner[in] << ", from file is " << X_file_inner[i] << std::endl;
+            // std::cout << "Xn value is " << Xn_inner[in] << ", from file is " << X_file_inner[i] << std::endl;
             ASSERT_NEAR(Xn_inner[in], X_file_inner[i], 1e-6);
         }
     }
-    std::cout << "file outer" << std::endl;
+    // std::cout << "file outer" << std::endl;
     for (int i=0; i<X_file_outer.Dim(); i++) {
         if (i < X_outer.Dim()) {
-            std::cout << "X value is " << X_outer[i] << ", from file is " << X_file_outer[i] << std::endl;
+            // std::cout << "X value is " << X_outer[i] << ", from file is " << X_file_outer[i] << std::endl;
             ASSERT_NEAR(X_outer[i], X_file_outer[i], 1e-6);
         } else {
             sctl::Long in = i - X_outer.Dim();
-            std::cout << "Xn value is " << Xn_outer[in] << ", from file is " << X_file_outer[i] << std::endl;
+            // std::cout << "Xn value is " << Xn_outer[in] << ", from file is " << X_file_outer[i] << std::endl;
             ASSERT_NEAR(Xn_outer[in], X_file_outer[i], 1e-6);
         }
     }
-    std::cout << "file all" << std::endl;
+    // std::cout << "file all" << std::endl;
     for (int i=0; i<X_file_all.Dim(); i++) {
         if (i < X_all.Dim()) {
-            std::cout << "X value is " << X_all[i] << ", from file is " << X_file_all[i] << std::endl;
+            // std::cout << "X value is " << X_all[i] << ", from file is " << X_file_all[i] << std::endl;
             ASSERT_NEAR(X_all[i], X_file_all[i], 1e-6);
         } else {
             sctl::Long in = i - X_all.Dim();
-            std::cout << "X value is " << Xn_all[in] << ", from file is " << X_file_all[i] << std::endl;
+            // std::cout << "X value is " << Xn_all[in] << ", from file is " << X_file_all[i] << std::endl;
             ASSERT_NEAR(Xn_all[in], X_file_all[i], 1e-6);
         }
     }

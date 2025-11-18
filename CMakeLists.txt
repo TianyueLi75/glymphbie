@@ -1,3 +1,10 @@
+# # # NOTE: Nov 17 night version that allows to compile sources and tests without multiple definition error
+# # #       requires removing utils.cpp from csbq.hpp to avoid those functions, which should all be for csbq tests -- not used by sctl, pvfmm, stokesbio, or slender_elem. 
+# # #       TODO: should be able to remove mobility.hpp as well.
+# # #       TODO: how to make this self-contained in this project? Fork from CSBQ? include only slender_body.hpp somehow? make a new csbq2.hpp in this directory then point to slender_body.hpp there?
+# # #       Tests passed as before -- slender_body does not seem to have issues.
+# # #       TODO: tests a lot slower, could be login node issue, or compiled something wrong..
+
 cmake_minimum_required(VERSION 3.16)
 
 project(GlymphBIE VERSION 0.1.0 LANGUAGES CXX)
@@ -28,7 +35,7 @@ set(CMAKE_CXX_COMPILER mpic++)
 # -------------------------------
 #  User options
 # -------------------------------
-option(DEBUG "Enable debug build with sanitizers" ON)
+option(DEBUG "Enable debug build with sanitizers" OFF)
 option(ENABLE_BLAS "Enable BLAS support" ON)
 option(ENABLE_LAPACK "Enable LAPACK support" ON)
 option(ENABLE_FFTW "Enable FFTW (double) support" ON)
@@ -55,6 +62,9 @@ set_target_properties(pvfmm PROPERTIES
     IMPORTED_LOCATION "${PVFMM_LIB}"
     INTERFACE_INCLUDE_DIRECTORIES "${PVFMM_INC_DIR};${SCTL_INCLUDE_DIR}"
 )
+
+add_library(csbq INTERFACE)
+
 
 # -------------------------------
 # Extra libraries from MakeVariables
@@ -106,6 +116,9 @@ target_include_directories(pvfmm INTERFACE
     ${PVFMM_INC_DIR}
     ${SCTL_INCLUDE_DIR}
 )
+target_include_directories(csbq INTERFACE
+    ${CSBQ_INCLUDE_DIR}
+)
 
 # -------------------------------
 # SCTL / PVFMM Base Defines
@@ -138,8 +151,8 @@ macro(GLYMPHBIE_add_cxx_compiler_flag FLAG)
 endmacro()
 
 # Set warning flags
-GLYMPHBIE_add_cxx_compiler_flag("-Wall")
-GLYMPHBIE_add_cxx_compiler_flag("-Wfloat-conversion")
+# GLYMPHBIE_add_cxx_compiler_flag("-Wall")
+# GLYMPHBIE_add_cxx_compiler_flag("-Wfloat-conversion")
 
 # -------------------------------
 # OpenMP
@@ -175,7 +188,6 @@ if(DEBUG)
     endforeach()
 
     add_compile_definitions(SCTL_MEMDEBUG)
-
 else()
     GLYMPHBIE_add_cxx_compiler_flag("-O3")
     GLYMPHBIE_add_cxx_compiler_flag("-march=native")
@@ -198,11 +210,12 @@ endif()
 # set(GLYMPHBIE_SOURCES
 #   "src/Annular.cpp"
 #   "src/Particle.cpp"
-#   "src/SpatialSolver.cpp"
+#   "src/StokesBIO.cpp"
 #   "src/Wall.cpp"
 # )
 set(GLYMPHBIE_SOURCES
     "src/Annular.cpp"
+    "src/StokesBIO.cpp"
 )
 
 add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES})
@@ -211,35 +224,20 @@ target_include_directories(GLYMPHBIE
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-    ${PVFMM_INC_DIR}
-    ${CSBQ_INCLUDE_DIR}
-    ${MPI_INCLUDE_PATH}
-    ${SCTL_INCLUDE_DIR}
 )
 target_link_libraries(GLYMPHBIE PRIVATE
+    csbq
     pvfmm
     ${EXTRA_LIBS}
 )
 
 # -------------------------------
-#  Include + Library paths
-# -------------------------------
-# target_include_directories(GLYMPHBIE PUBLIC
-#     ${MPI_LIBRARIES}
-#     ${SCTL_INCLUDE_DIR}
-#     ${CSBQ_INCLUDE_DIR}
-#     ${PVFMM_INC_DIR}
-# )
-
-# -------------------------------
 #  Source discovery, build tests
 # -------------------------------
-# file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
-#     "${CMAKE_SOURCE_DIR}/tests/*.cpp"
-# )
 # Set target test files manually
 set(TEST_SOURCES
     "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/StokesBIO_tests.cpp"
 )
 
 foreach(src ${TEST_SOURCES})
@@ -247,8 +245,8 @@ foreach(src ${TEST_SOURCES})
     add_executable(${name} ${src})
 
     target_link_libraries(${name} PRIVATE
-        ${MPI_INCLUDE_PATH}
         GLYMPHBIE
+        csbq
         pvfmm
         ${EXTRA_LIBS}
     )

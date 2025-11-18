@@ -3,7 +3,9 @@
 
 #include "Annular.hpp"
 #include "Particle.hpp"
-#include "SpatialSolver.hpp"
+#include "StokesBIO.hpp"
 #include "Wall.hpp"
+
+#include <csbq.hpp>
 
 #endif
