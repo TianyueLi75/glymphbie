@@ -30,6 +30,45 @@ class BoundaryIntegralOp {
     void ComputePotential()
 }
 
+class GMRES {
+    constructor()
+    operator()
+}
+GMRES ..> KrylovPrecond
+
+class KrylovPrecond {
+    constructor()
+    sctl::Long Size()
+    sctl::Long Rank() 
+    void Append()
+    void Apply()
+}
+
+class StokesBIO {
+    - ker_FxU
+    - ker_DxU
+    - comm
+    - SL_scal_
+    - DL_scal_
+    - LayerPotenSL
+    - LayerPotenDL
+
+    constructor()
+    destructor()
+    void SetAccuracy()
+    void AddElemList()
+    void SetPeriodicity()
+    void SetTargetCoord()
+    void SetTargetNormal()
+    long Dim()
+    void Setup()
+    void ClearSetup()
+
+    void ComputePotential()
+}
+
+StokesBIO --> BoundaryIntegralOp
+
 class Annular {
     - Xc_inner
     - Xc_outer

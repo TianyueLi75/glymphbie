@@ -1,3 +1,10 @@
+# # # NOTE: Nov 17 night version that allows to compile sources and tests without multiple definition error
+# # #       requires removing utils.cpp from csbq.hpp to avoid those functions, which should all be for csbq tests -- not used by sctl, pvfmm, stokesbio, or slender_elem. 
+# # #       TODO: should be able to remove mobility.hpp as well.
+# # #       TODO: how to make this self-contained in this project? Fork from CSBQ? include only slender_body.hpp somehow? make a new csbq2.hpp in this directory then point to slender_body.hpp there?
+# # #       Tests passed as before -- slender_body does not seem to have issues.
+# # #       TODO: tests a lot slower, could be login node issue, or compiled something wrong..
+
 cmake_minimum_required(VERSION 3.16)
 
 project(GlymphBIE VERSION 0.1.0 LANGUAGES CXX)
@@ -22,45 +29,102 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Set module path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Check that the compiler supports the C++ standard
-set(GLYMPHBIE_MIN_GCC_VERSION 8.0)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${GLYMPHBIE_MIN_GCC_VERSION})
-    message(FATAL_ERROR "GCC version must be at least ${GLYMPHBIE_MIN_GCC_VERSION}")
-  endif()
-else()
-  message(WARNING 
-          "You are using an unsupported compiler! "
-          "Please use GCC >= ${GLYMPHBIE_MIN_GCC_VERSION}")
-endif()
+# Use mpic++ for compiling
+set(CMAKE_CXX_COMPILER mpic++)
 
 # -------------------------------
 #  User options
 # -------------------------------
 option(DEBUG "Enable debug build with sanitizers" OFF)
-option(ENABLE_BLAS "Enable BLAS support" OFF)
-option(ENABLE_LAPACK "Enable LAPACK support" OFF)
-option(ENABLE_FFTW "Enable FFTW (double) support" OFF)
-option(ENABLE_FFTWF "Enable FFTW (float) support" OFF)
+option(ENABLE_BLAS "Enable BLAS support" ON)
+option(ENABLE_LAPACK "Enable LAPACK support" ON)
+option(ENABLE_FFTW "Enable FFTW (double) support" ON)
+option(ENABLE_FFTWF "Enable FFTW (float) support" ON)
 option(ENABLE_FFTWL "Enable FFTW (long double) support" OFF)
 
 # Paths
 set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm" CACHE PATH "")
 set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include"         CACHE PATH "")
-set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/CSBQ/include" CACHE PATH "")
-set(SCTL_DATA_PATH   "${CMAKE_SOURCE_DIR}/extern/CSBQ/data"    CACHE PATH "")
+set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include" CACHE PATH "")
+set(SCTL_DATA_PATH   "${CMAKE_SOURCE_DIR}/extern/csbq/data"    CACHE PATH "")
 
 set(PVFMM_INC_DIR "${PVFMM_DIR}/include")
 set(PVFMM_LIB_DIR "${PVFMM_DIR}/lib/.libs")
+set(PVFMM_LIB "${PVFMM_LIB_DIR}/libpvfmm.so")
+
+# Check that PVFMM library exists
+if(NOT EXISTS "${PVFMM_LIB}")
+    message(FATAL_ERROR "PVFMM library not found at ${PVFMM_LIB}. Build PVFMM first.")
+endif()
+
+add_library(pvfmm SHARED IMPORTED)
+set_target_properties(pvfmm PROPERTIES
+    IMPORTED_LOCATION "${PVFMM_LIB}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PVFMM_INC_DIR};${SCTL_INCLUDE_DIR}"
+)
+
+add_library(csbq INTERFACE)
+
+
+# -------------------------------
+# Extra libraries from MakeVariables
+# -------------------------------
+# FFTW + MKL
+set(PVFMM_FFTW_LIBS
+    mkl_intel_thread
+    mkl_core
+    iomp5
+    pthread
+)
+# BLAS + LAPACK
+set(PVFMM_BLAS_LAPACK_LIBS
+    mkl_intel_lp64
+    mkl_sequential
+    mkl_core
+    pthread
+    dl
+    stdc++
+    gfortran
+    m
+    quadmath
+)
+# X11 (if needed)
+set(PVFMM_X_LIBS X11)
+
+# Combine all libraries in the order of MakeVariables
+set(PVFMM_DEP_LIBS
+    ${PVFMM_LIB}            # PVFMM itself
+    ${PVFMM_FFTW_LIBS}      # FFTW / MKL
+    ${PVFMM_BLAS_LAPACK_LIBS} # BLAS/LAPACK
+    ${PVFMM_X_LIBS}         # X11
+)
+
+target_link_libraries(pvfmm INTERFACE 
+    ${PVFMM_DEP_LIBS}
+)
+
+target_compile_definitions(pvfmm INTERFACE
+    SCTL_HAVE_PVFMM
+    SCTL_HAVE_BLAS
+    SCTL_HAVE_LAPACK
+    SCTL_HAVE_FFTW
+    SCTL_PROFILE=5
+    SCTL_VERBOSE
+)
+
+target_include_directories(pvfmm INTERFACE
+    ${PVFMM_INC_DIR}
+    ${SCTL_INCLUDE_DIR}
+)
+target_include_directories(csbq INTERFACE
+    ${CSBQ_INCLUDE_DIR}
+)
 
 # -------------------------------
 # SCTL / PVFMM Base Defines
 # -------------------------------
 add_compile_definitions(
-    SCTL_PROFILE=5
-    SCTL_VERBOSE
     SCTL_HAVE_MPI
-    SCTL_HAVE_PVFMM
     SCTL_DATA_PATH="${SCTL_DATA_PATH}"
     SCTL_QUAD_T=__float128
 )
@@ -87,25 +151,8 @@ macro(GLYMPHBIE_add_cxx_compiler_flag FLAG)
 endmacro()
 
 # Set warning flags
-GLYMPHBIE_add_cxx_compiler_flag("-Wall")
-GLYMPHBIE_add_cxx_compiler_flag("-Wextra")
-GLYMPHBIE_add_cxx_compiler_flag("-Wcast-align")
-GLYMPHBIE_add_cxx_compiler_flag("-Wcast-qual")
-GLYMPHBIE_add_cxx_compiler_flag("-Wdouble-promotion")
-GLYMPHBIE_add_cxx_compiler_flag("-Wfloat-equal")
-GLYMPHBIE_add_cxx_compiler_flag("-Wimplicit-fallthrough")
-GLYMPHBIE_add_cxx_compiler_flag("-Wnon-virtual-dtor")
-GLYMPHBIE_add_cxx_compiler_flag("-Wshadow")
-GLYMPHBIE_add_cxx_compiler_flag("-Wunused")
-GLYMPHBIE_add_cxx_compiler_flag("-Wvla")
-GLYMPHBIE_add_cxx_compiler_flag("-Wzero-as-null-pointer-constant")
-GLYMPHBIE_add_cxx_compiler_flag("-Wunreachable-code")
-GLYMPHBIE_add_cxx_compiler_flag("-Wmissing-noreturn")
-GLYMPHBIE_add_cxx_compiler_flag("-Wtautological-compare")
-GLYMPHBIE_add_cxx_compiler_flag("-Wundef")
-GLYMPHBIE_add_cxx_compiler_flag("-Werror")
-GLYMPHBIE_add_cxx_compiler_flag("-Wold-style-cast")
-GLYMPHBIE_add_cxx_compiler_flag("-pedantic")
+# GLYMPHBIE_add_cxx_compiler_flag("-Wall")
+# GLYMPHBIE_add_cxx_compiler_flag("-Wfloat-conversion")
 
 # -------------------------------
 # OpenMP
@@ -141,7 +188,6 @@ if(DEBUG)
     endforeach()
 
     add_compile_definitions(SCTL_MEMDEBUG)
-
 else()
     GLYMPHBIE_add_cxx_compiler_flag("-O3")
     GLYMPHBIE_add_cxx_compiler_flag("-march=native")
@@ -156,81 +202,6 @@ else()
     GLYMPHBIE_add_cxx_compiler_flag("-gdwarf-4")
 endif()
 
-# ------------------------------------------------------
-# BLAS
-# ------------------------------------------------------
-if(ENABLE_BLAS)
-    find_package(BLAS REQUIRED)
-
-    if(BLAS_FOUND)
-        message(STATUS "BLAS found: ${BLAS_LIBRARIES}")
-        add_compile_definitions(SCTL_HAVE_BLAS)
-        list(APPEND EXTRA_LIBS ${BLAS_LIBRARIES})
-    else()
-        message(FATAL_ERROR "BLAS requested but not found")
-    endif()
-endif()
-
-# ------------------------------------------------------
-# LAPACK
-# ------------------------------------------------------
-if(ENABLE_LAPACK)
-    find_package(LAPACK REQUIRED)
-
-    if(LAPACK_FOUND)
-        message(STATUS "LAPACK found: ${LAPACK_LIBRARIES}")
-        add_compile_definitions(SCTL_HAVE_LAPACK)
-        list(APPEND EXTRA_LIBS ${LAPACK_LIBRARIES})
-    else()
-        message(FATAL_ERROR "LAPACK requested but not found")
-    endif()
-endif()
-
-# ------------------------------------------------------
-# FFTW (double)
-# ------------------------------------------------------
-if(ENABLE_FFTW)
-    find_package(FFTW3 REQUIRED COMPONENTS DOUBLE)
-
-    if(FFTW3_FOUND)
-        message(STATUS "Found FFTW (double): ${FFTW3_LIBRARIES}")
-        add_compile_definitions(SCTL_HAVE_FFTW)
-        list(APPEND EXTRA_LIBS ${FFTW3_LIBRARIES})
-    else()
-        message(FATAL_ERROR "FFTW (double) requested but not found")
-    endif()
-endif()
-
-# ------------------------------------------------------
-# FFTWF (float)
-# ------------------------------------------------------
-if(ENABLE_FFTWF)
-    find_package(FFTW3f REQUIRED)
-
-    if(FFTW3F_FOUND)
-        message(STATUS "Found FFTWF (float): ${FFTW3F_LIBRARIES}")
-        add_compile_definitions(SCTL_HAVE_FFTWF)
-        list(APPEND EXTRA_LIBS ${FFTW3F_LIBRARIES})
-    else()
-        message(FATAL_ERROR "FFTWf (float) requested but not found")
-    endif()
-endif()
-
-# ------------------------------------------------------
-# FFTWL (long double)
-# ------------------------------------------------------
-if(ENABLE_FFTWL)
-    find_package(FFTW3l REQUIRED)
-
-    if(FFTW3L_FOUND)
-        message(STATUS "Found FFTWl (long double): ${FFTW3L_LIBRARIES}")
-        add_compile_definitions(SCTL_HAVE_FFTWL)
-        list(APPEND EXTRA_LIBS ${FFTW3L_LIBRARIES})
-    else()
-        message(FATAL_ERROR "FFTWl (long double) requested but not found")
-    endif()
-endif()
-
 #===============================================================================
 # Create the library
 #===============================================================================
@@ -239,11 +210,12 @@ endif()
 # set(GLYMPHBIE_SOURCES
 #   "src/Annular.cpp"
 #   "src/Particle.cpp"
-#   "src/SpatialSolver.cpp"
+#   "src/StokesBIO.cpp"
 #   "src/Wall.cpp"
 # )
 set(GLYMPHBIE_SOURCES
     "src/Annular.cpp"
+    "src/StokesBIO.cpp"
 )
 
 add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES})
@@ -253,31 +225,29 @@ target_include_directories(GLYMPHBIE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-
-# -------------------------------
-#  Include + Library paths
-# -------------------------------
-target_include_directories(GLYMPHBIE PUBLIC
-    ${SCTL_INCLUDE_DIR}
-    ${CSBQ_INCLUDE_DIR}
-    ${PVFMM_INC_DIR}
+target_link_libraries(GLYMPHBIE PRIVATE
+    csbq
+    pvfmm
+    ${EXTRA_LIBS}
 )
-
-target_link_directories(GLYMPHBIE PRIVATE ${PVFMM_LIB_DIR})
-target_link_libraries(GLYMPHBIE PRIVATE pvfmm)
 
 # -------------------------------
 #  Source discovery, build tests
 # -------------------------------
-file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_SOURCE_DIR}/tests/*.cpp"
+# Set target test files manually
+set(TEST_SOURCES
+    "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/StokesBIO_tests.cpp"
 )
 
 foreach(src ${TEST_SOURCES})
     get_filename_component(name ${src} NAME_WE)
     add_executable(${name} ${src})
 
-    target_link_libraries(${name} PRIVATE GLYMPHBIE
+    target_link_libraries(${name} PRIVATE
+        GLYMPHBIE
+        csbq
+        pvfmm
         ${EXTRA_LIBS}
     )
 
