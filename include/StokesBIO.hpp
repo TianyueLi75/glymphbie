@@ -1,8 +1,9 @@
 #ifndef _STOKESBIO_HPP_
 #define _STOKESBIO_HPP_
 
-#include "csbq.hpp"
-// #include <slender_element.hpp>
+// #include "csbq.hpp"
+#include "csbq/slender_element.hpp"
+#include "csbq/slender_element.cpp"
 
 // StokesBIE by Dhairya Malhotra, 2025: 
 // https://github.com/dmalhotra/stokes-periodize
