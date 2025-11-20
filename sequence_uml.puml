@@ -1,0 +1,55 @@
+@startuml sequence_diagram
+
+participant Wall
+participant Annular
+participant StokesBIO
+participant GMRES
+participant Particle
+
+participant Environment
+activate Environment
+Environment -> Wall : Init()
+activate Wall
+
+Wall -> Wall : GetTimeSeries()
+
+Wall --> Environment : Xc, r, drdx
+
+Environment -> Annular : Annular(Xc, r, drdx)
+activate Annular
+
+group One Time Step 
+
+    Annular -> Annular : Setup()
+
+    Annular --> Environment : Xc_updated, r_updated, drdx_updated
+    Environment --> Wall : Xc_updated, r_updated, drdx_updated
+
+    Environment -> Annular : GetMinRadius()
+    Annular --> Environment : aspect_ratio
+    Environment -> StokesBIO : StokesBIO(aspect_ratio)
+    activate StokesBIO
+
+    Environment -> Annular : GetElemLists(), GetNodeCoord()
+    Annular --> Environment : elem_lst, X
+    Environment -> StokesBIO : AddElemList(elem_lst), SetTargetCoord(X)
+
+    activate GMRES
+
+    Environment -> Annular : GetVslip()
+    Annular --> Environment : vslip
+    Environment -> GMRES : Operator()(StokesBIO, vslip)
+    GMRES --> Environment : x (density)
+
+    activate Particle
+    Environment -> Particle : GetPositions()
+    Particle --> Environment : Xp
+    Environment -> StokesBIO : ComputePotential(Xp, x)
+    StokesBIO --> Environment : u (velocity at Xp)
+    Environment -> Particle : EvolveTime()
+    Particle -> Particle : TimeStep()
+    Particle -> Particle : ResolveCollision()
+
+end
+
+@enduml

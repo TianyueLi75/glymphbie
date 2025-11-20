@@ -1,9 +1,3 @@
-# # # NOTE: Nov 17 night version that allows to compile sources and tests without multiple definition error
-# # #       requires removing utils.cpp from csbq.hpp to avoid those functions, which should all be for csbq tests -- not used by sctl, pvfmm, stokesbio, or slender_elem. 
-# # #       TODO: should be able to remove mobility.hpp as well.
-# # #       TODO: how to make this self-contained in this project? Fork from CSBQ? include only slender_body.hpp somehow? make a new csbq2.hpp in this directory then point to slender_body.hpp there?
-# # #       Tests passed as before -- slender_body does not seem to have issues.
-# # #       TODO: tests a lot slower, could be login node issue, or compiled something wrong..
 
 cmake_minimum_required(VERSION 3.16)
 

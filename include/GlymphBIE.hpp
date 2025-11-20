@@ -6,6 +6,7 @@
 #include "StokesBIO.hpp"
 #include "Wall.hpp"
 
-#include <csbq.hpp>
+#include "csbq/slender_element.hpp"
+#include "csbq/slender_element.cpp"
 
 #endif

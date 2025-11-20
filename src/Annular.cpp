@@ -41,75 +41,126 @@ void Annular<Real>::SetOuterR(const sctl::Vector<Real> r_in) {
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, sctl::Vector<Real> drdx_outer_, bool force_setup) {
+    if (force_setup) {
+        SetupInner_bool = false;
+        SetupOuter_bool = false;
+    }
     if (SetupInner_bool && SetupOuter_bool) {
         // Have already Setup() before, only redo setup if Nelem, ElemOrder, or FourierOrder are different
         if (Nelem_==Nelem_inner && Nelem_==Nelem_outer && ElemOrder_==ElemOrder_inner && ElemOrder_==ElemOrder_outer && FourierOrder_==FourierOrder_inner && FourierOrder_== FourierOrder_outer) {
             std::cout << "Already set up with the same parameters, nothing done." << std::endl;
-            return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer);
+            return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer, drdx_inner_, drdx_outer);
         }
     }
-    sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated;
+    sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated;
     if (SetupInner_bool) {
         // Inner set up, outer not
         std::cout << "Inner is setup, setting up outer now."<<std::endl;
-        auto [Xc_outer_updated, r_outer_updated] = SetupOuter(Nelem_, ElemOrder_, FourierOrder_);
+        std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_);
         Xc_inner_updated = Xc_inner;
         r_inner_updated = r_inner;
+        drdx_inner_updated = drdx_inner;
     } else if (SetupOuter_bool) {
         // Outer set up, inner not
-        std::cout << "OUter is setup, setting up inner now." << std::endl;
-        auto [Xc_inner_updated, r_inner_updated] = SetupInner(Nelem_, ElemOrder_, FourierOrder_);
+        std::cout << "Outer is setup, setting up inner now." << std::endl;
+        std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_);
         Xc_outer_updated = Xc_outer;
         r_outer_updated = r_outer;
+        drdx_outer_updated = drdx_outer;
     } else {
         // Neither is set up
         std::cout << "neither is setup." << std::endl;
-        auto [Xc_inner_updated, r_inner_updated] = SetupInner(Nelem_, ElemOrder_, FourierOrder_);
-        auto [Xc_outer_updated, r_outer_updated] = SetupOuter(Nelem_, ElemOrder_, FourierOrder_);
+        std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_, force_setup);
+        std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_, force_setup);
     }    
-    return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated);
+    return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated);
 }
 
+// TODO: debug -- doesn't even do linear interp correctly.
 template <class Real>
 void Annular<Real>::InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> src_r, const sctl::Vector<Real> src_x, const sctl::Vector<Real> trg_x) {
     sctl::Matrix<Real> Minterp(src_x.Dim(), trg_x.Dim());
     sctl::Vector<Real> wts(src_x.Dim()*trg_x.Dim(), (sctl::Iterator<Real>)Minterp.begin(), false);
     sctl::LagrangeInterp<Real>::Interpolate(wts, src_x, trg_x); // row-major order, Ns x Nt (stacked) so wts for all targets from first source first, from second source, etc.
     // left multiply by source value of r to get row of target r values.
-    trg_r.ReInit(trg_x.Dim());
+    // trg_r.ReInit(trg_x.Dim());
+    SCTL_ASSERT(trg_r.Dim() == trg_x.Dim());
     sctl::Matrix<Real> trg_r_mat(1, trg_r.Dim(), (sctl::Iterator<Real>)trg_r.begin(),false); 
-    sctl::Matrix<Real>::GEMM(trg_r_mat, sctl::Matrix<Real>(1,r_inner.Dim(),(sctl::Iterator<Real>)r_inner.begin(),false), Minterp);
-    // TODO: check that this assignes values to trg_r
+    sctl::Matrix<Real>::GEMM(trg_r_mat, sctl::Matrix<Real>(1,src_r.Dim(),(sctl::Iterator<Real>)src_r.begin(),false), Minterp);
+    // // DEBUG: manual multiply
+    // for (int row=0; row<trg_x.Dim(); row++) {
+    //     for (int col=0; col<src_x.Dim(); col++) {
+    //         trg_r[row] += Minterp(col,row) * src_r[col];
+    //     }
+    // }
+
+    //DEBUG
+    // std::cout << "SOURCE: " << std::endl;
+    // for (int i=0; i<src_x.Dim(); i++) {
+    //     std::cout << src_x[i] << std::endl;
+    // }
+    // std::cout << "TARGET: " << std::endl;
+    // for (int i=0; i<trg_x.Dim(); i++) {
+    //     std::cout << std::setprecision(8)<< trg_x[i] << std::endl;
+    // }
+    // std::cout << "SOURCE r: " << std::endl;
+    // for (int i=0; i<src_r.Dim(); i++) {
+    //     std::cout << src_r[i] << std::endl;
+    // }
+    // std::cout << "TARGET r: " << std::endl;
+    // for (int i=0; i<trg_r.Dim(); i++) {
+    //     std::cout <<std::setprecision(8)<< trg_r[i] << std::endl;
+    // }
+    // std::cout << "==============WEIGHTS: ============" << std::endl;
+    // for (int i=0; i<wts.Dim(); i++) {
+    //     std::cout << wts[i] << std::endl;
+    // }
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, bool force_setup) {
     if (!SetupInner_bool) {
 
         Nelem_inner = Nelem_;
         FourierOrder_inner = FourierOrder_;
         ElemOrder_inner = ElemOrder_;
 
-        sctl::Vector<Real> Xc_updated, r_updated;
-        if (Xc_inner.Dim() == Nelem_ * ElemOrder_ * 3) {
-            std::cout << "Cursory check on Xc_inner size, doesn't guarantee nodes are distributed in panel-based Cheb quadrature!" << std::endl;
+        sctl::Vector<Real> Xc_updated, r_updated, drdx_updated;
+        if (!force_setup && Xc_inner.Dim() == Nelem_ * ElemOrder_ * 3) {
             Xc_updated = Xc_inner;
             r_updated = r_inner;
+            drdx_updated = drdx_inner_;
         } else {
-            std::cout << "Xc_inner does not match expected number of nodes using panel-based quadrature; updating Xc_inner." << std::endl;
+            std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
+            // Get (approximately) x nodes from original Xc
+            sctl::Long OldOrder = Xc_inner.Dim() / 3 / Nelem_; 
+            sctl::Vector<Real> src_x(OldOrder);
+            // Get new nodes
             Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
-            // TODO: NEED TO CHANGE IN THE FUTURE, BUT FOR NOW: assume r = r(x), no y and z dependency.
-            // collect src_x and trg_x
-            sctl::Vector<Real> src_x(Xc_inner.Dim()/3);
-            sctl::Vector<Real> trg_x(Xc_updated.Dim()/3);
-            for (sctl::Long node_ind = 0; node_ind < Xc_inner.Dim()/3; node_ind++) {
-                src_x[node_ind] = Xc_inner[node_ind*3];
+            sctl::Vector<Real> trg_x(ElemOrder_);
+            r_updated.ReInit(ElemOrder_ * Nelem_);
+            drdx_updated.ReInit(ElemOrder_ * Nelem_);
+            for (sctl::Long panel_ind=0; panel_ind < Nelem_; panel_ind ++) {
+                src_x.SetZero();
+                trg_x.SetZero();
+                sctl::Vector<Real> Xc_updated_here(ElemOrder_*3, (sctl::Iterator<Real>) Xc_updated.begin() + panel_ind*ElemOrder_*3, false);
+                sctl::Vector<Real> Xc_inner_here(OldOrder*3, (sctl::Iterator<Real>) Xc_inner.begin() + panel_ind*OldOrder*3, false);
+                for (sctl::Long node_ind = 0; node_ind < OldOrder; node_ind++) {
+                    src_x[node_ind] = Xc_inner_here[node_ind*3];
+                }
+                for (sctl::Long node_ind = 0; node_ind < ElemOrder_; node_ind++) {
+                    trg_x[node_ind] = Xc_updated_here[node_ind*3];
+                }
+                sctl::Vector<Real> r_inner_here(OldOrder, (sctl::Iterator<Real>) r_inner.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> drdx_inner_here(OldOrder, (sctl::Iterator<Real>) drdx_inner_.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> r_updated_here(ElemOrder_, (sctl::Iterator<Real>) r_updated.begin() + panel_ind*ElemOrder_, false);
+                sctl::Vector<Real> drdx_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdx_updated.begin() + panel_ind*ElemOrder_, false);
+                InterpR(r_updated_here, r_inner_here, src_x, trg_x);
+                InterpR(drdx_updated_here, drdx_inner_here, src_x, trg_x);
+                // std::cout << "DEBUG interp, first entry locally in r_updated: " << r_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << r_updated_here[0] << std::endl;
+                // std::cout << "DEBUG interp, first entry locally in drdx_updated: " << drdx_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdx_updated_here[0] << std::endl;
             }
-            for (sctl::Long node_ind = 0; node_ind < Xc_updated.Dim()/3; node_ind++) {
-                trg_x[node_ind] = Xc_updated[node_ind*3];
-            }
-            InterpR(r_updated, r_inner, src_x, trg_x);
         }
         sctl::Vector<sctl::Long> ElemOrderVec(Nelem_);
         sctl::Vector<sctl::Long> FourierOrderVec(Nelem_);
@@ -121,42 +172,79 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(con
         SetupInner_bool = true;
         Xc_inner = Xc_updated;
         r_inner = r_updated;
-        min_radius = sctl::omp_par::reduce(r_inner.begin(), r_inner.Dim());
+        drdx_inner = drdx_updated;
+        // std::cout << "in setup inner, drdx_inner after setup is " << drdx_inner.Dim() << std::endl;
+        min_radius = r_inner[0];
+        for (const auto e : r_inner) min_radius = std::min<Real>(min_radius, sctl::fabs(e));
         elem_lst_inner.GetNodeCoord(&X_inner, &Xn_inner, nullptr);
     } else {
         // This clause is only for when called from user function; shouldn't be here from Setup().
         std::cout << "Note: Inner already setup, nothing done." << std::endl;
     }
-    return std::make_tuple(Xc_inner, r_inner);
+    // std::cout << "Xc inner inside SetupInner" << std::endl;
+    // std::cout << Xc_inner << std::endl;
+    return std::make_tuple(Xc_inner, r_inner, drdx_inner);
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_outer_, bool force_setup) {
     if (!SetupOuter_bool) {
         Nelem_outer = Nelem_;
         FourierOrder_outer = FourierOrder_;
         ElemOrder_outer = ElemOrder_;
 
-        sctl::Vector<Real> Xc_updated, r_updated;
-        if (Xc_outer.Dim() == Nelem_ * ElemOrder_ * 3) {
-            std::cout << "Cursory check on Xc_outer size, doesn't guarantee nodes are distributed in panel-based Cheb quadrature!" << std::endl;
+        sctl::Vector<Real> Xc_updated, r_updated, drdx_updated;
+        if (!force_setup && Xc_outer.Dim() == Nelem_ * ElemOrder_ * 3) {
             Xc_updated = Xc_outer;
             r_updated = r_outer;
+            drdx_updated = drdx_outer_;
             // TODO: will add adaptive quadrature later. Also check what kind of adaptive quadrature is already implemented in CSBQ, should be some Fourier zooming in..?
         } else {
-            std::cout << "Xc_outer does not match expected number of nodes using panel-based quadrature; updating Xc_inner." << std::endl;
+            // std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
+            // Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
+            // // TODO: NEED TO CHANGE IN THE FUTURE, BUT FOR NOW: assume r = r(x), no y and z dependency.
+            // // collect src_x and trg_x
+            // sctl::Vector<Real> src_x(Xc_outer.Dim()/3);
+            // sctl::Vector<Real> trg_x(Xc_updated.Dim()/3);
+            // for (sctl::Long node_ind = 0; node_ind < Xc_outer.Dim()/3; node_ind++) {
+            //     src_x[node_ind] = Xc_outer[node_ind*3];
+            // }
+            // for (sctl::Long node_ind = 0; node_ind < Xc_updated.Dim()/3; node_ind++) {
+            //     trg_x[node_ind] = Xc_updated[node_ind*3];
+            // }
+            // r_updated.ReInit(ElemOrder_ * Nelem_);
+            // drdx_updated.ReInit(ElemOrder_ * Nelem_);
+            // InterpR(r_updated, r_outer, src_x, trg_x);
+            // InterpR(drdx_updated, drdx_outer_, src_x, trg_x);
+            std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
+            // Get (approximately) x nodes from original Xc
+            sctl::Long OldOrder = Xc_outer.Dim() / 3 / Nelem_; 
+            sctl::Vector<Real> src_x(OldOrder);
+            // Get new nodes
             Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
-            // TODO: NEED TO CHANGE IN THE FUTURE, BUT FOR NOW: assume r = r(x), no y and z dependency.
-            // collect src_x and trg_x
-            sctl::Vector<Real> src_x(Xc_inner.Dim()/3);
-            sctl::Vector<Real> trg_x(Xc_updated.Dim()/3);
-            for (sctl::Long node_ind = 0; node_ind < Xc_inner.Dim()/3; node_ind++) {
-                src_x[node_ind] = Xc_inner[node_ind*3];
+            sctl::Vector<Real> trg_x(ElemOrder_);
+            r_updated.ReInit(ElemOrder_ * Nelem_);
+            drdx_updated.ReInit(ElemOrder_ * Nelem_);
+            for (sctl::Long panel_ind=0; panel_ind < Nelem_; panel_ind ++) {
+                src_x.SetZero();
+                trg_x.SetZero();
+                sctl::Vector<Real> Xc_updated_here(ElemOrder_*3, (sctl::Iterator<Real>) Xc_updated.begin() + panel_ind*ElemOrder_*3, false);
+                sctl::Vector<Real> Xc_outer_here(OldOrder*3, (sctl::Iterator<Real>) Xc_outer.begin() + panel_ind*OldOrder*3, false);
+                for (sctl::Long node_ind = 0; node_ind < OldOrder; node_ind++) {
+                    src_x[node_ind] = Xc_outer_here[node_ind*3];
+                }
+                for (sctl::Long node_ind = 0; node_ind < ElemOrder_; node_ind++) {
+                    trg_x[node_ind] = Xc_updated_here[node_ind*3];
+                }
+                sctl::Vector<Real> r_outer_here(OldOrder, (sctl::Iterator<Real>) r_outer.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> drdx_outer_here(OldOrder, (sctl::Iterator<Real>) drdx_outer_.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> r_updated_here(ElemOrder_, (sctl::Iterator<Real>) r_updated.begin() + panel_ind*ElemOrder_, false);
+                sctl::Vector<Real> drdx_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdx_updated.begin() + panel_ind*ElemOrder_, false);
+                InterpR(r_updated_here, r_outer_here, src_x, trg_x);
+                InterpR(drdx_updated_here, drdx_outer_here, src_x, trg_x);
+                // std::cout << "DEBUG interp, first entry locally in r_updated: " << r_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << r_updated_here[0] << std::endl;
+                // std::cout << "DEBUG interp, first entry locally in drdx_updated: " << drdx_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdx_updated_here[0] << std::endl;
             }
-            for (sctl::Long node_ind = 0; node_ind < Xc_updated.Dim()/3; node_ind++) {
-                trg_x[node_ind] = Xc_updated[node_ind*3];
-            }
-            InterpR(r_updated, r_inner, src_x, trg_x);
         }
         sctl::Vector<sctl::Long> ElemOrderVec(Nelem_);
         sctl::Vector<sctl::Long> FourierOrderVec(Nelem_);
@@ -168,13 +256,15 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter(con
         SetupOuter_bool = true;
         Xc_outer = Xc_updated;
         r_outer = r_updated;
+        drdx_outer = drdx_updated;
         elem_lst_outer.GetNodeCoord(&X_outer, &Xn_outer, nullptr);
         // Correct normal of outer channel to point into fluid domain.
         Xn_outer *= -1.;
+        // TODO: this doesn't do anything except for tests.
     } else {
         std::cout << "Note: Outer already setup, nothing done." << std::endl;
     }
-    return std::make_tuple(Xc_outer, r_outer);
+    return std::make_tuple(Xc_outer, r_outer, drdx_outer);
 }
 
 template <class Real>
@@ -257,8 +347,9 @@ sctl::Vector<sctl::Long> Annular<Real>::InDomain(sctl::Vector<Real> X_) {
         const Real x = X_[nd*3+0];
         const Real y = X_[nd*3+1];
         const Real z = X_[nd*3+2];
-        if (x < Xc_inner[0] || x < Xc_outer[0] || x > Xc_inner[Xc_inner.Dim()-1] || x > Xc_outer[Xc_outer.Dim()-1]) {
-            // x value already out of channel, don't consider.
+        // std::cout << "x bounds: < " << Xc_inner[0] << ", < " << Xc_outer[0] << ", > " << Xc_inner[Xc_inner.Dim()-3] << ", > " << Xc_outer[Xc_outer.Dim()-3] << std::endl;
+        if (x < Xc_inner[0] || x < Xc_outer[0] || x > Xc_inner[Xc_inner.Dim()-3] || x > Xc_outer[Xc_outer.Dim()-3]) {
+            std::cout << "x value already out of channel, don't consider." << std::endl;
             in_domain[nd] = 0;
         } else {
             const auto search_panel = [](Real x, sctl::Long Nelem_, sctl::Long ElemOrder_, sctl::Vector<Real> Xc_) {
@@ -269,6 +360,7 @@ sctl::Vector<sctl::Long> Annular<Real>::InDomain(sctl::Vector<Real> X_) {
                     }
                 }
                 std::cout << "Did not find panel, something went wrong." << std::endl;
+                return static_cast<sctl::Long>(-1);
             };
             // find panel x belongs to
             sctl::Long x_inner_ind = search_panel(x, Nelem_inner, ElemOrder_inner, Xc_inner);
@@ -276,19 +368,97 @@ sctl::Vector<sctl::Long> Annular<Real>::InDomain(sctl::Vector<Real> X_) {
             // interpolate r to this x value
             sctl::Vector<Real> r_inner_interp(1);
             sctl::Vector<Real> src_r(ElemOrder_inner, (sctl::Iterator<Real>)r_inner.begin()+x_inner_ind*ElemOrder_inner, false);
-            sctl::Vector<Real> src_x(ElemOrder_inner*3, (sctl::Iterator<Real>)Xc_inner.begin() + x_inner_ind*ElemOrder_inner*3, false);
-            sctl::Vector<Real> trg_x(3, (sctl::Iterator<Real>)X_.begin() + 3*nd, false);
+            sctl::Vector<Real> src_x(ElemOrder_inner);
+            for (sctl::Long node_ind = 0; node_ind < ElemOrder_inner; node_ind++) {
+                src_x[node_ind] = Xc_inner[x_inner_ind*ElemOrder_inner*3 + node_ind*3];
+            }
+            sctl::Vector<Real> trg_x(1, (sctl::Iterator<Real>)X_.begin() + 3*nd, false);
             InterpR(r_inner_interp, src_r, src_x, trg_x);
-            
+
             sctl::Vector<Real> r_outer_interp(1);
+            src_x.SetZero();
+            for (sctl::Long node_ind = 0; node_ind < ElemOrder_outer; node_ind++) {
+                src_x[node_ind] = Xc_outer[x_outer_ind*ElemOrder_outer*3 + node_ind*3];
+            }
             sctl::Vector<Real> src_r2(ElemOrder_outer, (sctl::Iterator<Real>)r_outer.begin()+x_outer_ind*ElemOrder_outer, false);
-            sctl::Vector<Real> src_x2(ElemOrder_outer*3, (sctl::Iterator<Real>)Xc_outer.begin() + x_outer_ind*ElemOrder_outer*3, false);
-            InterpR(r_outer_interp, src_r2, src_x2, trg_x);
+            InterpR(r_outer_interp, src_r2, src_x, trg_x);
             // compare r^2 with (y^2+z^2)
-            in_domain[nd] = ((r_outer_interp[0]*r_outer_interp[0] - y*y - z*z) > 1e-5) && (y*y + z*z - (r_inner_interp[0]*r_inner_interp[0]) > 1e-5);
+            in_domain[nd] = ((r_outer_interp[0]*r_outer_interp[0] - (y-0.5)*(y-0.5) - (z-0.5)*(z-0.5)) > 1e-5) && ((y-0.5)*(y-0.5) + (z-0.5)*(z-0.5) - (r_inner_interp[0]*r_inner_interp[0]) > 1e-5);
         }
     }
     return in_domain;
+}
+
+template <class Real>
+sctl::SlenderElemList<Real> Annular<Real>::GetInnerElemList() {
+    return elem_lst_inner;
+}
+
+template <class Real>
+sctl::SlenderElemList<Real> Annular<Real>::GetOuterElemList() {
+    return elem_lst_outer;
+}
+
+template <class Real>
+sctl::Vector<Real> Annular<Real>::GetVslip() {
+    // Given drdx at the same x discre as centerline nodes, return the axisymmetric vslip at surface nodes.
+    sctl::Vector<Real> v1, v2;
+    v1 = GetVslipInner();
+    v2 = GetVslipOuter();
+    sctl::Vector<Real> v(v1.Dim() + v2.Dim());
+    for (sctl::Long ind=0; ind<v.Dim(); ind++) {
+        if (ind < v1.Dim()) {
+            v[ind] = v1[ind];
+        } else {
+            sctl::Long ind_v2 = ind - v1.Dim();
+            v[ind] = v2[ind_v2];
+        }
+    }
+    return v;
+}
+
+template <class Real>
+sctl::Vector<Real> Annular<Real>::GetVslipInner() {
+    SCTL_ASSERT(SetupInner_bool); // check that inner channel is set up.
+    // r vector for each angular node, per center node.
+    sctl::Vector<Real> vslip(X_inner.Dim());
+    SCTL_ASSERT(vslip.Dim() == Nelem_inner*ElemOrder_inner*FourierOrder_inner * 3);
+
+    for (sctl::Long cn=0; cn < Nelem_inner * ElemOrder_inner; cn++) {
+        sctl::Vector<Real> Xc_here(3, (sctl::Iterator<Real>) Xc_inner.begin() + cn*3, false); // iterator starting at the x coord of current center node.
+        for (sctl::Long fn = 0; fn < FourierOrder_inner; fn++) { // check that this is the number of F nodes
+            sctl::Long fncn = 3*(cn * FourierOrder_inner + fn);
+            sctl::Vector<Real> X_here(3, (sctl::Iterator<Real>) X_inner.begin() + fncn, false); 
+            sctl::Vector<Real> rvec_here = X_here - Xc_here;
+            Real rnorm = rvec_here[0]*rvec_here[0] + rvec_here[1]*rvec_here[1] + rvec_here[2]*rvec_here[2];
+            rnorm = sctl::sqrt<Real>(rnorm);
+            sctl::Vector<Real> vslip_here(3, (sctl::Iterator<Real>) vslip.begin() + fncn, false);
+            vslip_here = drdx_inner[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdx.
+        }
+    }
+    return vslip;
+}
+
+template <class Real>
+sctl::Vector<Real> Annular<Real>::GetVslipOuter() {
+    SCTL_ASSERT(SetupOuter_bool); // check that outer channel is set up.
+    // r vector for each angular node, per center node.
+    sctl::Vector<Real> vslip(X_outer.Dim());
+    SCTL_ASSERT(vslip.Dim() == Nelem_outer*ElemOrder_outer*FourierOrder_outer * 3);
+
+    for (sctl::Long cn=0; cn < Nelem_outer * ElemOrder_outer; cn++) {
+        sctl::Vector<Real> Xc_here(3, (sctl::Iterator<Real>) Xc_outer.begin() + cn*3, false); // iterator starting at the x coord of current center node.
+        for (sctl::Long fn = 0; fn < FourierOrder_outer; fn++) { // check that this is the number of F nodes
+            sctl::Long fncn = 3*(cn * FourierOrder_outer + fn);
+            sctl::Vector<Real> X_here(3, (sctl::Iterator<Real>) X_outer.begin() + fncn, false); 
+            sctl::Vector<Real> rvec_here = X_here - Xc_here;
+            Real rnorm = rvec_here[0]*rvec_here[0] + rvec_here[1]*rvec_here[1] + rvec_here[2]*rvec_here[2];
+            rnorm = sctl::sqrt<Real>(rnorm);
+            sctl::Vector<Real> vslip_here(3, (sctl::Iterator<Real>) vslip.begin() + fncn, false);
+            vslip_here = drdx_outer[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdx.
+        }
+    }
+    return vslip;
 }
 
 template class Annular<float>;
