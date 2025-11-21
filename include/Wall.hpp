@@ -2,24 +2,31 @@
 #define __GLYMPH_WALL__
 
 #include <csbq.hpp>
+#include <stdexcept>
 
 template <class Real>
 class Wall
 {
     protected:
-        size_t _n_tsteps;
         Real _dt;
-        size_t _grid_size;
         Real _min_gap = 1e-5;
         Real _min_inner_radius = 1e-5;
+        size_t _time_step = 0;
         sctl::Vector<Real> _center_coords_out;
         sctl::Vector<Real> _center_coords_in;
 
         sctl::Vector<Real> _radius_out;
         sctl::Vector<Real> _radius_in;
+        size_t _spatial_grid_size = 0;
 
     public:
-        Wall(const size_t n_tsteps, const Real dt, const size_t grid_size);
+        Wall(const Real dt, 
+            const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
+            const sctl::Vector<Real>& center_in,
+            const sctl::Vector<Real>& radius_out,
+            const sctl::Vector<Real>& radius_in
+            // add sctl::Comm if needed for MPI
+        );
         virtual ~Wall();
 
         virtual void update() = 0;
@@ -27,21 +34,25 @@ class Wall
         void enforceGapGeometry();
         
         // Replace grid and data in case mesh is refined
-        virtual void setGridAndData(size_t new_grid_size,
+        virtual void setGridAndData(
                                 const sctl::Vector<Real>& center_out,
                                 const sctl::Vector<Real>& center_in,
                                 const sctl::Vector<Real>& radius_out,
                                 const sctl::Vector<Real>& radius_in);
 
-
+        
 
 
 
         // Accessors
+        void incrementTimeStep() { _time_step++; }
+        size_t getTimeStep() const { return _time_step; }
+        Real getTime() const { return _time_step*_dt; }
         const sctl::Vector<Real>& centerCoordsOut() const { return _center_coords_out; }
         const sctl::Vector<Real>& centerCoordsIn() const { return _center_coords_in; }
         const sctl::Vector<Real>& radiusOut() const { return _radius_out; }
         const sctl::Vector<Real>& radiusIn() const { return _radius_in; }
 
 };
+#include "detail/Wall.tpp"
 #endif // __GLYMPH_WALL__

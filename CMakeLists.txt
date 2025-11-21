@@ -205,11 +205,10 @@ endif()
 #   "src/Annular.cpp"
 #   "src/Particle.cpp"
 #   "src/StokesBIO.cpp"
-#   "src/Wall.cpp"
 # )
 set(GLYMPHBIE_SOURCES
     "src/Annular.cpp"
-    "src/StokesBIO.cpp"
+    #"src/StokesBIO.cpp"
 )
 
 add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES})
@@ -231,8 +230,8 @@ target_link_libraries(GLYMPHBIE PRIVATE
 # Set target test files manually
 set(TEST_SOURCES
     "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/StokesBIO_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/FuncWall_tests.cpp"
+    #"${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
 )
 
 foreach(src ${TEST_SOURCES})
