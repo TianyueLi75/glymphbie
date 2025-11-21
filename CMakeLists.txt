@@ -37,10 +37,10 @@ option(ENABLE_FFTWF "Enable FFTW (float) support" ON)
 option(ENABLE_FFTWL "Enable FFTW (long double) support" OFF)
 
 # Paths
-set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm" CACHE PATH "")
-set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include"         CACHE PATH "")
-set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include" CACHE PATH "")
-set(SCTL_DATA_PATH   "${CMAKE_SOURCE_DIR}/extern/csbq/data"    CACHE PATH "")
+set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm")
+set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include")
+set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include")
+set(SCTL_DATA_PATH   ${CMAKE_SOURCE_DIR}/extern/csbq/data)
 
 set(PVFMM_INC_DIR "${PVFMM_DIR}/include")
 set(PVFMM_LIB_DIR "${PVFMM_DIR}/lib/.libs")
@@ -119,7 +119,7 @@ target_include_directories(csbq INTERFACE
 # -------------------------------
 add_compile_definitions(
     SCTL_HAVE_MPI
-    SCTL_DATA_PATH="${SCTL_DATA_PATH}"
+    SCTL_DATA_PATH=${SCTL_DATA_PATH}
     SCTL_QUAD_T=__float128
 )
 
@@ -232,6 +232,7 @@ target_link_libraries(GLYMPHBIE PRIVATE
 set(TEST_SOURCES
     "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
     "${CMAKE_SOURCE_DIR}/tests/StokesBIO_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
 )
 
 foreach(src ${TEST_SOURCES})
