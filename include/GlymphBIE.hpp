@@ -8,6 +8,7 @@
 #include "FuncWall.hpp"
 #include "IntegratorWall.hpp"
 
-#include <csbq.hpp>
+#include "csbq/slender_element.hpp"
+#include "csbq/slender_element.cpp"
 
 #endif

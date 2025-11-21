@@ -1,9 +1,3 @@
-# # # NOTE: Nov 17 night version that allows to compile sources and tests without multiple definition error
-# # #       requires removing utils.cpp from csbq.hpp to avoid those functions, which should all be for csbq tests -- not used by sctl, pvfmm, stokesbio, or slender_elem. 
-# # #       TODO: should be able to remove mobility.hpp as well.
-# # #       TODO: how to make this self-contained in this project? Fork from CSBQ? include only slender_body.hpp somehow? make a new csbq2.hpp in this directory then point to slender_body.hpp there?
-# # #       Tests passed as before -- slender_body does not seem to have issues.
-# # #       TODO: tests a lot slower, could be login node issue, or compiled something wrong..
 
 cmake_minimum_required(VERSION 3.16)
 
@@ -43,10 +37,10 @@ option(ENABLE_FFTWF "Enable FFTW (float) support" ON)
 option(ENABLE_FFTWL "Enable FFTW (long double) support" OFF)
 
 # Paths
-set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm" CACHE PATH "")
-set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include"         CACHE PATH "")
-set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include" CACHE PATH "")
-set(SCTL_DATA_PATH   "${CMAKE_SOURCE_DIR}/extern/csbq/data"    CACHE PATH "")
+set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm")
+set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include")
+set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include")
+set(SCTL_DATA_PATH   ${CMAKE_SOURCE_DIR}/extern/csbq/data)
 
 set(PVFMM_INC_DIR "${PVFMM_DIR}/include")
 set(PVFMM_LIB_DIR "${PVFMM_DIR}/lib/.libs")
@@ -125,7 +119,7 @@ target_include_directories(csbq INTERFACE
 # -------------------------------
 add_compile_definitions(
     SCTL_HAVE_MPI
-    SCTL_DATA_PATH="${SCTL_DATA_PATH}"
+    SCTL_DATA_PATH=${SCTL_DATA_PATH}
     SCTL_QUAD_T=__float128
 )
 
@@ -238,6 +232,7 @@ target_link_libraries(GLYMPHBIE PRIVATE
 set(TEST_SOURCES
     "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
     "${CMAKE_SOURCE_DIR}/tests/StokesBIO_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
 )
 
 foreach(src ${TEST_SOURCES})

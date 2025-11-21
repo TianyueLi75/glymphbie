@@ -1,8 +1,9 @@
 #ifndef _ANNULAR_HPP_
 #define _ANNULAR_HPP_
 
-#include "csbq.hpp"
-// #include <slender_element.hpp>
+// #include "csbq.hpp"
+#include "csbq/slender_element.hpp"
+#include "csbq/slender_element.cpp"
 
 template <class Real> class Annular {
 
@@ -16,15 +17,20 @@ template <class Real> class Annular {
         void SetOuterXc(const sctl::Vector<Real> X_in);
         void SetInnerR(const sctl::Vector<Real> r_in);
         void SetOuterR(const sctl::Vector<Real> r_in);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_); // TODO: Compute aspect ratio in inner setup since this will be the most limiting factor
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>,sctl::Vector<Real>, sctl::Vector<Real>> Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner, sctl::Vector<Real> drdx_outer, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_outer, bool force_setup = false);
         void GetInnerCoord(sctl::Vector<Real>* X_out, sctl::Vector<Real>* Xn_out);
         void GetOuterCoord(sctl::Vector<Real>* X_out, sctl::Vector<Real>* Xn_out);
         void GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn); // TODO: enable comm support later.
         static sctl::Vector<Real> GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_);
         Real GetMinRadius();
         sctl::Vector<sctl::Long> InDomain(sctl::Vector<Real> X_); // given a vector of x positions, return which nodes are in bewteen outer and inner channels V.S. not.
+        sctl::SlenderElemList<Real> GetInnerElemList();
+        sctl::SlenderElemList<Real> GetOuterElemList();
+        sctl::Vector<Real> GetVslip();
+        sctl::Vector<Real> GetVslipInner();
+        sctl::Vector<Real> GetVslipOuter();
 
         // TODO: add read/write and plotting support
 
@@ -37,6 +43,7 @@ template <class Real> class Annular {
         sctl::Vector<Real> X_inner, X_outer, Xn_inner, Xn_outer; // computed values from CSBQ; NOTE: Normal points into fluid.
         Real min_radius = 0.; // computed value
         sctl::Long Nelem_inner, Nelem_outer, ElemOrder_inner, ElemOrder_outer, FourierOrder_inner, FourierOrder_outer; 
+        sctl::Vector<Real> drdx_inner, drdx_outer;
 
         sctl::SlenderElemList<Real> elem_lst_outer, elem_lst_inner;
 

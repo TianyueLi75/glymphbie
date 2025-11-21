@@ -78,7 +78,7 @@ class Annular {
     - X_outer
     - Xn_inner
     - Xn_outer 
-    - aspect_ratio
+    - min_radius
 
     constructor() 
     destructor()
