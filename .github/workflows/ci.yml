@@ -1,0 +1,94 @@
+name: build-and-test
+
+on:
+  push:
+    branches: [ annular ]
+  pull_request:
+    branches: [ annular ]
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CC: mpicc
+      CXX: mpic++
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -------------------------------------------------------
+      # Install Dependencies (Ubuntu + macOS)
+      # Includes fallback: if apt-get fails → try module load
+      # -------------------------------------------------------
+      - name: Install Dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+
+          echo "Attempting apt-get install..."
+          if sudo apt-get update && sudo apt-get install -y \
+              build-essential cmake mpich libfftw3-dev libfftw3-mpi-dev \
+              libopenblas-dev liblapack-dev gfortran xorg-dev libquadmath0 \
+              intel-mkl; then
+            echo "apt-get install succeeded."
+          else
+            echo "apt-get failed. Trying module load..."
+            # NOTE: This assumes your machine has environment modules available.
+            # Modify module names as needed.
+            module load cmake || true
+            module load gcc/13.2.0 || true 
+            module load fftw/3.3.10 || true
+            module load mkl/2023.2.1 || true
+            module load openmpi/5.0.7 || true
+          fi
+
+      - name: Install Dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # brew update
+          # brew install mpich fftw openblas lapack cmake
+
+          # # If MKL is required on macOS: brew install mkl
+          # # But MKL on macOS is deprecated, so you may want OpenBLAS instead.
+          brew install gcc@13 llvm libomp
+          echo "PATH=$(brew --prefix llvm)/bin:$PATH" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix llvm)/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix llvm)/include" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$(brew --prefix llvm)/lib:$LIBRARY_PATH" >> $GITHUB_ENV
+
+      # -------------------------------------------------------
+      # Build PVFMM (simple Makefile)
+      # -------------------------------------------------------
+      - name: Build PVFMM
+        working-directory: extern/pvfmm
+        run: |
+          make -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
+
+          echo "PVFMM build complete."
+          find . -name "libpvfmm.*" || true
+
+      # -------------------------------------------------------
+      # Configure & Build main project
+      # -------------------------------------------------------
+      - name: Configure (CMake)
+        run: |
+          cmake -B build \
+            -DCMAKE_CXX_COMPILER=mpic++ 
+
+      - name: Build
+        run: |
+          cmake --build build -- -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
+
+      # -------------------------------------------------------
+      # Run CTest
+      # -------------------------------------------------------
+      - name: Run Tests
+        working-directory: build
+        run: |
+          ctest --output-on-failure
