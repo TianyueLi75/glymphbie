@@ -231,8 +231,8 @@ target_link_libraries(GLYMPHBIE PRIVATE
 # Set target test files manually
 set(TEST_SOURCES
     "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/StokesBIO_tests.cpp"
     "${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/Annular_mpi_tests.cpp"
 )
 
 foreach(src ${TEST_SOURCES})

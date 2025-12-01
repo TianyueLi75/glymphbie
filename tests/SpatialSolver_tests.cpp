@@ -6,23 +6,26 @@ void concentric_poiseuille(const Real R_in, const Real R_out, const Real dpdx, c
 {
     SCTL_ASSERT(R_out > R_in);
 
-    Real gmres_tol = 1e-10;
+    Real gmres_tol = 1e-11;
     Real tol = 1e-14;
+    if (FourierOrder < 16) {
+        gmres_tol = 1e-9;
+    }
 
     // Make Annular channel
     sctl::Vector<Real> Xc = Annular<Real>::GetCenterLine(Nelem, ElemOrder);
-    sctl::Vector<Real> r1(ElemOrder);
+    sctl::Vector<Real> r1(ElemOrder*Nelem);
     r1 = R_in;
-    sctl::Vector<Real> r2(ElemOrder);
+    sctl::Vector<Real> r2(ElemOrder*Nelem);
     r2 = R_out;
     sctl::Vector<Real> drdx(ElemOrder*Nelem); // no outward velocity on wall.
     drdx = 0.;
     Annular<Real> straight(Xc,Xc,r1,r2);
     straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);
-    std::cout << "DEBUG: Xc: "<< std::endl;
-    for (int i=0; i<Xc.Dim(); i++) {
-        std::cout << Xc[i] << std::endl;
-    }
+    // std::cout << "DEBUG: Xc: "<< std::endl;
+    // for (int i=0; i<Xc.Dim(); i++) {
+    //     std::cout << Xc[i] << std::endl;
+    // }
 
     // Function to get exact flow at location X given center Xc and other params.
     // NOTE: This assumes Xvec taken as an intermediate channel with the same parameters for simplicity. Otherwise an interpolation is needed.
@@ -86,7 +89,7 @@ void concentric_poiseuille(const Real R_in, const Real R_out, const Real dpdx, c
     NormalOrient = 1.;
     sctl::Long size_inner = Nelem*ElemOrder*FourierOrder*3;
     sctl::Long size_outer = X_annular.Dim() - size_inner;
-    std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
+    // std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
     for (sctl::Long ind=0; ind<size_outer; ind++) {
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
@@ -106,11 +109,11 @@ void concentric_poiseuille(const Real R_in, const Real R_out, const Real dpdx, c
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = straight.GetVslip(); // no EXTRA wall velocity
     sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
-    std::cout << "DEBUG, bg poiseuille values, should be equal in magnitude for all nodes on each channel." << std::endl;
+    // std::cout << "DEBUG, bg poiseuille values, should be equal in magnitude for all nodes on each channel." << std::endl;
     for (int i=0; i<X_annular.Dim()/3; i++) {
         Real magv2 = vbg[i*3+0]*vbg[i*3+0] + vbg[i*3+1]*vbg[i*3+1] + vbg[i*3+2]*vbg[i*3+2];
-        std::cout << "vector = " << vbg[i*3+0] << ", " << vbg[i*3+1] << ", " << vbg[i*3+2] << ", magnitude = " << magv2 << std::endl;
-        std::cout << "vslip (shoudl be 0): " << vslip[i*3+0] << ", " << vslip[i*3+1] << ", " << vslip[i*3+2] << std::endl;
+        // std::cout << "vector = " << vbg[i*3+0] << ", " << vbg[i*3+1] << ", " << vbg[i*3+2] << ", magnitude = " << magv2 << std::endl;
+        // std::cout << "vslip (shoudl be 0): " << vslip[i*3+0] << ", " << vslip[i*3+1] << ", " << vslip[i*3+2] << std::endl;
     }
 
     // Solve gmres
@@ -118,9 +121,9 @@ void concentric_poiseuille(const Real R_in, const Real R_out, const Real dpdx, c
 
     // Compare to exact, report error.
     // Create two cylindrical channels of different radius to test U at different r. (NOTE: Can do sinusoidal channel later)
-    sctl::Vector<Real> r3(ElemOrder);
+    sctl::Vector<Real> r3(ElemOrder*Nelem);
     r3 = R_in + 1./3. * (R_out - R_in);
-    sctl::Vector<Real> r4(ElemOrder);
+    sctl::Vector<Real> r4(ElemOrder*Nelem);
     r4 = R_in + 2./3. * (R_out - R_in);
 
     Annular<Real> channel_trg(Xc,Xc,r3,r4);
@@ -133,24 +136,27 @@ void concentric_poiseuille(const Real R_in, const Real R_out, const Real dpdx, c
     BIO(&U_inner, sigma);
     LPO.SetTargetCoord(X_outer);
     BIO(&U_outer, sigma);
+    U_inner += bg_poiseuille(X_inner);
+    U_outer += bg_poiseuille(X_outer);
     sctl::Vector<Real> Uexact_inner = uexact(X_inner);
     sctl::Vector<Real> Uexact_outer = uexact(X_outer);
     Real max_err_inner = 0.;
     Real max_err_outer = 0.;
-    sctl::Vector<Real> Diff_inner = U_inner + bg_poiseuille(X_inner) - Uexact_inner;
-    sctl::Vector<Real> Diff_outer = U_outer + bg_poiseuille(X_outer) - Uexact_outer;
-    std::cout << " ======================= DEBUG U eval." << std::endl;
-    Real mag_exact2 = Uexact_inner[0]*Uexact_inner[0] + Uexact_inner[1]*Uexact_inner[1] + Uexact_inner[2]*Uexact_inner[2];
-    std::cout << "uexact = " << Uexact_inner[0] << ", " << Uexact_inner[1] << ", " << Uexact_inner[2] << ", mag = " << mag_exact2 << std::endl;
-    Real mag_solve2 = U_inner[0]*U_inner[0] + U_inner[1]*U_inner[1] + U_inner[2]*U_inner[2];
-    std::cout << "usolve = " << U_inner[0] << ", " << U_inner[1] << ", " << U_inner[2] << ", mag = " << mag_solve2 << std::endl;
-    mag_exact2 = Uexact_outer[0]*Uexact_outer[0] + Uexact_outer[1]*Uexact_outer[1] + Uexact_outer[2]*Uexact_outer[2];
-    std::cout << "uexact = " << Uexact_outer[0] << ", " << Uexact_outer[1] << ", " << Uexact_outer[2] << ", mag = " << mag_exact2 << std::endl;
-    mag_solve2 = U_outer[0]*U_outer[0] + U_outer[1]*U_outer[1] + U_outer[2]*U_outer[2];
-    std::cout << "usolve = " << U_outer[0] << ", " << U_outer[1] << ", " << U_outer[2] << ", mag = " << mag_solve2 << std::endl;
+    sctl::Vector<Real> Diff_inner = U_inner - Uexact_inner;
+    sctl::Vector<Real> Diff_outer = U_outer - Uexact_outer;
+    // std::cout << " ======================= DEBUG U eval." << std::endl;
+    // Real mag_exact2 = Uexact_inner[0]*Uexact_inner[0] + Uexact_inner[1]*Uexact_inner[1] + Uexact_inner[2]*Uexact_inner[2];
+    // std::cout << "uexact inner = " << Uexact_inner[0] << ", " << Uexact_inner[1] << ", " << Uexact_inner[2] << ", mag = " << mag_exact2 << std::endl;
+    // Real mag_solve2 = U_inner[0]*U_inner[0] + U_inner[1]*U_inner[1] + U_inner[2]*U_inner[2];
+    // std::cout << "usolve inner = " << U_inner[0] << ", " << U_inner[1] << ", " << U_inner[2] << ", mag = " << mag_solve2 << std::endl;
+    // mag_exact2 = Uexact_outer[0]*Uexact_outer[0] + Uexact_outer[1]*Uexact_outer[1] + Uexact_outer[2]*Uexact_outer[2];
+    // std::cout << "uexact outer = " << Uexact_outer[0] << ", " << Uexact_outer[1] << ", " << Uexact_outer[2] << ", mag = " << mag_exact2 << std::endl;
+    // mag_solve2 = U_outer[0]*U_outer[0] + U_outer[1]*U_outer[1] + U_outer[2]*U_outer[2];
+    // std::cout << "usolve outer = " << U_outer[0] << ", " << U_outer[1] << ", " << U_outer[2] << ", mag = " << mag_solve2 << std::endl;
     for (auto e : Diff_inner) max_err_inner = std::max<Real>(max_err_inner, sctl::fabs(e));
     for (auto e : Diff_outer) max_err_outer = std::max<Real>(max_err_outer, sctl::fabs(e));
-    std::cout << "Max error at r="<<r3[0]<<": " << max_err_inner << "; max error at r="<<r4[0]<<": " << max_err_outer << std::endl;
+    Real avg_max_err = 0.5*(max_err_inner + max_err_outer);
+    std::cout << "Nelem = " << Nelem << ", Fourier order = " << FourierOrder << "; Averaged max error at two different r: "<< avg_max_err << std::endl;
 
 }
 

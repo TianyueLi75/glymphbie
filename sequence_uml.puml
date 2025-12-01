@@ -8,7 +8,11 @@ participant Particle
 
 participant Environment
 activate Environment
-Environment -> Wall : Init()
+
+Environment -> Annular : GetCenterline(Nelem, Order)
+Annular --> Environment : Xc
+
+Environment -> Wall : Init(Xc)
 activate Wall
 
 Wall -> Wall : GetTimeSeries()
@@ -23,7 +27,6 @@ group One Time Step
     Annular -> Annular : Setup()
 
     Annular --> Environment : Xc_updated, r_updated, drdx_updated
-    Environment --> Wall : Xc_updated, r_updated, drdx_updated
 
     Environment -> Annular : GetMinRadius()
     Annular --> Environment : aspect_ratio
@@ -39,16 +42,21 @@ group One Time Step
     Environment -> Annular : GetVslip()
     Annular --> Environment : vslip
     Environment -> GMRES : Operator()(StokesBIO, vslip)
-    GMRES --> Environment : x (density)
+    GMRES --> Environment : sigma (density)
 
     activate Particle
     Environment -> Particle : GetPositions()
     Particle --> Environment : Xp
-    Environment -> StokesBIO : ComputePotential(Xp, x)
+    Environment -> StokesBIO : ComputePotential(Xp, sigma)
     StokesBIO --> Environment : u (velocity at Xp)
     Environment -> Particle : EvolveTime()
     Particle -> Particle : TimeStep()
     Particle -> Particle : ResolveCollision()
+
+    Environment -> StokesBIO : ComputePotential(X, sigma)
+    StokesBIO --> Environment : Uwall (velocity at wall nodes.) [necessary?]
+
+    Environment --> Wall : Xc_updated, r_updated, drdx_updated, Uwall
 
 end
 
