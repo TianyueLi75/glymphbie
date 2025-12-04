@@ -58,7 +58,7 @@ jobs:
 
           # # If MKL is required on macOS: brew install mkl
           # # But MKL on macOS is deprecated, so you may want OpenBLAS instead.
-          brew install gcc@13 llvm libomp autoconf automake libtool
+          brew install gcc@13 llvm libomp openmpi autoconf automake libtool
           echo "PATH=$(brew --prefix llvm)/bin:$PATH" >> $GITHUB_ENV
           echo "LDFLAGS=-L$(brew --prefix llvm)/lib" >> $GITHUB_ENV
           echo "CPPFLAGS=-I$(brew --prefix llvm)/include" >> $GITHUB_ENV
@@ -70,9 +70,6 @@ jobs:
       - name: Build PVFMM
         working-directory: extern/pvfmm
         run: |
-          echo "finding autogen: "
-          ls -l autogen.sh
-          chmod u+x autogen.sh
           ./autogen.sh
           ./configure
           make -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
