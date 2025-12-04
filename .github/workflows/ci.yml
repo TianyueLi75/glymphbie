@@ -68,6 +68,8 @@ jobs:
       - name: Build PVFMM
         working-directory: extern/pvfmm
         run: |
+          ./autogen.sh
+          ./configure
           make -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
 
           echo "PVFMM build complete."
