@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-22.04, macos-13]
-        os: [ubuntu-22.04]
+        os: [ubuntu-23.04]
 
     runs-on: ${{ matrix.os }}
 
@@ -36,7 +36,7 @@ jobs:
 
           echo "Attempting apt-get install..."
           if sudo apt-get update && sudo apt-get install -y \
-              build-essential cmake mpich libfftw3-dev libfftw3-mpi-dev \
+              build-essential gcc-13 cmake mpich libfftw3-dev libfftw3-mpi-dev \
               libopenblas-dev liblapack-dev gfortran xorg-dev libquadmath0 \
               intel-mkl autoconf automake libtool make; then
             echo "apt-get install succeeded."
