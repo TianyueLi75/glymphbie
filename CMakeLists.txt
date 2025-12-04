@@ -37,6 +37,7 @@ option(ENABLE_FFTWF "Enable FFTW (float) support" ON)
 option(ENABLE_FFTWL "Enable FFTW (long double) support" OFF)
 
 # Paths
+message("Setting path to pvfmm and sctl")
 set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm")
 set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include")
 set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include")
