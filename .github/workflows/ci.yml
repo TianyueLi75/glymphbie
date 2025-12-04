@@ -97,7 +97,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build . -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
+          cmake --build build -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
 
       # -------------------------------------------------------
       # Run CTest
