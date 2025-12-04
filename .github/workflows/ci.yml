@@ -35,7 +35,7 @@ jobs:
           if sudo apt-get update && sudo apt-get install -y \
               build-essential cmake mpich libfftw3-dev libfftw3-mpi-dev \
               libopenblas-dev liblapack-dev gfortran xorg-dev libquadmath0 \
-              intel-mkl; then
+              intel-mkl autoconf automake libtool make; then
             echo "apt-get install succeeded."
           else
             echo "apt-get failed. Trying module load..."
