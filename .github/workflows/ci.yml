@@ -19,8 +19,10 @@ jobs:
       CXX: mpic++
 
     steps:
-      - name: Checkout
+      - name: Checkout and submodules
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       # -------------------------------------------------------
       # Install Dependencies (Ubuntu + macOS)
