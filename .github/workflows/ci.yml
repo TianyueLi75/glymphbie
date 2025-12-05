@@ -18,6 +18,8 @@ jobs:
     env:
       CC: mpicc
       CXX: mpic++
+      MPICH_CC: gcc-13
+      MPICH_CXX: g++-13
 
     steps:
       - name: Checkout and submodules
