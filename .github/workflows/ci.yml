@@ -25,13 +25,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install GCC 13
-        run: |
-          sudo apt update
-          sudo apt install -y software-properties-common
-          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          sudo apt update
-          sudo apt install -y gcc-13 g++-13
+      # - name: Install GCC 13
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install -y software-properties-common
+      #     sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      #     sudo apt update
+      #     sudo apt install -y gcc-13 g++-13
 
       # -------------------------------------------------------
       # Install Dependencies (Ubuntu + macOS)
@@ -48,6 +48,7 @@ jobs:
               libopenblas-dev liblapack-dev gfortran xorg-dev libquadmath0 \
               intel-mkl autoconf automake libtool make; then
             echo "apt-get install succeeded."
+            mpic++ --version
           else
             echo "apt-get failed. Trying module load..."
             # NOTE: This assumes your machine has environment modules available.
