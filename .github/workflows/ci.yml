@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-22.04, macos-13]
-        os: [ubuntu-22.04]
+        os: [ubuntu-24.04]
 
     runs-on: ${{ matrix.os }}
 
@@ -25,17 +25,33 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install GCC 13
-        run: |
-          sudo apt update
-          sudo apt install -y software-properties-common
-          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          sudo apt update
-          sudo apt install -y gcc-13 g++-13
+      # - name: Install GCC 13
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install -y software-properties-common
+      #     sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      #     sudo apt update
+      #     sudo apt install -y gcc-13 g++-13
 
-          # Tell MPICH to use gcc-13/g++-13
-          echo "export MPICH_CC=gcc-13"  >> $GITHUB_ENV
-          echo "export MPICH_CXX=g++-13" >> $GITHUB_ENV
+      #     echo "installed gcc 13. Before linking, versions of gcc and g++ are: "
+
+      #     gcc --version
+      #     g++ --version
+
+      #     # Make gcc/g++ point to version 13
+      #     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+      #     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+
+      #     echo "After linking, versions of gcc and g++ are: "
+
+      #     gcc --version
+      #     g++ --version
+
+      # - name: Link MPICH to gcc 13
+      #   run: |
+      #     # Tell MPICH to use gcc-13/g++-13
+      #     echo "export MPICH_CC=gcc-13"  >> $GITHUB_ENV
+      #     echo "export MPICH_CXX=g++-13" >> $GITHUB_ENV
 
       # -------------------------------------------------------
       # Install Dependencies (Ubuntu + macOS)
