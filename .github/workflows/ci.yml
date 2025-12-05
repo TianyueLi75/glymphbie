@@ -25,6 +25,14 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install GCC 13
+        run: |
+          sudo apt update
+          sudo apt install -y software-properties-common
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt update
+          sudo apt install -y gcc-13 g++-13
+
       # -------------------------------------------------------
       # Install Dependencies (Ubuntu + macOS)
       # Includes fallback: if apt-get fails → try module load
@@ -36,7 +44,7 @@ jobs:
 
           echo "Attempting apt-get install..."
           if sudo apt-get update && sudo apt-get install -y \
-              build-essential software-properties-common gcc-13 g++-13 cmake mpich libfftw3-dev libfftw3-mpi-dev \
+              build-essential cmake mpich libfftw3-dev libfftw3-mpi-dev \
               libopenblas-dev liblapack-dev gfortran xorg-dev libquadmath0 \
               intel-mkl autoconf automake libtool make; then
             echo "apt-get install succeeded."
