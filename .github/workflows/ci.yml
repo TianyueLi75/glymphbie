@@ -134,4 +134,5 @@ jobs:
       - name: Run Tests
         working-directory: build
         run: |
-          ctest --output-on-failure
+          # ctest --output-on-failure
+          ctest --verbose

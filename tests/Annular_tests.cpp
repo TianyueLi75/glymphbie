@@ -88,9 +88,9 @@ TEST_CASE(straight_getnodes)
     straight.GetInnerCoord(&X_inner, &Xn_inner);
     straight.GetOuterCoord(&X_outer, &Xn_outer);
     straight.GetNodeCoord(&X_all, &Xn_all);
-    sctl::Vector<Real> X_file_inner = read_from_file<Real>("../tests/Annular_tests_files/straight_channel_r=0pt3_Np=1_Cheb=4_Nf=4.txt"); // file combines nodes then normal
-    sctl::Vector<Real> X_file_outer = read_from_file<Real>("../tests/Annular_tests_files/straight_channel_r=0pt5_Np=1_Cheb=4_Nf=4.txt");
-    sctl::Vector<Real> X_file_all = read_from_file<Real>("../tests/Annular_tests_files/straight_channel_annular_Np=1_Cheb=4_Nf=4.txt"); 
+    sctl::Vector<Real> X_file_inner = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_r=0pt3_Np=1_Cheb=4_Nf=4.txt"); // file combines nodes then normal
+    sctl::Vector<Real> X_file_outer = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_r=0pt5_Np=1_Cheb=4_Nf=4.txt");
+    sctl::Vector<Real> X_file_all = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_annular_Np=1_Cheb=4_Nf=4.txt"); 
 
     SCTL_ASSERT(X_file_inner.Dim() == X_inner.Dim() + Xn_inner.Dim());
     SCTL_ASSERT(X_file_outer.Dim() == X_outer.Dim() + Xn_outer.Dim());
@@ -169,9 +169,9 @@ TEST_CASE(interp1)
     straight.GetInnerCoord(&X_inner, &Xn_inner);
     straight.GetOuterCoord(&X_outer, &Xn_outer);
     straight.GetNodeCoord(&X_all, &Xn_all);
-    sctl::Vector<Real> X_file_inner = read_from_file<Real>("/home/tianycli/NERS570/F25/glymphbie/tests/Annular_tests_files/straight_channel_r=0pt3_Np=1_Cheb=4_Nf=4.txt"); // file combines nodes then normal
-    sctl::Vector<Real> X_file_outer = read_from_file<Real>("/home/tianycli/NERS570/F25/glymphbie/tests/Annular_tests_files/straight_channel_r=0pt5_Np=1_Cheb=4_Nf=4.txt");
-    sctl::Vector<Real> X_file_all = read_from_file<Real>("/home/tianycli/NERS570/F25/glymphbie/tests/Annular_tests_files/straight_channel_annular_Np=1_Cheb=4_Nf=4.txt"); 
+    sctl::Vector<Real> X_file_inner = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_r=0pt3_Np=1_Cheb=4_Nf=4.txt"); // file combines nodes then normal
+    sctl::Vector<Real> X_file_outer = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_r=0pt5_Np=1_Cheb=4_Nf=4.txt");
+    sctl::Vector<Real> X_file_all = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_annular_Np=1_Cheb=4_Nf=4.txt"); 
 
     SCTL_ASSERT(X_file_inner.Dim() == X_inner.Dim() + Xn_inner.Dim());
     SCTL_ASSERT(X_file_outer.Dim() == X_outer.Dim() + Xn_outer.Dim());
@@ -404,7 +404,7 @@ TEST_CASE(get_vslip)
     drdx = 0.5;
     straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx, true);
     sctl::Vector<Real> v2 = straight.GetVslip();
-    sctl::Vector<Real> vfile = read_from_file<Real>("../tests/Annular_tests_files/straight_channel_drdx.txt"); 
+    sctl::Vector<Real> vfile = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_drdx.txt"); 
 
     // std::cout << "====================== get vslip values: " << std::endl;
     // for (int i=0; i<v2.Dim(); i++) {
@@ -442,12 +442,16 @@ TEST_SUITE(TestSuite1)
 }
 
 
-auto
-main() -> int
+int main(int argc, char** argv)
 {
-  // Run the unit tests. If a test fails, the program will print failure info
-  // and return 1.
-  RUN_SUITE(TestSuite1<float>);
-  RUN_SUITE(TestSuite1<double>);
-  return 0; 
+    sctl::Comm::MPI_Init(&argc, &argv);
+    {
+        // Run the unit tests. If a test fails, the program will print failure info
+        // and return 1.
+        RUN_SUITE(TestSuite1<float>);
+        RUN_SUITE(TestSuite1<double>);
+    }
+    sctl::Comm::MPI_Finalize();
+    
+    return 0; 
 }

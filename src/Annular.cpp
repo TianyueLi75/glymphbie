@@ -55,20 +55,20 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vec
         SetupOuter_bool = false;
     }
     if (SetupInner_bool && SetupOuter_bool) {
-        std::cout << "Already set up with the same parameters, nothing done." << std::endl;
+        // std::cout << "Already set up with the same parameters, nothing done." << std::endl;
         return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer, drdx_inner_, drdx_outer);
     }
     sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated;
     if (SetupInner_bool) {
         // Inner set up, outer not
-        std::cout << "Inner is setup, setting up outer now."<<std::endl;
+        // std::cout << "Inner is setup, setting up outer now."<<std::endl;
         std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_);
         Xc_inner_updated = Xc_inner;
         r_inner_updated = r_inner;
         drdx_inner_updated = drdx_inner;
     } else if (SetupOuter_bool) {
         // Outer set up, inner not
-        std::cout << "Outer is setup, setting up inner now." << std::endl;
+        // std::cout << "Outer is setup, setting up inner now." << std::endl;
         std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_);
         Xc_outer_updated = Xc_outer;
         r_outer_updated = r_outer;
@@ -144,7 +144,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             r_updated = r_inner;
             drdx_updated = drdx_inner_;
         } else {
-            std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
+            // std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
             // Get (approximately) x nodes from original Xc
             sctl::Long OldOrder = Xc_inner.Dim() / 3 / Nelem_; 
             sctl::Vector<Real> src_x(OldOrder);
@@ -215,7 +215,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         } else {
             loc_elem_dsp_inner = comm.Rank() * loc_elem_cnt_inner + remainder;
         }
-        std::cout << "On rank " << comm.Rank() << ", Nelem inner = " << loc_elem_cnt_inner << ", dsp = " << loc_elem_dsp_inner << std::endl;
+        // std::cout << "On rank " << comm.Rank() << ", Nelem inner = " << loc_elem_cnt_inner << ", dsp = " << loc_elem_dsp_inner << std::endl;
 
         Nelem_inner = loc_elem_cnt_inner;
         FourierOrder_inner = FourierOrder_;
@@ -227,7 +227,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             r_updated = r_inner;
             drdx_updated = drdx_inner_;
         } else {
-            std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
+            // std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
             // Get (approximately) x nodes from original Xc
             sctl::Long OldOrder = Xc_inner.Dim() / 3 / Nelem_inner; 
             sctl::Vector<Real> src_x(OldOrder);
@@ -271,14 +271,14 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         Xc_inner = Xc_updated;
         r_inner = r_updated;
         drdx_inner = drdx_updated;
-        std::cout << "in setup inner, Xc_inner after setup size is " << Xc_inner.Dim() << std::endl;
+        // std::cout << "in setup inner, Xc_inner after setup size is " << Xc_inner.Dim() << std::endl;
         min_radius = r_inner[0];
         for (const auto e : r_inner) min_radius = std::min<Real>(min_radius, sctl::fabs(e));
         elem_lst_inner.GetNodeCoord(&X_inner, &Xn_inner, nullptr);
-        std::cout << "elem lst inner size is " << X_inner.Dim() << std::endl;
+        // std::cout << "elem lst inner size is " << X_inner.Dim() << std::endl;
     } else {
         // This clause is only for when called from user function; shouldn't be here from Setup().
-        std::cout << "Note: Inner already setup, nothing done." << std::endl;
+        // std::cout << "Note: Inner already setup, nothing done." << std::endl;
     }
     return std::make_tuple(Xc_inner, r_inner, drdx_inner);
 }
@@ -297,7 +297,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             drdx_updated = drdx_outer_;
             // TODO: will add adaptive quadrature later. Also check what kind of adaptive quadrature is already implemented in CSBQ, should be some Fourier zooming in..?
         } else {
-            std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
+            // std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
             // Get (approximately) x nodes from original Xc
             sctl::Long OldOrder = Xc_outer.Dim() / 3 / Nelem_; 
             sctl::Vector<Real> src_x(OldOrder);
@@ -375,7 +375,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             drdx_updated = drdx_outer_;
             // TODO: will add adaptive quadrature later. Also check what kind of adaptive quadrature is already implemented in CSBQ, should be some Fourier zooming in..?
         } else {
-            std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
+            // std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
             // Get (approximately) x nodes from original Xc
             sctl::Long OldOrder = Xc_outer.Dim() / 3 / Nelem_outer; 
             sctl::Vector<Real> src_x(OldOrder);

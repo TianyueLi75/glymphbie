@@ -229,25 +229,7 @@ target_link_libraries(GLYMPHBIE PRIVATE
 # -------------------------------
 #  Source discovery, build tests
 # -------------------------------
-# Set target test files manually
-set(TEST_SOURCES
-    "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/Annular_mpi_tests.cpp"
-)
-
-foreach(src ${TEST_SOURCES})
-    get_filename_component(name ${src} NAME_WE)
-    add_executable(${name} ${src})
-
-    target_link_libraries(${name} PRIVATE
-        GLYMPHBIE
-        csbq
-        pvfmm
-        ${EXTRA_LIBS}
-    )
-
-    set_target_properties(${name} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-    )
-endforeach()
+# Enable testing
+include(CTest)
+enable_testing()
+add_subdirectory(tests)
