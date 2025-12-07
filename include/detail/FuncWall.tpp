@@ -51,7 +51,7 @@ void FuncWall<Real, InnerFunc, OuterFunc>::apply_wall_logic(
         static_assert(sizeof(Func) == 0, "Wall functor has unsupported signature");
     }
 }
-
+// need to be careful about when we evaluate fluid/particles vs wall update to ensure consistency right now wall functional form + implied volume conservation assumes update happens before fluid/particle eval at each time step 
 template <class Real, class InnerFunc, class OuterFunc>
 void FuncWall<Real, InnerFunc, OuterFunc>::update() {
     const Real t = this->getTime();

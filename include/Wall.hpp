@@ -4,6 +4,7 @@
 #include <csbq.hpp>
 #include <stdexcept>
 
+//** */
 template <class Real>
 class Wall
 {

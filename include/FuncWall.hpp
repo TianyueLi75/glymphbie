@@ -4,6 +4,22 @@
 #include "Wall.hpp"
 #include <type_traits>
 
+/**
+ * @brief FuncWall class template for wall dynamics defined by user-provided functions, inherits from Wall base class.
+ * 
+ * templated functors for inner and outer wall dynamics allow varying signatures, dynamics and parameters
+ * 
+ * The functor signatures supported are:
+ * 1. void func(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot, Real time, sctl::Vector<Real>& coords)
+ * 2. void func(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot, Real time)
+ * 3. void func(sctl::Vector<Real>& radius, Real time, sctl::Vector<Real>& coords)  // rdot set to zero
+ * 4. void func(sctl::Vector<Real>& radius, Real time)  // rdot set to zero 
+ * The functors are expected to modify the radius (and optionally its time derivative) based on the current time and spatial coordinates.
+ * 
+ * @tparam Real 
+ * @tparam InnerFunc 
+ * @tparam OuterFunc 
+ */
 template <class Real, class InnerFunc, class OuterFunc>
 class FuncWall: public Wall<Real>{
     private:

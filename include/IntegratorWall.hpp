@@ -7,6 +7,19 @@
 #include <cassert>
 // IntegratorWall class template work for wall dynamics defined by vasodilation and glial swelling variables
 // with non-linear functions defining their steady-state values based on neuronal activity input which is time/space dependent, but does not depend on G,V
+/**
+ * @brief IntegratorWall class template for wall dynamics defined by vasodilation and glial swelling variables, inherits from Wall base class.
+ * 
+ * The wall radii are updated based on internal state variables V (vasodilation) and G (glial swelling) which evolve according to exponential integration towards steady-state values defined by non-linear functions of neuronal activity.
+ * The non-linear functions FV and FG define the steady-state values of V and G respectively based on the neuronal activity input.
+ * The wall dynamics are further defined by user-provided functors for inner and outer wall radius calculations based on the current V, G, time, and spatial coordinates.
+ * 
+ * @tparam Real 
+ * @tparam NonLinearFuncV 
+ * @tparam NonLinearFuncG 
+ * @tparam InnerFunc 
+ * @tparam OuterFunc 
+ */
 template <class Real, class NonLinearFuncV, class NonLinearFuncG, class InnerFunc, class OuterFunc>
 class IntegratorWall: public Wall<Real>{
     private:
