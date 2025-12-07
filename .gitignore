@@ -3,3 +3,9 @@ build/
 
 # Slurm outputs
 *.out
+
+# Visualizations
+vis/
+
+# Convergence test outputs
+out/

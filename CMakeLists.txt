@@ -37,6 +37,7 @@ option(ENABLE_FFTWF "Enable FFTW (float) support" ON)
 option(ENABLE_FFTWL "Enable FFTW (long double) support" OFF)
 
 # Paths
+message("Setting path to pvfmm and sctl")
 set(PVFMM_DIR        "${CMAKE_SOURCE_DIR}/extern/pvfmm")
 set(SCTL_INCLUDE_DIR "${PVFMM_DIR}/SCTL/include")
 set(CSBQ_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/extern/csbq/include")
@@ -238,15 +239,17 @@ target_link_libraries(GLYMPHBIE PRIVATE
 # -------------------------------
 #  Source discovery, build tests
 # -------------------------------
-# Set target test files manually
-set(TEST_SOURCES
-    "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/FuncWall_tests.cpp"
-    "${CMAKE_SOURCE_DIR}/tests/IntegratorWall_tests.cpp"
-    #"${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
+# Enable testing
+include(CTest)
+enable_testing()
+add_subdirectory(tests)
+
+# Include examples
+set(EXAMPLE_SOURCES
+    "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
 )
 
-foreach(src ${TEST_SOURCES})
+foreach(src ${EXAMPLE_SOURCES})
     get_filename_component(name ${src} NAME_WE)
     add_executable(${name} ${src})
 
