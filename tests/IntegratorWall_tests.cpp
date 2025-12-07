@@ -257,8 +257,8 @@ TEST_CASE(inner_outer_wall_integration) {
     sctl::Vector<Real> act(N), V(N), G(N);
 
     // Initial Conditions
-    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 1.0);
-    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 1.0);
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 0.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 0.0);
 
     r_in[0]  = R_in_base;  // 1.0
     r_out[0] = R_out_base; // 1.15
