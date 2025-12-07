@@ -40,7 +40,7 @@ template <class Real> class Annular {
         sctl::Vector<Real> GetVslipInner_mpi();
         sctl::Vector<Real> GetVslipOuter_mpi();
 
-        // TODO: add read/write and plotting support
+        void WriteVTK(std::string filename_inner, std::string filename_outer, sctl::Vector<Real> F_inner, sctl::Vector<Real> F_outer, sctl::Comm comm);
 
         // TODO: setup adaptive grid, and return new centerline after each solve.
 
