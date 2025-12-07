@@ -245,22 +245,22 @@ enable_testing()
 add_subdirectory(tests)
 
 # Include examples
-set(EXAMPLE_SOURCES
-    "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
-)
+# set(EXAMPLE_SOURCES
+#     "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
+# )
 
-foreach(src ${EXAMPLE_SOURCES})
-    get_filename_component(name ${src} NAME_WE)
-    add_executable(${name} ${src})
+# foreach(src ${EXAMPLE_SOURCES})
+#     get_filename_component(name ${src} NAME_WE)
+#     add_executable(${name} ${src})
 
-    target_link_libraries(${name} PRIVATE
-        GLYMPHBIE
-        csbq
-        pvfmm
-        ${EXTRA_LIBS}
-    )
+#     target_link_libraries(${name} PRIVATE
+#         GLYMPHBIE
+#         csbq
+#         pvfmm
+#         ${EXTRA_LIBS}
+#     )
 
-    set_target_properties(${name} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-    )
-endforeach()
+#     set_target_properties(${name} PROPERTIES
+#         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+#     )
+# endforeach()

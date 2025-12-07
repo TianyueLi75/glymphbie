@@ -3,7 +3,6 @@ build/
 
 # Slurm outputs
 *.out
-
 # Visualizations
 vis/
 
