@@ -144,7 +144,9 @@ TEST_CASE(constant_walls)
 
     sctl::Vector<Real> c_out(N * 3), c_in(N * 3);
     sctl::Vector<Real> r_out(N), r_in(N);
-    c_out = 0; c_in = 0;
+    // Set centerlines (z from 0 to 1)
+    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
     
     // Initialize with bad values
     for(sctl::Long i=0; i<N; ++i) { r_out[i] = 99.9; r_in[i] = 99.9; }
@@ -180,54 +182,47 @@ TEST_CASE(constant_walls)
     }
 }
 
-// template <class Real>
-// TEST_CASE(spatial_walls)
-// {
-//     std::cout << "\n[TEST] Running Spatial (3-Arg) Wall Test..." << std::endl;
+template <class Real>
+TEST_CASE(spatial_walls)
+{
+    std::cout << "\n[TEST] Running Spatial (3-Arg) Wall Test..." << std::endl;
 
-//     // 1. Setup
-//     const Real dt = 0.1;
-//     const sctl::Long N = 5; 
-//     const Real base_r = 2.0;
-//     const Real slope = 0.5;
+    // 1. Setup
+    const Real dt = 0.1;
+    const sctl::Long N = 5; 
+    const Real base_r = 2.0;
+    const Real slope = 0.5;
 
-//     sctl::Vector<Real> c_in(N * 3), c_out(N * 3); // Only filling 'in' for this test
-//     sctl::Vector<Real> r_in(N), r_out(N);
+    sctl::Vector<Real> c_in(N * 3), c_out(N * 3); 
+    sctl::Vector<Real> r_in(N), r_out(N);
 
-//     // Setup a grid where X coordinates are 0, 1, 2, 3, 4
-//     std::cout << "  -> Initialization: Setting up grid x = [0, 1, 2, 3, 4]" << std::endl;
-//     for(sctl::Long i=0; i<N; ++i) {
-//         c_in[i*3]     = static_cast<Real>(i); // x
-//         c_in[i*3 + 1] = 0.0;                  // y
-//         c_in[i*3 + 2] = 0.0;                  // z
-//         r_in[i] = 0.0; // Reset radius
-//     }
-    
-//     // Use Constant for Outer, Spatial for Inner
-//     ConstantFunctor<Real> outer_logic(10.0); // Keep outer far away
-//     LinearSpatialFunctor<Real> inner_spatial_logic(base_r, slope);
+    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    r_in = 1.0; r_out = 10.0; // Set radii
+    // Use Constant for Outer, Spatial for Inner
+    ConstantFunctor<Real> outer_logic(10.0); // Keep outer far away
+    LinearSpatialFunctor<Real> inner_spatial_logic(base_r, slope);
 
-//     FuncWall<Real, LinearSpatialFunctor<Real>, ConstantFunctor<Real>> wall(
-//         dt, c_out, c_in, r_out, r_in, 
-//         inner_spatial_logic, outer_logic
-//     );
+    FuncWall<Real, LinearSpatialFunctor<Real>, ConstantFunctor<Real>> wall(
+        dt, c_out, c_in, r_out, r_in, 
+        inner_spatial_logic, outer_logic
+    );
 
-//     // 2. Run Update
-//     std::cout << "  -> Calling update()..." << std::endl;
-//     wall.update();
+    // 2. Run Update
+    std::cout << "  -> Calling update()..." << std::endl;
+    wall.update();
 
-//     // 3. Verify: R should be Base + Slope * x
-//     //    x=[0,1,2,3,4] -> R=[2.0, 2.5, 3.0, 3.5, 4.0]
-//     std::cout << "  -> Verifying Spatial Radii:" << std::endl;
-//     for (sctl::Long i = 0; i < N; ++i) {
-//         Real x = static_cast<Real>(i);
-//         Real expected = base_r + slope * x;
-//         Real actual = wall.radiusIn()[i];
+    // 3. Verify: R should be Base + Slope * z
+    std::cout << "  -> Verifying Spatial Radii:" << std::endl;
+    for (sctl::Long i = 0; i < N; ++i) {
+        Real z = c_in[i * 3 + 2];
+        Real expected = base_r + slope * z;
+        Real actual = wall.radiusIn()[i];
 
-//         std::cout << "     Index " << i << " (x=" << x << "): Expected " << expected << ", Got " << actual << std::endl;
-//         ASSERT_NEAR(actual, expected, 1e-10);
-//     }
-// }
+        std::cout << "     Index " << i << " (z=" << z << "): Expected " << expected << ", Got " << actual << std::endl;
+        ASSERT_NEAR(actual, expected, 1e-10);
+    }
+}
 
 template <class Real>
 TEST_CASE(spatiotemporal_walls)
@@ -349,7 +344,7 @@ TEST_CASE(r2_spatiotemporal_walls)
 TEST_SUITE(func_wall_suite)
 {
     TEST(constant_walls<double>);
-    //TEST(spatial_walls<double>);
+    TEST(spatial_walls<double>);
     TEST(spatiotemporal_walls<double>);
     TEST(r2_spatiotemporal_walls<double>);
 }

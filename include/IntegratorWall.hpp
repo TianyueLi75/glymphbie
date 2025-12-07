@@ -43,7 +43,6 @@ class IntegratorWall: public Wall<Real>{
         void expIntStep();
 
         const sctl::Vector<Real>& getNeuronalActivity() const { return _neuronal_activity; }
-        sctl::Vector<Real>& getNeuronalActivity() { return _neuronal_activity;  }
         
 
 };

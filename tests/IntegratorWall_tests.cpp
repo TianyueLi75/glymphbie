@@ -5,6 +5,35 @@
 #include <iostream>
 #include <iomanip> // For std::setprecision
 
+
+template <class Real>
+void set_centerline_z_linspace(sctl::Vector<Real>& coords,
+                               Real x_fixed,
+                               Real y_fixed,
+                               Real z_start,
+                               Real z_end) {
+    const sctl::Long dim = coords.Dim();
+    SCTL_ASSERT(dim % 3 == 0);
+    const sctl::Long N = dim / 3;
+
+    if (N <= 0) return;
+    if (N == 1) {
+        coords[0] = x_fixed;
+        coords[1] = y_fixed;
+        coords[2] = z_start; // or (z_start+z_end)/2
+        return;
+    }
+
+    const Real dz = (z_end - z_start) / (Real)(N - 1);
+
+    for (sctl::Long i = 0; i < N; ++i) {
+        Real z = z_start + dz * (Real)i;
+        coords[3*i    ] = x_fixed;
+        coords[3*i + 1] = y_fixed;
+        coords[3*i + 2] = z;
+    }
+}
+
 // ==========================================
 // Functor Definitions
 // ==========================================
@@ -136,7 +165,9 @@ TEST_CASE(constant_walls){
     sctl::Vector<Real> activity(N), V(N), G(N);
 
     // 
-    c_in = 0; c_out = 0;
+    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+
     for (long i=0; i<N; ++i) {
         r_in[i]  = R_in_base;
         r_out[i] = R_out_base;
@@ -225,10 +256,8 @@ TEST_CASE(inner_outer_wall_integration) {
     sctl::Vector<Real> act(N), V(N), G(N);
 
     // Initial Conditions
-    c_in = 0; c_out = 0; // Centers aligned (delta = 0)
-    
-    // Set Center Z to 0.0 for the functor lookup
-    c_in[2] = 0.0; c_out[2] = 0.0;
+    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
 
     r_in[0]  = R_in_base;  // 1.0
     r_out[0] = R_out_base; // 1.15
