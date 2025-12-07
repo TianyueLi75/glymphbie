@@ -1,3 +1,6 @@
+#ifndef __FUNC_WALL__
+#include "../FuncWall.hpp"
+#endif
 
 template <class Real, class InnerFunc, class OuterFunc>
 FuncWall<Real, InnerFunc, OuterFunc>::FuncWall( const Real dt, 
@@ -16,30 +19,120 @@ template <class Real, class InnerFunc, class OuterFunc>
 FuncWall<Real, InnerFunc, OuterFunc>::~FuncWall() {}
 
 
-
 template <class Real, class InnerFunc, class OuterFunc>
 void FuncWall<Real, InnerFunc, OuterFunc>::update() {
-    Real t = this->getTime();
+    const Real t = this->getTime();
 
-    if constexpr (std::is_invocable_v<InnerFunc, sctl::Vector<Real>&, Real, const sctl::Vector<Real>&>) {
-        // InnerFunc is callable with (sctl::Vector<Real>&, Real , const sctl::Vector<Real>&)
+    // Inner wall
+    if constexpr (std::is_invocable_v<
+                      InnerFunc,
+                      sctl::Vector<Real>&,      // radius
+                      sctl::Vector<Real>&,      // rdot
+                      Real,                     // time
+                      const sctl::Vector<Real>& // coords
+                  >)
+    {
+        // InnerFunc(radius, rdot, time, coords)
+        _inner_func(this->_radius_in,
+                    this->_rdot_in,
+                    t,
+                    this->_center_coords_in);
+    }
+    else if constexpr (std::is_invocable_v<
+                           InnerFunc,
+                           sctl::Vector<Real>&,
+                           sctl::Vector<Real>&,
+                           Real
+                       >)
+    {
+        // InnerFunc(radius, rdot, time)
+        _inner_func(this->_radius_in,
+                    this->_rdot_in,
+                    t);
+    }
+    else if constexpr (std::is_invocable_v<
+                           InnerFunc,
+                           sctl::Vector<Real>&,
+                           Real,
+                           const sctl::Vector<Real>&
+                       >)
+    {
+        // InnerFunc(radius, time, coords) – no derivative
         _inner_func(this->_radius_in, t, this->_center_coords_in);
-    } else {
-        // Assume InnerFunc is callable with (sctl::Vector<Real>&, Real)
+        this->_rdot_in = 0; // will this work?
+    }
+    else if constexpr (std::is_invocable_v<
+                           InnerFunc,
+                           sctl::Vector<Real>&,
+                           Real
+                       >)
+    {
+        // InnerFunc(radius, time) – no derivative
         _inner_func(this->_radius_in, t);
+        this->_rdot_in = 0;
+    }
+    else {
+        static_assert(sizeof(InnerFunc) == 0,
+                      "InnerFunc has unsupported signature");
     }
 
-    if constexpr (std::is_invocable_v<OuterFunc, sctl::Vector<Real>&, Real, const sctl::Vector<Real>&>) {
-        // OuterFunc is callable with (sctl::Vector<Real>&, Real , const sctl::Vector<Real>&)
+    // =========================
+    // Outer wall
+    // =========================
+    if constexpr (std::is_invocable_v<
+                      OuterFunc,
+                      sctl::Vector<Real>&,      // radius
+                      sctl::Vector<Real>&,      // rdot
+                      Real,                     // time
+                      const sctl::Vector<Real>& // coords
+                  >)
+    {
+        // OuterFunc(radius, rdot, time, coords)
+        _outer_func(this->_radius_out,
+                    this->_rdot_out,
+                    t,
+                    this->_center_coords_out);
+    }
+    else if constexpr (std::is_invocable_v<
+                           OuterFunc,
+                           sctl::Vector<Real>&,
+                           sctl::Vector<Real>&,
+                           Real
+                       >)
+    {
+        // OuterFunc(radius, rdot, time)
+        _outer_func(this->_radius_out,
+                    this->_rdot_out,
+                    t);
+    }
+    else if constexpr (std::is_invocable_v<
+                           OuterFunc,
+                           sctl::Vector<Real>&,
+                           Real,
+                           const sctl::Vector<Real>&
+                       >)
+    {
+        // OuterFunc(radius, time, coords) – no derivative
         _outer_func(this->_radius_out, t, this->_center_coords_out);
-    } else {
-        // Assume OuterFunc is callable with (sctl::Vector<Real>&, Real)
+        this->_rdot_out = 0; // will this work?
+    }
+    else if constexpr (std::is_invocable_v<
+                           OuterFunc,
+                           sctl::Vector<Real>&,
+                           Real
+                       >)
+    {
+        // OuterFunc(radius, time) – no derivative
         _outer_func(this->_radius_out, t);
+        this->_rdot_out = 0;
+    }
+    else {
+        static_assert(sizeof(OuterFunc) == 0,
+                      "OuterFunc has unsupported signature");
     }
 
     // Make sure wall is physical after update
-    this->enforceGapGeometry(); 
+    this->enforceGapGeometry();
     // Increment time step
     this->incrementTimeStep();
-
 }

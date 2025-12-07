@@ -1,6 +1,11 @@
+#ifndef __WALL__
+#include "../Wall.hpp"
+#endif
+
 #include <cmath>
 #include <iostream> // For std::cerr, std::endl
 #include <cassert>  // For assert()
+
 
 template <class Real>
 Wall<Real>::Wall(const Real dt, 
@@ -9,7 +14,10 @@ Wall<Real>::Wall(const Real dt,
             const sctl::Vector<Real>& radius_out,
             const sctl::Vector<Real>& radius_in)
     : _dt(dt), _center_coords_out(center_out), _center_coords_in(center_in),
-      _radius_out(radius_out), _radius_in(radius_in) 
+      _radius_out(radius_out), _radius_in(radius_in),
+      _rdot_in(radius_in.Dim()),
+      _rdot_out(radius_out.Dim())
+
       
 {
     // Validation checks
@@ -25,6 +33,9 @@ Wall<Real>::Wall(const Real dt,
         throw std::invalid_argument("Outer and inner radius vectors must have the same size.");
     }
     _spatial_grid_size = radius_out.Dim();
+
+    _rdot_in.SetZero();
+    _rdot_out.SetZero();
 }
 
 template <class Real>
@@ -35,7 +46,10 @@ void Wall<Real>::setGridAndData(
                                    const sctl::Vector<Real>& center_out,
                                    const sctl::Vector<Real>& center_in,
                                    const sctl::Vector<Real>& radius_out,
-                                   const sctl::Vector<Real>& radius_in) {
+                                   const sctl::Vector<Real>& radius_in,
+                                   const sctl::Vector<Real>& rdot_out,
+                                   const sctl::Vector<Real>& rdot_in
+                                   ) {
     if (center_out.Dim() != radius_out.Dim()*3 || center_in.Dim() != radius_in.Dim()*3) {
         throw std::invalid_argument("in/out radius and in/out center coordinate vectors must match grid size.");
     }
@@ -47,6 +61,8 @@ void Wall<Real>::setGridAndData(
     _center_coords_in = center_in;
     _radius_out = radius_out;
     _radius_in = radius_in;
+    _rdot_out = rdot_out;
+    _rdot_in = rdot_in;
 }
 
 template <class Real>

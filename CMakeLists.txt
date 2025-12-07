@@ -206,12 +206,23 @@ endif()
 #   "src/Particle.cpp"
 #   "src/StokesBIO.cpp"
 # )
+
+set(GLYMPHBIE_HEADERS
+    "include/Annular.hpp"
+    "include/FuncWall.hpp"
+    "include/detail/FuncWall.tpp"
+    "include/Particle.hpp"
+    "include/Wall.hpp"
+    "include/detail/Wall.tpp"
+    "include/IntegratorWall.hpp"
+    "include/detail/IntegratorWall.tpp"
+)
 set(GLYMPHBIE_SOURCES
     "src/Annular.cpp"
     #"src/StokesBIO.cpp"
 )
 
-add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES})
+add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES} ${GLYMPHBIE_HEADERS})
 
 target_include_directories(GLYMPHBIE
   PUBLIC
@@ -231,6 +242,7 @@ target_link_libraries(GLYMPHBIE PRIVATE
 set(TEST_SOURCES
     "${CMAKE_SOURCE_DIR}/tests/Annular_tests.cpp"
     "${CMAKE_SOURCE_DIR}/tests/FuncWall_tests.cpp"
+    "${CMAKE_SOURCE_DIR}/tests/IntegratorWall_tests.cpp"
     #"${CMAKE_SOURCE_DIR}/tests/SpatialSolver_tests.cpp"
 )
 

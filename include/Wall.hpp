@@ -17,6 +17,8 @@ class Wall
 
         sctl::Vector<Real> _radius_out;
         sctl::Vector<Real> _radius_in;
+        sctl::Vector<Real> _rdot_out;
+        sctl::Vector<Real> _rdot_in;
         size_t _spatial_grid_size = 0;
 
     public:
@@ -38,7 +40,10 @@ class Wall
                                 const sctl::Vector<Real>& center_out,
                                 const sctl::Vector<Real>& center_in,
                                 const sctl::Vector<Real>& radius_out,
-                                const sctl::Vector<Real>& radius_in);
+                                const sctl::Vector<Real>& radius_in, 
+                                const sctl::Vector<Real>& rdot_out,
+                                const sctl::Vector<Real>& rdot_in
+                                );
 
         
 
@@ -52,7 +57,8 @@ class Wall
         const sctl::Vector<Real>& centerCoordsIn() const { return _center_coords_in; }
         const sctl::Vector<Real>& radiusOut() const { return _radius_out; }
         const sctl::Vector<Real>& radiusIn() const { return _radius_in; }
-
+        const sctl::Vector<Real>& rdotOut() const { return _rdot_out; }
+        const sctl::Vector<Real>& rdotIn() const { return _rdot_in; }
 };
 #include "detail/Wall.tpp"
 #endif // __GLYMPH_WALL__
