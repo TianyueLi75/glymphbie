@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>glymphbie: Main Page</title>
+<title>glymphbie: GlymphBIE</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -68,10 +68,39 @@ $(function() {
 </div>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">glymphbie Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">GlymphBIE </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md_README"></a>A simulation platform for glymphatic flow in the perivascular spaces of penetrating arterioles coupled to neuronal activity.</p>
+<h1>SETUP notes</h1>
+<h2>Getting the submodules</h2>
+<p>Either clone the whole repo with recurse-submodules:</p>
+<div class="fragment"><div class="line">git clone --recurse-submodules https://github.com/TianyueLi75/glymphbie.git</div>
+</div><!-- fragment --><p>Or if repo is already cloned, use submodule update: </p><div class="fragment"><div class="line">(git clone https://github.com/TianyueLi75/glymphbie.git)</div>
+<div class="line">cd glymphbie</div>
+<div class="line">git submodule update --init --recursive</div>
+</div><!-- fragment --><p>To stay up-to-date with the linked submodules: </p><div class="fragment"><div class="line">git pull --recurse-submodules</div>
+</div><!-- fragment --><h2>Compile PVFMM</h2>
+<p>Requires: C++17+ compiler with OpenMP; mpirun; autotools</p>
+<p>If on Great Lakes: load the following modules: </p><div class="fragment"><div class="line">module list</div>
+<div class="line">    1) gcc/13.2.0   2) mkl/2023.2.1   3) openmpi/5.0.7</div>
+</div><!-- fragment --><p>Build PVFMM: </p><div class="fragment"><div class="line">cd glymphbie/extern/pvfmm</div>
+<div class="line">./autogen.sh</div>
+<div class="line">./configure</div>
+<div class="line">make -j</div>
+<div class="line">cd ../..</div>
+</div><!-- fragment --><h2>Compile GlymphBIE tests</h2>
+<p>In the main directory, go through CMakeLists.txt to update source files being compiled:</p><ul>
+<li>under "# Create the library", add in source files to GLYMPHBIE_SOURCES;</li>
+<li>under "# Source discovery, build tests", add in source files to TEST_SOURCES. <div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake ..</div>
+<div class="line">cmake --build .</div>
+</div><!-- fragment --></li>
+</ul>
+<p>Resolve any compilation errors from source code, then find the executables in build/bin, for example: </p><div class="fragment"><div class="line">./bin/Annular_tests</div>
+</div><!-- fragment --><p>Note: Makefile in main folder is NOT updated! </p>
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
