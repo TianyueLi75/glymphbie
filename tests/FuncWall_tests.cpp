@@ -5,30 +5,30 @@
 #include <iomanip> // For std::setprecision
 
 template <class Real>
-void set_centerline_z_linspace(sctl::Vector<Real>& coords,
-                               Real x_fixed,
+void set_centerline_x_linspace(sctl::Vector<Real>& coords,
+                               Real x_start,
+                               Real x_end,
                                Real y_fixed,
-                               Real z_start,
-                               Real z_end) {
+                               Real z_fixed) {
     const sctl::Long dim = coords.Dim();
     SCTL_ASSERT(dim % 3 == 0);
     const sctl::Long N = dim / 3;
 
     if (N <= 0) return;
     if (N == 1) {
-        coords[0] = x_fixed;
+        coords[0] = x_start;
         coords[1] = y_fixed;
-        coords[2] = z_start; // or (z_start+z_end)/2
+        coords[2] = z_fixed;
         return;
     }
 
-    const Real dz = (z_end - z_start) / (Real)(N - 1);
+    const Real dx = (x_end - x_start) / (Real)(N - 1);
 
     for (sctl::Long i = 0; i < N; ++i) {
-        Real z = z_start + dz * (Real)i;
-        coords[3*i    ] = x_fixed;
+        Real x = x_start + dx * (Real)i;
+        coords[3*i    ] = x;
         coords[3*i + 1] = y_fixed;
-        coords[3*i + 2] = z;
+        coords[3*i + 2] = z_fixed;
     }
 }
 
@@ -53,7 +53,7 @@ struct ConstantFunctor {
 };
 
 // 2. Spatial Functor (3 Arguments: Radius, Time, Coords)
-//    Radius varies based on the z-coordinate: R(z) = Base + Slope * z
+//    Radius varies based on the x-coordinate: R(x) = Base + Slope * x
 template <class Real>
 struct LinearSpatialFunctor {
     Real _base;
@@ -65,14 +65,14 @@ struct LinearSpatialFunctor {
     void operator()(sctl::Vector<Real>& radius, Real time, const sctl::Vector<Real>& coords) const {
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
             // Coords are packed: [x0, y0, z0, x1, y1, z1, ...]
-            Real z_coord = coords[i * 3+2]; 
-            radius[i] = _base + _slope * z_coord;
+            Real x_coord = coords[i * 3]; 
+            radius[i] = _base + _slope * x_coord;
         }
     }
 };
 
 // 3. Spatiotemporal Functor (4 Arguments: Radius, Rdot, Time, Coords)
-//    Radius varies based on the z-coordinate: R(z) = Base + Slope * z + Amplitude * sin(omega * t)
+//    Radius varies based on the x-coordinate: R(x) = Base + Slope * x + Amplitude * sin(omega * t)
 template <class Real>
 struct SpatiotemporalFunctor {
     Real _base;
@@ -87,16 +87,16 @@ struct SpatiotemporalFunctor {
         Real cos_term = std::cos(_omega * time);
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
             // Coords are packed: [x0, y0, z0, x1, y1, z1, ...]
-            Real z_coord = coords[i * 3+2]; 
-            radius[i] = _base + _slope * z_coord + _amplitude * sin_term;
+            Real x_coord = coords[i * 3]; 
+            radius[i] = _base + _slope * x_coord + _amplitude * sin_term;
             rdot[i] = _amplitude * _omega * cos_term;
         }
     }
 };
 
 // 4. r^2 spatiotemporal Functor (4 Arguments: Radius, Rdot, Time, Coords)
-//    Radius varies based on the z-coordinate: r(z,t) = R0*sqrt(1 + Amplitude * cos( 2*pi * n* z/L) * cos(omega * t))
-//   Rdot is computed accordingly dr/dt = - (R0 * Amplitude * omega * cos(2*pi*n*z/L) * sin(omega*t)) / (2*sqrt(1 + Amplitude * cos(2*pi*n*z/L) * cos(omega*t)))
+//    Radius varies based on the x-coordinate: r(x,t) = R0*sqrt(1 + Amplitude * cos( 2*pi * n* x/L) * cos(omega * t))
+//   Rdot is computed accordingly dr/dt = - (R0 * Amplitude * omega * cos(2*pi*n*x/L) * sin(omega*t)) / (2*sqrt(1 + Amplitude * cos(2*pi*n*x/L) * cos(omega*t)))
 template <class Real>
 struct R2SpatiotemporalFunctor {
     Real _R0;
@@ -112,8 +112,8 @@ struct R2SpatiotemporalFunctor {
         Real sin_omega_t = std::sin(_omega * time);
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
             // Coords are packed: [x0, y0, z0, x1, y1, z1, ...]
-            Real z_coord = coords[i * 3+2]; 
-            Real cos_term = std::cos(2.0 * sctl::const_pi<Real>() * _n * z_coord / _L);
+            Real x_coord = coords[i * 3]; 
+            Real cos_term = std::cos(2.0 * sctl::const_pi<Real>() * _n * x_coord / _L);
             Real radicand = 1.0 + _amplitude * cos_term * cos_omega_t;
             radius[i] = _R0 * std::sqrt(radicand);
             // Derivative calculation
@@ -125,6 +125,29 @@ struct R2SpatiotemporalFunctor {
         }
     }
 };
+
+
+// 5. radius held constant centerline shifts functor (4 Arguments: Radius, Rdot, Time, Coords)
+// eccentricity oscillates sinusoidally while radius remains constant
+// need to revise how velocity is handled here currenlty we assumed not theta dependence but rigid motion of centerline implies velocity depends on theta
+// template <class Real>
+// struct VesselRigidMotionFunctor {
+//     Real _E0;
+//     Real _amplitude;
+//     Real _omega;
+//     VesselRigidMotionFunctor(Real Y0, Real amplitude, Real omega) 
+//         : _E0(Y0), _amplitude(amplitude), _omega(omega) {}
+//     // This signature triggers the 'if constexpr' true branch in FuncWall
+//     void operator()(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot, Real time, sctl::Vector<Real>& coords) const {
+//         Real sin_term = std::sin(_omega * time);
+//         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
+//             // Update y-coordinate of centerlines
+//             coords[i * 3 + 1] = _Y0 + _amplitude * sin_term;
+//             // Radius remains constant
+//             rdot[i] = 0.0;
+//         }
+//     }
+// };
 // ==========================================
 // Test Cases
 // ==========================================
@@ -144,9 +167,9 @@ TEST_CASE(constant_walls)
 
     sctl::Vector<Real> c_out(N * 3), c_in(N * 3);
     sctl::Vector<Real> r_out(N), r_in(N);
-    // Set centerlines (z from 0 to 1)
-    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
-    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    // Set centerlines (x from 0 to 1)
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 0.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 0.0);
     
     // Initialize with bad values
     for(sctl::Long i=0; i<N; ++i) { r_out[i] = 99.9; r_in[i] = 99.9; }
@@ -196,8 +219,8 @@ TEST_CASE(spatial_walls)
     sctl::Vector<Real> c_in(N * 3), c_out(N * 3); 
     sctl::Vector<Real> r_in(N), r_out(N);
 
-    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
-    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 0.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 0.0);
     r_in = 1.0; r_out = 10.0; // Set radii
     // Use Constant for Outer, Spatial for Inner
     ConstantFunctor<Real> outer_logic(10.0); // Keep outer far away
@@ -215,11 +238,11 @@ TEST_CASE(spatial_walls)
     // 3. Verify: R should be Base + Slope * z
     std::cout << "  -> Verifying Spatial Radii:" << std::endl;
     for (sctl::Long i = 0; i < N; ++i) {
-        Real z = c_in[i * 3 + 2];
-        Real expected = base_r + slope * z;
+        Real x = c_in[i * 3];
+        Real expected = base_r + slope * x;
         Real actual = wall.radiusIn()[i];
 
-        std::cout << "     Index " << i << " (z=" << z << "): Expected " << expected << ", Got " << actual << std::endl;
+        std::cout << "     Index " << i << " (x=" << x << "): Expected " << expected << ", Got " << actual << std::endl;
         ASSERT_NEAR(actual, expected, 1e-10);
     }
 }
@@ -238,10 +261,10 @@ TEST_CASE(spatiotemporal_walls)
     sctl::Vector<Real> c_in(N * 3), c_out(N * 3);
     sctl::Vector<Real> r_in(N), r_out(N);   
 
-    // Setup a grid where Z coordinates are linearly spaced [0,1]
-    std::cout << "  -> Initialization: Setting up grid z = linspace[0, 1]" << std::endl;
-    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
-    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    // Setup a grid where x coordinates are linearly spaced [0,1]
+    std::cout << "  -> Initialization: Setting up grid x = linspace[0, 1]" << std::endl;
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 0.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 0.0);
 
     r_in = 1.0; r_out = 10.0; // Set radii
 
@@ -262,15 +285,15 @@ TEST_CASE(spatiotemporal_walls)
     Real sin_term = std::sin(omega * time);
     Real cos_term = std::cos(omega * time);
     for (sctl::Long i = 0; i < N; ++i) {
-        Real z = c_in[i * 3 + 2];
-        Real expected_radius = base_r + slope * z + amplitude * sin_term;
+        Real x = c_in[i * 3 ];
+        Real expected_radius = base_r + slope * x + amplitude * sin_term;
         Real expected_rdot = amplitude * omega * cos_term;
 
         Real actual_radius = wall.radiusIn()[i];
         Real actual_rdot = wall.rdotIn()[i];
 
         std::cout << std::setprecision(10);
-        std::cout << "     Index " << i << " (z=" << z << "): "
+        std::cout << "     Index " << i << " (x=" << x << "): "
                   << "Expected R=" << expected_radius << ", Got R=" << actual_radius
                   << "  |  Expected Rdot=" << expected_rdot << ", Got Rdot=" << actual_rdot
                   << std::endl;
@@ -294,10 +317,10 @@ TEST_CASE(r2_spatiotemporal_walls)
     sctl::Vector<Real> c_in(N * 3), c_out(N * 3);
     sctl::Vector<Real> r_in(N), r_out(N);   
 
-    // Setup a grid where Z coordinates are linearly spaced [0,1]
-    std::cout << "  -> Initialization: Setting up grid z = linspace[0, 1]" << std::endl;
-    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
-    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    // Setup a grid where x coordinates are linearly spaced [0,1]
+    std::cout << "  -> Initialization: Setting up grid x = linspace[0, 1]" << std::endl;
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 0.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 0.0);
 
     r_in = 1.0; r_out = 10.0; // Set radii
 
@@ -321,15 +344,15 @@ TEST_CASE(r2_spatiotemporal_walls)
     Real cos_omega_t = std::cos(omega * time);
     Real sin_omega_t = std::sin(omega * time);
     for (sctl::Long i = 0; i < N; ++i) {
-        Real z = c_in[i * 3 + 2];
-        Real cos_term = std::cos(2.0 * sctl::const_pi<Real>() * n * z / L);
+        Real x = c_in[i * 3];
+        Real cos_term = std::cos(2.0 * sctl::const_pi<Real>() * n * x / L);
         Real radicand = 1.0 + amplitude * cos_term * cos_omega_t;
         Real expected_radius = R0 * std::sqrt(radicand);
         Real expected_rdot = - (R0 * amplitude * omega * cos_term * sin_omega_t) / (2.0 * std::sqrt(radicand));
         Real actual_radius = wall.radiusIn()[i];
         Real actual_rdot = wall.rdotIn()[i];
         std::cout << std::setprecision(10);
-        std::cout << "     Index " << i << " (z=" << z << "): "
+        std::cout << "     Index " << i << " (x=" << x << "): "
                   << "Expected R=" << expected_radius << ", Got R=" << actual_radius
                   << "  |  Expected Rdot=" << expected_rdot << ", Got Rdot=" << actual_rdot
                   << std::endl;

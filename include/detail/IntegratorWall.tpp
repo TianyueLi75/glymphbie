@@ -46,9 +46,9 @@ void IntegratorWall<Real, NonLinearFuncV, NonLinearFuncG, InnerFunc, OuterFunc>:
         const Real N = _neuronal_activity[i];
         const Real V_inf = _FV(N);
         const Real G_inf = _FG(N);
-        const Real offsetX = this->_center_coords_in[3*i] - this->_center_coords_out[3*i];
         const Real offsetY = this->_center_coords_in[3*i+1] - this->_center_coords_out[3*i+1];
-        const Real delta = std::sqrt(offsetX*offsetX + offsetY*offsetY);
+        const Real offsetZ = this->_center_coords_in[3*i+2] - this->_center_coords_out[3*i+2];
+        const Real delta = std::sqrt(offsetZ*offsetZ + offsetY*offsetY);
         
         // exponential integration step
         _V[i] = V_inf + (_V[i] - V_inf)*decayV;
@@ -59,8 +59,8 @@ void IntegratorWall<Real, NonLinearFuncV, NonLinearFuncG, InnerFunc, OuterFunc>:
         Real rout_old = this->_radius_out[i];
 
         // compute new physical radii based on wall functions
-        Real rin_phys = _inner_func(this->_center_coords_in[3*i+2], _V[i], _G[i], t_next);
-        Real rout_phys = _outer_func(this->_center_coords_out[3*i+2], _V[i], _G[i], t_next);
+        Real rin_phys = _inner_func(this->_center_coords_in[3*i], _V[i], _G[i], t_next);
+        Real rout_phys = _outer_func(this->_center_coords_out[3*i], _V[i], _G[i], t_next);
 
         assert(rin_phys > 0.0 && rout_phys > 0.0);
         const Real minimum_gap = rout_phys - rin_phys - delta;

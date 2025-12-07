@@ -10,6 +10,14 @@ class FuncWall: public Wall<Real>{
         InnerFunc _inner_func;
         OuterFunc _outer_func;
 
+        // Helper function to flexibly call wall functors with varying signatures
+        template <class Func>
+        void apply_wall_logic(Func& func, 
+                            sctl::Vector<Real>& radius, 
+                            sctl::Vector<Real>& rdot, 
+                            Real t, 
+                            sctl::Vector<Real>& coords);
+
     public:
         FuncWall( const Real dt, 
             const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines

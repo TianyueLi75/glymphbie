@@ -7,32 +7,33 @@
 
 
 template <class Real>
-void set_centerline_z_linspace(sctl::Vector<Real>& coords,
-                               Real x_fixed,
+void set_centerline_x_linspace(sctl::Vector<Real>& coords,
+                               Real x_start,
+                               Real x_end,
                                Real y_fixed,
-                               Real z_start,
-                               Real z_end) {
+                               Real z_fixed) {
     const sctl::Long dim = coords.Dim();
     SCTL_ASSERT(dim % 3 == 0);
     const sctl::Long N = dim / 3;
 
     if (N <= 0) return;
     if (N == 1) {
-        coords[0] = x_fixed;
+        coords[0] = x_start;
         coords[1] = y_fixed;
-        coords[2] = z_start; // or (z_start+z_end)/2
+        coords[2] = z_fixed;
         return;
     }
 
-    const Real dz = (z_end - z_start) / (Real)(N - 1);
+    const Real dx = (x_end - x_start) / (Real)(N - 1);
 
     for (sctl::Long i = 0; i < N; ++i) {
-        Real z = z_start + dz * (Real)i;
-        coords[3*i    ] = x_fixed;
+        Real x = x_start + dx * (Real)i;
+        coords[3*i    ] = x;
         coords[3*i + 1] = y_fixed;
-        coords[3*i + 2] = z;
+        coords[3*i + 2] = z_fixed;
     }
 }
+
 
 // ==========================================
 // Functor Definitions
@@ -96,14 +97,14 @@ struct InnerWallFunctor {
         _inv_2sigma2 = 1.0 / (2.0 * sigma_c * sigma_c);
     }
 
-    Real operator()(Real z, Real V, Real G, Real t) const {
+    Real operator()(Real x, Real V, Real G, Real t) const {
 
         Real diff = V - _Vc;
         Real gaussian = std::exp(-(diff * diff) * _inv_2sigma2);
         Real Ac = _ac * gaussian;
 
 
-        Real s = z; 
+        Real s = x; 
         Real phase = (_omega * t) + (_k * s);
         Real sin_val = std::sin(phase);
 
@@ -124,7 +125,7 @@ struct OuterWallFunctor {
     OuterWallFunctor(Real R0, Real alpha_G, Real G0)
         : _R0(R0), _alpha_G(alpha_G), _G0(G0) {}
 
-    Real operator()(Real z, Real V, Real G, Real t) const {
+    Real operator()(Real x, Real V, Real G, Real t) const {
         Real term_swell = 1.0 - _alpha_G * (G - _G0);
         return _R0 * term_swell;
     }
@@ -165,8 +166,8 @@ TEST_CASE(constant_walls){
     sctl::Vector<Real> activity(N), V(N), G(N);
 
     // 
-    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
-    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 0.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 0.0);
 
     for (long i=0; i<N; ++i) {
         r_in[i]  = R_in_base;
@@ -256,8 +257,8 @@ TEST_CASE(inner_outer_wall_integration) {
     sctl::Vector<Real> act(N), V(N), G(N);
 
     // Initial Conditions
-    set_centerline_z_linspace(c_in, 0.0, 0.0, 0.0, 1.0);
-    set_centerline_z_linspace(c_out, 0.0, 0.0, 0.0, 1.0);
+    set_centerline_x_linspace(c_in, 0.0, 1.0, 0.0, 1.0);
+    set_centerline_x_linspace(c_out, 0.0, 1.0, 0.0, 1.0);
 
     r_in[0]  = R_in_base;  // 1.0
     r_out[0] = R_out_base; // 1.15
