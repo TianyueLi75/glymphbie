@@ -49,41 +49,41 @@ void Annular<Real>::SetOuterR(const sctl::Vector<Real> r_in) {
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, sctl::Vector<Real> drdx_outer_, bool force_setup) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner_, sctl::Vector<Real> drdt_outer_, bool force_setup) {
     if (force_setup) {
         SetupInner_bool = false;
         SetupOuter_bool = false;
     }
     if (SetupInner_bool && SetupOuter_bool) {
         // std::cout << "Already set up with the same parameters, nothing done." << std::endl;
-        return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer, drdx_inner_, drdx_outer);
+        return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer, drdt_inner_, drdt_outer);
     }
-    sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated;
+    sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdt_inner_updated, drdt_outer_updated;
     if (SetupInner_bool) {
         // Inner set up, outer not
         // std::cout << "Inner is setup, setting up outer now."<<std::endl;
-        std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_);
+        std::tie(Xc_outer_updated, r_outer_updated, drdt_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdt_outer_);
         Xc_inner_updated = Xc_inner;
         r_inner_updated = r_inner;
-        drdx_inner_updated = drdx_inner;
+        drdt_inner_updated = drdt_inner;
     } else if (SetupOuter_bool) {
         // Outer set up, inner not
         // std::cout << "Outer is setup, setting up inner now." << std::endl;
-        std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_);
+        std::tie(Xc_inner_updated, r_inner_updated, drdt_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdt_inner_);
         Xc_outer_updated = Xc_outer;
         r_outer_updated = r_outer;
-        drdx_outer_updated = drdx_outer;
+        drdt_outer_updated = drdt_outer;
     } else {
         // Neither is set up
         // std::cout << "neither is setup." << std::endl;
-        std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_, force_setup);
-        std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_, force_setup);
+        std::tie(Xc_inner_updated, r_inner_updated, drdt_inner_updated) = SetupInner(Nelem_, ElemOrder_, FourierOrder_, drdt_inner_, force_setup);
+        std::tie(Xc_outer_updated, r_outer_updated, drdt_outer_updated) = SetupOuter(Nelem_, ElemOrder_, FourierOrder_, drdt_outer_, force_setup);
     }    
-    return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated);
+    return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdt_inner_updated, drdt_outer_updated);
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::Setup_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, sctl::Vector<Real> drdx_outer_, bool force_setup) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::Setup_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner_, sctl::Vector<Real> drdt_outer_, bool force_setup) {
     if (comm.Size() > Nelem_) {
         std::cerr << "\n ERROR in Setup_mpi: Number of MPI processes larger than number of elements, will result in seg-faults. Use fewer processes." << std::endl;
     }
@@ -93,30 +93,30 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vec
     }
     if (SetupInner_bool && SetupOuter_bool) {
         std::cout << "Already set up with the same parameters, nothing done." << std::endl;
-        return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer, drdx_inner_, drdx_outer);
+        return std::make_tuple(Xc_inner, Xc_outer, r_inner, r_outer, drdt_inner_, drdt_outer);
     }
-    sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated;
+    sctl::Vector<Real> Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdt_inner_updated, drdt_outer_updated;
     if (SetupInner_bool) {
         // Inner set up, outer not
         std::cout << "Inner is setup, setting up outer now."<<std::endl;
-        std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter_mpi(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_);
+        std::tie(Xc_outer_updated, r_outer_updated, drdt_outer_updated) = SetupOuter_mpi(Nelem_, ElemOrder_, FourierOrder_, drdt_outer_);
         Xc_inner_updated = Xc_inner;
         r_inner_updated = r_inner;
-        drdx_inner_updated = drdx_inner;
+        drdt_inner_updated = drdt_inner;
     } else if (SetupOuter_bool) {
         // Outer set up, inner not
         std::cout << "Outer is setup, setting up inner now." << std::endl;
-        std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner_mpi(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_);
+        std::tie(Xc_inner_updated, r_inner_updated, drdt_inner_updated) = SetupInner_mpi(Nelem_, ElemOrder_, FourierOrder_, drdt_inner_);
         Xc_outer_updated = Xc_outer;
         r_outer_updated = r_outer;
-        drdx_outer_updated = drdx_outer;
+        drdt_outer_updated = drdt_outer;
     } else {
         // Neither is set up
         // std::cout << "neither is setup." << std::endl;
-        std::tie(Xc_inner_updated, r_inner_updated, drdx_inner_updated) = SetupInner_mpi(Nelem_, ElemOrder_, FourierOrder_, drdx_inner_, force_setup);
-        std::tie(Xc_outer_updated, r_outer_updated, drdx_outer_updated) = SetupOuter_mpi(Nelem_, ElemOrder_, FourierOrder_, drdx_outer_, force_setup);
+        std::tie(Xc_inner_updated, r_inner_updated, drdt_inner_updated) = SetupInner_mpi(Nelem_, ElemOrder_, FourierOrder_, drdt_inner_, force_setup);
+        std::tie(Xc_outer_updated, r_outer_updated, drdt_outer_updated) = SetupOuter_mpi(Nelem_, ElemOrder_, FourierOrder_, drdt_outer_, force_setup);
     }    
-    return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdx_inner_updated, drdx_outer_updated);
+    return std::make_tuple(Xc_inner_updated, Xc_outer_updated, r_inner_updated, r_outer_updated, drdt_inner_updated, drdt_outer_updated);
 }
 
 template <class Real>
@@ -131,18 +131,18 @@ void Annular<Real>::InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> 
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, bool force_setup) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner_, bool force_setup) {
     if (!SetupInner_bool) {
 
         Nelem_inner = Nelem_;
         FourierOrder_inner = FourierOrder_;
         ElemOrder_inner = ElemOrder_;
 
-        sctl::Vector<Real> Xc_updated, r_updated, drdx_updated;
+        sctl::Vector<Real> Xc_updated, r_updated, drdt_updated;
         if (!force_setup && Xc_inner.Dim() == Nelem_ * ElemOrder_ * 3) {
             Xc_updated = Xc_inner;
             r_updated = r_inner;
-            drdx_updated = drdx_inner_;
+            drdt_updated = drdt_inner_;
         } else {
             // std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
             // Get (approximately) x nodes from original Xc
@@ -152,7 +152,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
             sctl::Vector<Real> trg_x(ElemOrder_);
             r_updated.ReInit(ElemOrder_ * Nelem_);
-            drdx_updated.ReInit(ElemOrder_ * Nelem_);
+            drdt_updated.ReInit(ElemOrder_ * Nelem_);
             for (sctl::Long panel_ind=0; panel_ind < Nelem_; panel_ind ++) {
                 src_x.SetZero();
                 trg_x.SetZero();
@@ -165,13 +165,13 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
                     trg_x[node_ind] = Xc_updated_here[node_ind*3];
                 }
                 sctl::Vector<Real> r_inner_here(OldOrder, (sctl::Iterator<Real>) r_inner.begin() + panel_ind*OldOrder, false);
-                sctl::Vector<Real> drdx_inner_here(OldOrder, (sctl::Iterator<Real>) drdx_inner_.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> drdt_inner_here(OldOrder, (sctl::Iterator<Real>) drdt_inner_.begin() + panel_ind*OldOrder, false);
                 sctl::Vector<Real> r_updated_here(ElemOrder_, (sctl::Iterator<Real>) r_updated.begin() + panel_ind*ElemOrder_, false);
-                sctl::Vector<Real> drdx_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdx_updated.begin() + panel_ind*ElemOrder_, false);
+                sctl::Vector<Real> drdt_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdt_updated.begin() + panel_ind*ElemOrder_, false);
                 InterpR(r_updated_here, r_inner_here, src_x, trg_x);
-                InterpR(drdx_updated_here, drdx_inner_here, src_x, trg_x);
+                InterpR(drdt_updated_here, drdt_inner_here, src_x, trg_x);
                 // std::cout << "DEBUG interp, first entry locally in r_updated: " << r_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << r_updated_here[0] << std::endl;
-                // std::cout << "DEBUG interp, first entry locally in drdx_updated: " << drdx_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdx_updated_here[0] << std::endl;
+                // std::cout << "DEBUG interp, first entry locally in drdt_updated: " << drdt_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdt_updated_here[0] << std::endl;
             }
         }
         sctl::Vector<sctl::Long> ElemOrderVec(Nelem_);
@@ -184,8 +184,8 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         SetupInner_bool = true;
         Xc_inner = Xc_updated;
         r_inner = r_updated;
-        drdx_inner = drdx_updated;
-        // std::cout << "in setup inner, drdx_inner after setup is " << drdx_inner.Dim() << std::endl;
+        drdt_inner = drdt_updated;
+        // std::cout << "in setup inner, drdt_inner after setup is " << drdt_inner.Dim() << std::endl;
         min_radius = r_inner[0];
         for (const auto e : r_inner) min_radius = std::min<Real>(min_radius, sctl::fabs(e));
         elem_lst_inner.GetNodeCoord(&X_inner, &Xn_inner, nullptr);
@@ -195,12 +195,12 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
     }
     // std::cout << "Xc inner inside SetupInner" << std::endl;
     // std::cout << Xc_inner << std::endl;
-    return std::make_tuple(Xc_inner, r_inner, drdx_inner);
+    return std::make_tuple(Xc_inner, r_inner, drdt_inner);
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, bool force_setup) {
-    // Assume Nelem, Xc, r, drdx given are for the whole object, but initialize slender_element as local objects.
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupInner_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner_, bool force_setup) {
+    // Assume Nelem, Xc, r, drdt given are for the whole object, but initialize slender_element as local objects.
 
     if (!SetupInner_bool) {
         // Split ElemOrder up by number of mpi.
@@ -221,11 +221,11 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         FourierOrder_inner = FourierOrder_;
         ElemOrder_inner = ElemOrder_;
 
-        sctl::Vector<Real> Xc_updated, r_updated, drdx_updated;
+        sctl::Vector<Real> Xc_updated, r_updated, drdt_updated;
         if (!force_setup && Xc_inner.Dim() == Nelem_inner * ElemOrder_ * 3) {
             Xc_updated = Xc_inner;
             r_updated = r_inner;
-            drdx_updated = drdx_inner_;
+            drdt_updated = drdt_inner_;
         } else {
             // std::cout << "Xc_inner does not match panel-based quadrature; updating Xc_inner." << std::endl;
             // Get (approximately) x nodes from original Xc
@@ -236,7 +236,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             SCTL_ASSERT(Xc_updated.Dim() == 3*Nelem_inner*ElemOrder_);
             sctl::Vector<Real> trg_x(ElemOrder_);
             r_updated.ReInit(ElemOrder_ * Nelem_inner);
-            drdx_updated.ReInit(ElemOrder_ * Nelem_inner);
+            drdt_updated.ReInit(ElemOrder_ * Nelem_inner);
             for (sctl::Long panel_ind=0; panel_ind < Nelem_inner; panel_ind ++) {
                 src_x.SetZero();
                 trg_x.SetZero();
@@ -249,13 +249,13 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
                     trg_x[node_ind] = Xc_updated_here[node_ind*3];
                 }
                 sctl::Vector<Real> r_inner_here(OldOrder, (sctl::Iterator<Real>) r_inner.begin() + panel_ind*OldOrder, false);
-                sctl::Vector<Real> drdx_inner_here(OldOrder, (sctl::Iterator<Real>) drdx_inner_.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> drdt_inner_here(OldOrder, (sctl::Iterator<Real>) drdt_inner_.begin() + panel_ind*OldOrder, false);
                 sctl::Vector<Real> r_updated_here(ElemOrder_, (sctl::Iterator<Real>) r_updated.begin() + panel_ind*ElemOrder_, false);
-                sctl::Vector<Real> drdx_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdx_updated.begin() + panel_ind*ElemOrder_, false);
+                sctl::Vector<Real> drdt_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdt_updated.begin() + panel_ind*ElemOrder_, false);
                 InterpR(r_updated_here, r_inner_here, src_x, trg_x);
-                InterpR(drdx_updated_here, drdx_inner_here, src_x, trg_x);
+                InterpR(drdt_updated_here, drdt_inner_here, src_x, trg_x);
                 // std::cout << "DEBUG interp, first entry locally in r_updated: " << r_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << r_updated_here[0] << std::endl;
-                // std::cout << "DEBUG interp, first entry locally in drdx_updated: " << drdx_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdx_updated_here[0] << std::endl;
+                // std::cout << "DEBUG interp, first entry locally in drdt_updated: " << drdt_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdt_updated_here[0] << std::endl;
             }
         }
 
@@ -270,7 +270,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         SetupInner_bool = true;
         Xc_inner = Xc_updated;
         r_inner = r_updated;
-        drdx_inner = drdx_updated;
+        drdt_inner = drdt_updated;
         // std::cout << "in setup inner, Xc_inner after setup size is " << Xc_inner.Dim() << std::endl;
         min_radius = r_inner[0];
         for (const auto e : r_inner) min_radius = std::min<Real>(min_radius, sctl::fabs(e));
@@ -280,21 +280,21 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         // This clause is only for when called from user function; shouldn't be here from Setup().
         // std::cout << "Note: Inner already setup, nothing done." << std::endl;
     }
-    return std::make_tuple(Xc_inner, r_inner, drdx_inner);
+    return std::make_tuple(Xc_inner, r_inner, drdt_inner);
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_outer_, bool force_setup) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_outer_, bool force_setup) {
     if (!SetupOuter_bool) {
         Nelem_outer = Nelem_;
         FourierOrder_outer = FourierOrder_;
         ElemOrder_outer = ElemOrder_;
 
-        sctl::Vector<Real> Xc_updated, r_updated, drdx_updated;
+        sctl::Vector<Real> Xc_updated, r_updated, drdt_updated;
         if (!force_setup && Xc_outer.Dim() == Nelem_ * ElemOrder_ * 3) {
             Xc_updated = Xc_outer;
             r_updated = r_outer;
-            drdx_updated = drdx_outer_;
+            drdt_updated = drdt_outer_;
             // TODO: will add adaptive quadrature later. Also check what kind of adaptive quadrature is already implemented in CSBQ, should be some Fourier zooming in..?
         } else {
             // std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
@@ -305,7 +305,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             Xc_updated = GetCenterLine(Nelem_, ElemOrder_);
             sctl::Vector<Real> trg_x(ElemOrder_);
             r_updated.ReInit(ElemOrder_ * Nelem_);
-            drdx_updated.ReInit(ElemOrder_ * Nelem_);
+            drdt_updated.ReInit(ElemOrder_ * Nelem_);
             for (sctl::Long panel_ind=0; panel_ind < Nelem_; panel_ind ++) {
                 src_x.SetZero();
                 trg_x.SetZero();
@@ -318,13 +318,13 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
                     trg_x[node_ind] = Xc_updated_here[node_ind*3];
                 }
                 sctl::Vector<Real> r_outer_here(OldOrder, (sctl::Iterator<Real>) r_outer.begin() + panel_ind*OldOrder, false);
-                sctl::Vector<Real> drdx_outer_here(OldOrder, (sctl::Iterator<Real>) drdx_outer_.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> drdt_outer_here(OldOrder, (sctl::Iterator<Real>) drdt_outer_.begin() + panel_ind*OldOrder, false);
                 sctl::Vector<Real> r_updated_here(ElemOrder_, (sctl::Iterator<Real>) r_updated.begin() + panel_ind*ElemOrder_, false);
-                sctl::Vector<Real> drdx_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdx_updated.begin() + panel_ind*ElemOrder_, false);
+                sctl::Vector<Real> drdt_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdt_updated.begin() + panel_ind*ElemOrder_, false);
                 InterpR(r_updated_here, r_outer_here, src_x, trg_x);
-                InterpR(drdx_updated_here, drdx_outer_here, src_x, trg_x);
+                InterpR(drdt_updated_here, drdt_outer_here, src_x, trg_x);
                 // std::cout << "DEBUG interp, first entry locally in r_updated: " << r_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << r_updated_here[0] << std::endl;
-                // std::cout << "DEBUG interp, first entry locally in drdx_updated: " << drdx_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdx_updated_here[0] << std::endl;
+                // std::cout << "DEBUG interp, first entry locally in drdt_updated: " << drdt_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdt_updated_here[0] << std::endl;
             }
         }
         sctl::Vector<sctl::Long> ElemOrderVec(Nelem_);
@@ -337,7 +337,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         SetupOuter_bool = true;
         Xc_outer = Xc_updated;
         r_outer = r_updated;
-        drdx_outer = drdx_updated;
+        drdt_outer = drdt_updated;
         elem_lst_outer.GetNodeCoord(&X_outer, &Xn_outer, nullptr);
         // Correct normal of outer channel to point into fluid domain.
         Xn_outer *= -1.;
@@ -345,11 +345,11 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
     } else {
         std::cout << "Note: Outer already setup, nothing done." << std::endl;
     }
-    return std::make_tuple(Xc_outer, r_outer, drdx_outer);
+    return std::make_tuple(Xc_outer, r_outer, drdt_outer);
 }
 
 template <class Real>
-std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_outer_, bool force_setup) {
+std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<Real>::SetupOuter_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_outer_, bool force_setup) {
     if (!SetupOuter_bool) {
         // Split ElemOrder up by number of mpi.
         // Assume all elements have the same ElemOrder and FourierOrder -- adaptive quadrature (later) should change only panel locations.
@@ -368,11 +368,11 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         FourierOrder_outer = FourierOrder_;
         ElemOrder_outer = ElemOrder_;
 
-        sctl::Vector<Real> Xc_updated, r_updated, drdx_updated;
+        sctl::Vector<Real> Xc_updated, r_updated, drdt_updated;
         if (!force_setup && Xc_outer.Dim() == Nelem_outer * ElemOrder_ * 3) {
             Xc_updated = Xc_outer;
             r_updated = r_outer;
-            drdx_updated = drdx_outer_;
+            drdt_updated = drdt_outer_;
             // TODO: will add adaptive quadrature later. Also check what kind of adaptive quadrature is already implemented in CSBQ, should be some Fourier zooming in..?
         } else {
             // std::cout << "Xc_outer does not match panel-based quadrature; updating Xc_outer." << std::endl;
@@ -384,7 +384,7 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
             SCTL_ASSERT(Xc_updated.Dim() == 3*Nelem_outer*ElemOrder_);
             sctl::Vector<Real> trg_x(ElemOrder_);
             r_updated.ReInit(ElemOrder_ * Nelem_outer);
-            drdx_updated.ReInit(ElemOrder_ * Nelem_outer);
+            drdt_updated.ReInit(ElemOrder_ * Nelem_outer);
             for (sctl::Long panel_ind=0; panel_ind < Nelem_outer; panel_ind ++) {
                 src_x.SetZero();
                 trg_x.SetZero();
@@ -397,13 +397,13 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
                     trg_x[node_ind] = Xc_updated_here[node_ind*3];
                 }
                 sctl::Vector<Real> r_outer_here(OldOrder, (sctl::Iterator<Real>) r_outer.begin() + panel_ind*OldOrder, false);
-                sctl::Vector<Real> drdx_outer_here(OldOrder, (sctl::Iterator<Real>) drdx_outer_.begin() + panel_ind*OldOrder, false);
+                sctl::Vector<Real> drdt_outer_here(OldOrder, (sctl::Iterator<Real>) drdt_outer_.begin() + panel_ind*OldOrder, false);
                 sctl::Vector<Real> r_updated_here(ElemOrder_, (sctl::Iterator<Real>) r_updated.begin() + panel_ind*ElemOrder_, false);
-                sctl::Vector<Real> drdx_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdx_updated.begin() + panel_ind*ElemOrder_, false);
+                sctl::Vector<Real> drdt_updated_here(ElemOrder_, (sctl::Iterator<Real>) drdt_updated.begin() + panel_ind*ElemOrder_, false);
                 InterpR(r_updated_here, r_outer_here, src_x, trg_x);
-                InterpR(drdx_updated_here, drdx_outer_here, src_x, trg_x);
+                InterpR(drdt_updated_here, drdt_outer_here, src_x, trg_x);
                 // std::cout << "DEBUG interp, first entry locally in r_updated: " << r_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << r_updated_here[0] << std::endl;
-                // std::cout << "DEBUG interp, first entry locally in drdx_updated: " << drdx_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdx_updated_here[0] << std::endl;
+                // std::cout << "DEBUG interp, first entry locally in drdt_updated: " << drdt_updated[panel_ind*ElemOrder_] << ", calculated form interpR: " << drdt_updated_here[0] << std::endl;
             }
         }
 
@@ -417,14 +417,14 @@ std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Annular<R
         SetupOuter_bool = true;
         Xc_outer = Xc_updated;
         r_outer = r_updated;
-        drdx_outer = drdx_updated;
+        drdt_outer = drdt_updated;
         elem_lst_outer.GetNodeCoord(&X_outer, &Xn_outer, nullptr);
         // Correct normal of outer channel to point into fluid domain.
         Xn_outer *= -1.;
     } else {
         std::cout << "Note: Outer already setup, nothing done." << std::endl;
     }
-    return std::make_tuple(Xc_outer, r_outer, drdx_outer);
+    return std::make_tuple(Xc_outer, r_outer, drdt_outer);
 }
 
 template <class Real>
@@ -636,7 +636,7 @@ sctl::SlenderElemList<Real> Annular<Real>::GetOuterElemList() {
 
 template <class Real>
 sctl::Vector<Real> Annular<Real>::GetVslip() {
-    // Given drdx at the same x discre as centerline nodes, return the axisymmetric vslip at surface nodes.
+    // Given drdt at the same x discre as centerline nodes, return the axisymmetric vslip at surface nodes.
     sctl::Vector<Real> v1, v2;
     v1 = GetVslipInner();
     v2 = GetVslipOuter();
@@ -654,7 +654,7 @@ sctl::Vector<Real> Annular<Real>::GetVslip() {
 
 template <class Real>
 sctl::Vector<Real> Annular<Real>::GetVslip_mpi() {
-    // Given drdx at the same x discre as centerline nodes, return the axisymmetric vslip at surface nodes.
+    // Given drdt at the same x discre as centerline nodes, return the axisymmetric vslip at surface nodes.
     sctl::Vector<Real> v1, v2;
     v1 = GetVslipInner_mpi();
     v2 = GetVslipOuter_mpi();
@@ -686,7 +686,7 @@ sctl::Vector<Real> Annular<Real>::GetVslipInner() {
             Real rnorm = rvec_here[0]*rvec_here[0] + rvec_here[1]*rvec_here[1] + rvec_here[2]*rvec_here[2];
             rnorm = sctl::sqrt<Real>(rnorm);
             sctl::Vector<Real> vslip_here(3, (sctl::Iterator<Real>) vslip.begin() + fncn, false);
-            vslip_here = drdx_inner[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdx.
+            vslip_here = drdt_inner[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdt.
         }
     }
     return vslip;
@@ -708,7 +708,7 @@ sctl::Vector<Real> Annular<Real>::GetVslipInner_mpi() {
             Real rnorm = rvec_here[0]*rvec_here[0] + rvec_here[1]*rvec_here[1] + rvec_here[2]*rvec_here[2];
             rnorm = sctl::sqrt<Real>(rnorm);
             sctl::Vector<Real> vslip_here(3, (sctl::Iterator<Real>) vslip.begin() + fncn, false);
-            vslip_here = drdx_inner[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdx.
+            vslip_here = drdt_inner[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdt.
         }
     }
     return vslip;
@@ -730,7 +730,7 @@ sctl::Vector<Real> Annular<Real>::GetVslipOuter() {
             Real rnorm = rvec_here[0]*rvec_here[0] + rvec_here[1]*rvec_here[1] + rvec_here[2]*rvec_here[2];
             rnorm = sctl::sqrt<Real>(rnorm);
             sctl::Vector<Real> vslip_here(3, (sctl::Iterator<Real>) vslip.begin() + fncn, false);
-            vslip_here = drdx_outer[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdx.
+            vslip_here = drdt_outer[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdt.
         }
     }
     return vslip;
@@ -752,7 +752,7 @@ sctl::Vector<Real> Annular<Real>::GetVslipOuter_mpi() {
             Real rnorm = rvec_here[0]*rvec_here[0] + rvec_here[1]*rvec_here[1] + rvec_here[2]*rvec_here[2];
             rnorm = sctl::sqrt<Real>(rnorm);
             sctl::Vector<Real> vslip_here(3, (sctl::Iterator<Real>) vslip.begin() + fncn, false);
-            vslip_here = drdx_outer[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdx.
+            vslip_here = drdt_outer[cn] / rnorm * rvec_here; // vslip points out in r direction with magnitude drdt.
         }
     }
     return vslip;

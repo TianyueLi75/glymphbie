@@ -17,12 +17,12 @@ template <class Real> class Annular {
         void SetOuterXc(const sctl::Vector<Real> X_in);
         void SetInnerR(const sctl::Vector<Real> r_in);
         void SetOuterR(const sctl::Vector<Real> r_in);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner, sctl::Vector<Real> drdx_outer, bool force_setup = false);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Setup_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner_, sctl::Vector<Real> drdx_outer_, bool force_setup = false);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner, bool force_setup = false);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_outer, bool force_setup = false);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupInner_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_inner, bool force_setup = false);
-        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdx_outer, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Setup(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner, sctl::Vector<Real> drdt_outer, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> Setup_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner_, sctl::Vector<Real> drdt_outer_, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupInner(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_outer, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupInner_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_inner, bool force_setup = false);
+        std::tuple<sctl::Vector<Real>, sctl::Vector<Real>, sctl::Vector<Real>> SetupOuter_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector<Real> drdt_outer, bool force_setup = false);
         void GetInnerCoord(sctl::Vector<Real>* X_out, sctl::Vector<Real>* Xn_out);
         void GetOuterCoord(sctl::Vector<Real>* X_out, sctl::Vector<Real>* Xn_out);
         void GetNodeCoord(sctl::Vector<Real>* X, sctl::Vector<Real>* Xn); // TODO: enable comm support later.
@@ -51,7 +51,7 @@ template <class Real> class Annular {
         sctl::Vector<Real> X_inner, X_outer, Xn_inner, Xn_outer; // computed values from CSBQ; NOTE: Normal points into fluid.
         Real min_radius = 0.; // computed value
         sctl::Long Nelem_inner, Nelem_outer, ElemOrder_inner, ElemOrder_outer, FourierOrder_inner, FourierOrder_outer; 
-        sctl::Vector<Real> drdx_inner, drdx_outer;
+        sctl::Vector<Real> drdt_inner, drdt_outer;
 
         // MPI specific params
         sctl::Comm comm;

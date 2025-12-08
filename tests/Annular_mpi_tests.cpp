@@ -47,10 +47,10 @@ void straight_getnodes(sctl::Comm comm)
     r1 = 0.3;
     sctl::Vector<Real> r2(Xc_serial.Dim()/3);
     r2 = 0.5;
-    sctl::Vector<Real> drdx(Xc_serial.Dim()/3); // no outward velocity on wall.
-    drdx = 0.;
+    sctl::Vector<Real> drdt(Xc_serial.Dim()/3); // no outward velocity on wall.
+    drdt = 0.;
     Annular<Real> straight(Xc_serial,Xc_serial,r1,r2);
-    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx); 
+    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt); 
 
     auto [cnt, dsp, Xc_mpi] = Annular<Real>::GetCenterLine_mpi(Nelem, ElemOrder, comm);
     // std::cout << "on rank " << comm.Rank() << ", cnt is " << cnt << ", dsp is " << dsp << ", size of Xc_mpi here is " << Xc_mpi.Dim() << std::endl;
@@ -58,10 +58,10 @@ void straight_getnodes(sctl::Comm comm)
     r1_mpi = 0.3;
     sctl::Vector<Real> r2_mpi(Xc_mpi.Dim()/3);
     r2_mpi = 0.5;
-    sctl::Vector<Real> drdx_mpi(Xc_mpi.Dim()/3); // no outward velocity on wall.
-    drdx_mpi = 0.;
+    sctl::Vector<Real> drdt_mpi(Xc_mpi.Dim()/3); // no outward velocity on wall.
+    drdt_mpi = 0.;
     Annular<Real> straight_mpi(Xc_mpi,Xc_mpi,r1_mpi,r2_mpi, comm);
-    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder,drdx_mpi,drdx_mpi);
+    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder,drdt_mpi,drdt_mpi);
     
     Real rad_out = straight.GetMinRadius();
     // MPI Reduce to collect min of all min radii on each process
@@ -113,10 +113,10 @@ void in_domain(sctl::Comm comm)
     r1_mpi = 0.3;
     sctl::Vector<Real> r2_mpi(Xc_mpi.Dim()/3);
     r2_mpi = 0.5;
-    sctl::Vector<Real> drdx_mpi(Xc_mpi.Dim()/3); // no outward velocity on wall.
-    drdx_mpi = 0.;
+    sctl::Vector<Real> drdt_mpi(Xc_mpi.Dim()/3); // no outward velocity on wall.
+    drdt_mpi = 0.;
     Annular<Real> straight_mpi(Xc_mpi,Xc_mpi,r1_mpi,r2_mpi, comm);
-    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdx_mpi, drdx_mpi);
+    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdt_mpi, drdt_mpi);
 
     sctl::Vector<Real> Xtrg(3);
     Xtrg = {0.75,0.75,0.75};
@@ -150,10 +150,10 @@ void get_vslip(sctl::Comm comm)
     r1 = 0.3;
     sctl::Vector<Real> r2(Xc_serial.Dim()/3);
     r2 = 0.5;
-    sctl::Vector<Real> drdx(Xc_serial.Dim()/3); // no outward velocity on wall.
-    drdx = 0.5;
+    sctl::Vector<Real> drdt(Xc_serial.Dim()/3); // no outward velocity on wall.
+    drdt = 0.5;
     Annular<Real> straight(Xc_serial,Xc_serial,r1,r2);
-    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx); 
+    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt); 
     sctl::Vector<Real> v2 = straight.GetVslip();
 
     auto [cnt, dsp, Xc_mpi] = Annular<Real>::GetCenterLine_mpi(Nelem, ElemOrder, comm);
@@ -162,10 +162,10 @@ void get_vslip(sctl::Comm comm)
     r1_mpi = 0.3;
     sctl::Vector<Real> r2_mpi(Xc_mpi.Dim()/3);
     r2_mpi = 0.5;
-    sctl::Vector<Real> drdx_mpi(Xc_mpi.Dim()/3); 
-    drdx_mpi = 0.5;
+    sctl::Vector<Real> drdt_mpi(Xc_mpi.Dim()/3); 
+    drdt_mpi = 0.5;
     Annular<Real> straight_mpi(Xc_mpi,Xc_mpi,r1_mpi,r2_mpi, comm);
-    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdx_mpi, drdx_mpi);
+    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdt_mpi, drdt_mpi);
     sctl::Vector<Real> v2_mpi = straight_mpi.GetVslip_mpi();
 
     sctl::Long offset = dsp*ElemOrder*3*FourierOrder;

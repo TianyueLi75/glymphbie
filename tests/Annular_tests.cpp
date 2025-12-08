@@ -75,11 +75,11 @@ TEST_CASE(straight_getnodes)
     r1 = 0.3;
     sctl::Vector<Real> r2(ElemOrder);
     r2 = 0.5;
-    sctl::Vector<Real> drdx(ElemOrder*Nelem); // no outward velocity on wall.
-    drdx = 0.;
+    sctl::Vector<Real> drdt(ElemOrder*Nelem); // no outward velocity on wall.
+    drdt = 0.;
 
     Annular<Real> straight(Xc,Xc,r1,r2);
-    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx); // TODO: there are some std::cout comments here, should also check. E.g. here "cursory check ..." should print. 
+    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt); // TODO: there are some std::cout comments here, should also check. E.g. here "cursory check ..." should print. 
     
     Real rad_out = straight.GetMinRadius();
     ASSERT_NEAR(rad_out, r1[0], 1e-6);
@@ -149,11 +149,11 @@ TEST_CASE(interp1)
     r1 = 0.3;
     sctl::Vector<Real> r2(1);
     r2 = 0.5;
-    sctl::Vector<Real> drdx(1); // no outward velocity on wall.
-    drdx = 0.;
+    sctl::Vector<Real> drdt(1); // no outward velocity on wall.
+    drdt = 0.;
 
     Annular<Real> straight(Xc,Xc,r1,r2);
-    auto [Xc1new, Xc2new, r1new, r2new, drdx1new, drdx2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);
+    auto [Xc1new, Xc2new, r1new, r2new, drdt1new, drdt2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);
 
     Real rad_out = straight.GetMinRadius();
     ASSERT_NEAR(rad_out, r1new[0], 1e-6);
@@ -162,8 +162,8 @@ TEST_CASE(interp1)
     SCTL_ASSERT(Xc2new.Dim()==3*ElemOrder);
     SCTL_ASSERT(r1new.Dim()==ElemOrder);
     SCTL_ASSERT(r2new.Dim()==ElemOrder);
-    SCTL_ASSERT(drdx1new.Dim()==ElemOrder);
-    SCTL_ASSERT(drdx2new.Dim()==ElemOrder);
+    SCTL_ASSERT(drdt1new.Dim()==ElemOrder);
+    SCTL_ASSERT(drdt2new.Dim()==ElemOrder);
     
     sctl::Vector<Real> X_inner, X_outer, X_all, Xn_inner, Xn_outer, Xn_all;
     straight.GetInnerCoord(&X_inner, &Xn_inner);
@@ -246,11 +246,11 @@ TEST_CASE(interp2)
     sctl::Vector<Real> Xc = Annular<Real>::GetCenterLine(Nelem, OldOrder);
     sctl::Vector<Real> r1 = r1f(Xc);
     sctl::Vector<Real> r2 = r2f(Xc);
-    sctl::Vector<Real> drdx(1 * OldOrder*Nelem); // no outward velocity on wall.
-    drdx = 0.;
+    sctl::Vector<Real> drdt(1 * OldOrder*Nelem); // no outward velocity on wall.
+    drdt = 0.;
 
     Annular<Real> straight(Xc,Xc,r1,r2);
-    auto [Xc1new, Xc2new, r1new, r2new, drdx1new, drdx2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx,true);
+    auto [Xc1new, Xc2new, r1new, r2new, drdt1new, drdt2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt,true);
     
     sctl::Vector<Real> Xc_code = Annular<Real>::GetCenterLine(Nelem, ElemOrder);
     sctl::Vector<Real> r3 = r1f(Xc_code);
@@ -307,11 +307,11 @@ TEST_CASE(interp3)
     sctl::Vector<Real> Xc = Annular<Real>::GetCenterLine(Nelem, OldOrder);
     sctl::Vector<Real> r1 = r1f(Xc);
     sctl::Vector<Real> r2 = r2f(Xc);
-    sctl::Vector<Real> drdx(1 * OldOrder*Nelem); // no outward velocity on wall.
-    drdx = 0.;
+    sctl::Vector<Real> drdt(1 * OldOrder*Nelem); // no outward velocity on wall.
+    drdt = 0.;
 
     Annular<Real> straight(Xc,Xc,r1,r2);
-    auto [Xc1new, Xc2new, r1new, r2new, drdx1new, drdx2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx,true);
+    auto [Xc1new, Xc2new, r1new, r2new, drdt1new, drdt2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt,true);
     
     sctl::Vector<Real> Xc_code = Annular<Real>::GetCenterLine(Nelem, ElemOrder);
     sctl::Vector<Real> r3 = r1f(Xc_code);
@@ -356,11 +356,11 @@ TEST_CASE(in_domain)
     r1 = 0.3;
     sctl::Vector<Real> r2(ElemOrder);
     r2 = 0.5;
-    sctl::Vector<Real> drdx(ElemOrder*Nelem); // no outward velocity on wall.
-    drdx = 0.;
+    sctl::Vector<Real> drdt(ElemOrder*Nelem); // no outward velocity on wall.
+    drdt = 0.;
 
     Annular<Real> straight(Xc,Xc,r1,r2);
-    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);
+    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);
 
     sctl::Vector<Real> Xtrg(3);
     Xtrg = {0.75,0.75,0.75};
@@ -388,12 +388,12 @@ TEST_CASE(get_vslip)
     r1 = 0.3;
     sctl::Vector<Real> r2(ElemOrder);
     r2 = 0.5;
-    sctl::Vector<Real> drdx(ElemOrder*Nelem); // no outward velocity on wall.
+    sctl::Vector<Real> drdt(ElemOrder*Nelem); // no outward velocity on wall.
     
     // First, this should return all zeros.
-    drdx = 0.;
+    drdt = 0.;
     Annular<Real> straight(Xc,Xc,r1,r2);
-    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);
+    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);
     sctl::Vector<Real> v1 = straight.GetVslip();
     for (int i=0; i<v1.Dim(); i++) {
         ASSERT_NEAR(v1[i], 0., 1e-6);
@@ -401,10 +401,10 @@ TEST_CASE(get_vslip)
     std::cout << "passed first all 0 test." << std::endl;
 
     //Next, nonzero radial change. FourierOrder = 4 ==> just four directions
-    drdx = 0.5;
-    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx, true);
+    drdt = 0.5;
+    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt, true);
     sctl::Vector<Real> v2 = straight.GetVslip();
-    sctl::Vector<Real> vfile = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_drdx.txt"); 
+    sctl::Vector<Real> vfile = read_from_file<Real>("../../tests/Annular_tests_files/straight_channel_drdt.txt"); 
 
     // std::cout << "====================== get vslip values: " << std::endl;
     // for (int i=0; i<v2.Dim(); i++) {
