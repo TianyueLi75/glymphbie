@@ -759,9 +759,9 @@ sctl::Vector<Real> Annular<Real>::GetVslipOuter_mpi() {
 }
 
 template <class Real>
-void Annular<Real>::WriteVTK(std::string filename_inner, std::string filename_outer, sctl::Vector<Real> F_inner, sctl::Vector<Real> F_outer, sctl::Comm comm) {
-    elem_lst_inner.WriteVTK(filename_inner, F_inner, comm);
-    elem_lst_outer.WriteVTK(filename_outer, F_outer, comm);
+void Annular<Real>::WriteVTK(std::string filename_inner, std::string filename_outer, sctl::Vector<Real> F_inner, sctl::Vector<Real> F_outer, sctl::Comm comm_) {
+    elem_lst_inner.WriteVTK(filename_inner, F_inner, comm_);
+    elem_lst_outer.WriteVTK(filename_outer, F_outer, comm_);
 }
 
 template class Annular<float>;

@@ -5,6 +5,20 @@
 #include <string>
 #include <stdexcept>
 
+// Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
+template <class Real> 
+sctl::Vector<Real> bg_poiseuille(const Real dpdx, const Real mu, const sctl::Vector<Real> X)
+{
+    const sctl::Long N = X.Dim()/3;
+    sctl::Vector<Real> U(N*3);
+    U.SetZero();
+    for (sctl::Long i = 0; i < N; i++) {
+        sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
+        U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; 
+    }
+    return U;
+}
+
 template <class Real> 
 void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nelem, const sctl::Long ElemOrder, const sctl::Long FourierOrder, sctl::Comm comm)
 {
@@ -27,10 +41,8 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     drdt = 0.;
     Annular<Real> straight(Xc,Xc,r1,r2);
     straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);
-    // std::cout << "DEBUG: Xc: "<< std::endl;
-    // for (int i=0; i<Xc.Dim(); i++) {
-    //     std::cout << Xc[i] << std::endl;
-    // }
+    sctl::Vector<Real> X_annular;
+    straight.GetNodeCoord(&X_annular, nullptr);
 
     // Function to get exact flow at location X given center Xc and other params.
     // NOTE: This assumes Xvec taken as an intermediate channel with the same parameters for simplicity. Otherwise an interpolation is needed.
@@ -65,18 +77,6 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
         return Uvec;
     };
 
-    // Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
-    const auto bg_poiseuille = [dpdx, mu](const sctl::Vector<Real> X) {
-        const sctl::Long N = X.Dim()/3;
-        sctl::Vector<Real> U(N*3);
-        U.SetZero();
-        for (sctl::Long i = 0; i < N; i++) {
-            sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
-            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; 
-        }
-        return U;
-    };
-
     // Make StokesBIO
     // Real min_rad = straight.GetMinRadius();
     // Real S_scal = 1./(2.*min_rad*sctl::log<Real>(1./min_rad)); // TODO: stable computation? check csbq code.
@@ -86,15 +86,12 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     LPO.AddElemList(straight.GetInnerElemList(), "inner");
     LPO.AddElemList(straight.GetOuterElemList(), "outer");
     LPO.SetAccuracy(tol);
-    sctl::Vector<Real> X_annular;
-    straight.GetNodeCoord(&X_annular, nullptr);
     LPO.SetTargetCoord(X_annular);
     LPO.SetPeriodicity(sctl::Periodicity::X, 1.0);
     sctl::Vector<Real> NormalOrient(X_annular.Dim());
     NormalOrient = 1.;
     sctl::Long size_inner = Nelem*ElemOrder*FourierOrder*3;
     sctl::Long size_outer = X_annular.Dim() - size_inner;
-    // std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
     for (sctl::Long ind=0; ind<size_outer; ind++) {
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
@@ -113,12 +110,10 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     sctl::Vector<Real> sigma;
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = straight.GetVslip(); // no EXTRA wall velocity
-    sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
+    sctl::Vector<Real> vbg = bg_poiseuille(dpdx,mu,X_annular);
     // std::cout << "DEBUG, bg poiseuille values, should be equal in magnitude for all nodes on each channel." << std::endl;
     for (int i=0; i<X_annular.Dim()/3; i++) {
         Real magv2 = vbg[i*3+0]*vbg[i*3+0] + vbg[i*3+1]*vbg[i*3+1] + vbg[i*3+2]*vbg[i*3+2];
-        // std::cout << "vector = " << vbg[i*3+0] << ", " << vbg[i*3+1] << ", " << vbg[i*3+2] << ", magnitude = " << magv2 << std::endl;
-        // std::cout << "vslip (shoudl be 0): " << vslip[i*3+0] << ", " << vslip[i*3+1] << ", " << vslip[i*3+2] << std::endl;
     }
 
     // Solve gmres
@@ -141,23 +136,14 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     BIO(&U_inner, sigma);
     LPO.SetTargetCoord(X_outer);
     BIO(&U_outer, sigma);
-    U_inner += bg_poiseuille(X_inner);
-    U_outer += bg_poiseuille(X_outer);
+    U_inner += bg_poiseuille(dpdx,mu,X_inner);
+    U_outer += bg_poiseuille(dpdx,mu,X_outer);
     sctl::Vector<Real> Uexact_inner = uexact(X_inner);
     sctl::Vector<Real> Uexact_outer = uexact(X_outer);
     Real max_err_inner = 0.;
     Real max_err_outer = 0.;
     sctl::Vector<Real> Diff_inner = U_inner - Uexact_inner;
     sctl::Vector<Real> Diff_outer = U_outer - Uexact_outer;
-    // std::cout << " ======================= DEBUG U eval." << std::endl;
-    // Real mag_exact2 = Uexact_inner[0]*Uexact_inner[0] + Uexact_inner[1]*Uexact_inner[1] + Uexact_inner[2]*Uexact_inner[2];
-    // std::cout << "uexact inner = " << Uexact_inner[0] << ", " << Uexact_inner[1] << ", " << Uexact_inner[2] << ", mag = " << mag_exact2 << std::endl;
-    // Real mag_solve2 = U_inner[0]*U_inner[0] + U_inner[1]*U_inner[1] + U_inner[2]*U_inner[2];
-    // std::cout << "usolve inner = " << U_inner[0] << ", " << U_inner[1] << ", " << U_inner[2] << ", mag = " << mag_solve2 << std::endl;
-    // mag_exact2 = Uexact_outer[0]*Uexact_outer[0] + Uexact_outer[1]*Uexact_outer[1] + Uexact_outer[2]*Uexact_outer[2];
-    // std::cout << "uexact outer = " << Uexact_outer[0] << ", " << Uexact_outer[1] << ", " << Uexact_outer[2] << ", mag = " << mag_exact2 << std::endl;
-    // mag_solve2 = U_outer[0]*U_outer[0] + U_outer[1]*U_outer[1] + U_outer[2]*U_outer[2];
-    // std::cout << "usolve outer = " << U_outer[0] << ", " << U_outer[1] << ", " << U_outer[2] << ", mag = " << mag_solve2 << std::endl;
     for (auto e : Diff_inner) max_err_inner = std::max<Real>(max_err_inner, sctl::fabs(e));
     for (auto e : Diff_outer) max_err_outer = std::max<Real>(max_err_outer, sctl::fabs(e));
     Real avg_max_err = 0.5*(max_err_inner + max_err_outer);
@@ -168,21 +154,9 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     const Real beta = alpha;
     const Real K = alpha*beta - 1.0;
     const Real Q_ana = sctl::const_pi<Real>()/8. *((K+1.)*(K+1.) - 1.0 - 2.*K*K/sctl::log<Real>(K+1.));
-
-    // // Check parameters to Tithof paper analytical U
-    // Real rho1 = (R_in + 1./3. * (R_out - R_in)) / R_in;
-    // Real rho2 = (R_in + 2./3. * (R_out - R_in)) / R_in;
-    // std::cout << rho1 << std::endl;
-    // Real U_T1 = 1/4. * (alpha*alpha - rho1*rho1 - (alpha*alpha-1)*sctl::log<Real>(alpha/rho1)/sctl::log<Real>(alpha));
-    // Real U_T2 = 1/4. * (alpha*alpha - rho2*rho2 - (alpha*alpha-1)*sctl::log<Real>(alpha/rho2)/sctl::log<Real>(alpha));
-    // std::cout << "debug U value, U eval here is " << U_T1 << ", U paper scaled by r_1^2: " << U_T1 * R_in * R_in * (-1 * dpdx) << std::endl;
-    // U_T1 *= R_in * R_in * (-1 * dpdx) / mu;
-    // U_T2 *= R_in * R_in * (-1 * dpdx) / mu;
     
-    // std::cout << "Difference between U in paper and U here are " << fabs(U_T1 - Uexact_inner[0]) << ", " << fabs(U_T2 - Uexact_outer[0]) << std::endl;
-
     // Compute Q by doing integral over outlet flow
-    const auto getQ = [&LPO, &R_in, &R_out, dpdx, mu, &sigma, &BIO, &bg_poiseuille](const sctl::Long r_ord, const sctl::Long theta_ord) {
+    const auto getQ = [&LPO, &R_in, &R_out, dpdx, mu, &sigma, &BIO](const sctl::Long r_ord, const sctl::Long theta_ord) {
         SCTL_ASSERT(dpdx<0.);
         
         sctl::Vector<Real> nds, wts;
@@ -211,7 +185,7 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
         sctl::Vector<Real> Utrg;
         LPO.SetTargetCoord(Xtrg);
         BIO(&Utrg, sigma);
-        Utrg += bg_poiseuille(Xtrg);
+        Utrg += bg_poiseuille(dpdx,mu,Xtrg);
 
         // Quadrature to integrate
         Real Q = 0.;
@@ -296,18 +270,6 @@ void concentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long 
         return Uvec;
     };
 
-    // Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
-    const auto bg_poiseuille = [dpdx, mu](const sctl::Vector<Real> X) {
-        const sctl::Long N = X.Dim()/3;
-        sctl::Vector<Real> U(N*3);
-        U.SetZero();
-        for (sctl::Long i = 0; i < N; i++) {
-            sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
-            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; 
-        }
-        return U;
-    };
-
     // Make StokesBIO
     // Real min_rad = straight.GetMinRadius();
     // Real S_scal = 1./(2.*min_rad*sctl::log<Real>(1./min_rad)); // TODO: stable computation? check csbq code.
@@ -343,12 +305,10 @@ void concentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long 
     sctl::Vector<Real> sigma;
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = straight.GetVslip_mpi(); // no EXTRA wall velocity
-    sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
+    sctl::Vector<Real> vbg = bg_poiseuille(dpdx,mu,X_annular);
     // std::cout << "DEBUG, bg poiseuille values, should be equal in magnitude for all nodes on each channel." << std::endl;
     for (int i=0; i<X_annular.Dim()/3; i++) {
         Real magv2 = vbg[i*3+0]*vbg[i*3+0] + vbg[i*3+1]*vbg[i*3+1] + vbg[i*3+2]*vbg[i*3+2];
-        // std::cout << "vector = " << vbg[i*3+0] << ", " << vbg[i*3+1] << ", " << vbg[i*3+2] << ", magnitude = " << magv2 << std::endl;
-        // std::cout << "vslip (shoudl be 0): " << vslip[i*3+0] << ", " << vslip[i*3+1] << ", " << vslip[i*3+2] << std::endl;
     }
 
     // Solve gmres
@@ -371,8 +331,8 @@ void concentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long 
     BIO(&U_inner, sigma);
     LPO.SetTargetCoord(X_outer);
     BIO(&U_outer, sigma);
-    U_inner += bg_poiseuille(X_inner);
-    U_outer += bg_poiseuille(X_outer);
+    U_inner += bg_poiseuille(dpdx,mu,X_inner);
+    U_outer += bg_poiseuille(dpdx,mu,X_outer);
     sctl::Vector<Real> Uexact_inner = uexact(X_inner);
     sctl::Vector<Real> Uexact_outer = uexact(X_outer);
     Real max_err_inner = 0.;
@@ -399,20 +359,8 @@ void concentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long 
     const Real K = alpha*beta - 1.0;
     const Real Q_ana = sctl::const_pi<Real>()/8. *((K+1.)*(K+1.) - 1.0 - 2.*K*K/sctl::log<Real>(K+1.));
 
-    // // Check parameters to Tithof paper analytical U
-    // Real rho1 = (R_in + 1./3. * (R_out - R_in)) / R_in;
-    // Real rho2 = (R_in + 2./3. * (R_out - R_in)) / R_in;
-    // std::cout << rho1 << std::endl;
-    // Real U_T1 = 1/4. * (alpha*alpha - rho1*rho1 - (alpha*alpha-1)*sctl::log<Real>(alpha/rho1)/sctl::log<Real>(alpha));
-    // Real U_T2 = 1/4. * (alpha*alpha - rho2*rho2 - (alpha*alpha-1)*sctl::log<Real>(alpha/rho2)/sctl::log<Real>(alpha));
-    // std::cout << "debug U value, U eval here is " << U_T1 << ", U paper scaled by r_1^2: " << U_T1 * R_in * R_in * (-1 * dpdx) << std::endl;
-    // U_T1 *= R_in * R_in * (-1 * dpdx) / mu;
-    // U_T2 *= R_in * R_in * (-1 * dpdx) / mu;
-    
-    // std::cout << "Difference between U in paper and U here are " << fabs(U_T1 - Uexact_inner[0]) << ", " << fabs(U_T2 - Uexact_outer[0]) << std::endl;
-
     // Compute Q by doing integral over outlet flow
-    const auto getQ = [&LPO, &R_in, &R_out, dpdx, mu, &sigma, &BIO, &bg_poiseuille](const sctl::Long r_ord, const sctl::Long theta_ord) {
+    const auto getQ = [&LPO, &R_in, &R_out, dpdx, mu, &sigma, &BIO](const sctl::Long r_ord, const sctl::Long theta_ord) {
         SCTL_ASSERT(dpdx<0.);
         
         sctl::Vector<Real> nds, wts;
@@ -441,7 +389,7 @@ void concentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long 
         sctl::Vector<Real> Utrg;
         LPO.SetTargetCoord(Xtrg);
         BIO(&Utrg, sigma);
-        Utrg += bg_poiseuille(Xtrg);
+        Utrg += bg_poiseuille(dpdx,mu,Xtrg);
 
         // Quadrature to integrate
         Real Q = 0.;
@@ -519,22 +467,6 @@ void eccentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nelem
     drdt = 0.;
     Annular<Real> straight(Xc_inner,Xc,r1,r2);
     straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);
-    // std::cout << "DEBUG: Xc: "<< std::endl;
-    // for (int i=0; i<Xc.Dim(); i++) {
-    //     std::cout << Xc[i] << std::endl;
-    // }
-
-    // Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
-    const auto bg_poiseuille = [dpdx, mu](const sctl::Vector<Real> X) {
-        const sctl::Long N = X.Dim()/3;
-        sctl::Vector<Real> U(N*3);
-        U.SetZero();
-        for (sctl::Long i = 0; i < N; i++) {
-            sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
-            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4. / mu; // TODO: check direction
-        }
-        return U;
-    };
 
     // Make StokesBIO
     // Real min_rad = straight.GetMinRadius();
@@ -553,7 +485,6 @@ void eccentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nelem
     NormalOrient = 1.;
     sctl::Long size_inner = Nelem*ElemOrder*FourierOrder*3;
     sctl::Long size_outer = X_annular.Dim() - size_inner;
-    // std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
     for (sctl::Long ind=0; ind<size_outer; ind++) {
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
@@ -572,14 +503,14 @@ void eccentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nelem
     sctl::Vector<Real> sigma;
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = straight.GetVslip(); // no EXTRA wall velocity
-    sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
+    sctl::Vector<Real> vbg = bg_poiseuille(dpdx,mu,X_annular);
 
     // Solve gmres
     solver(&sigma, BIO, vslip-vbg, gmres_tol, -1, false, nullptr, &ksp);
 
     // Compute Q by doing integral over outlet flow
     // r1 and r2 differ at different theta's!
-    const auto getQ = [&LPO, &R_in, &R_out, &Xc_y_in, &Xc_y_out, &Xc_z_in, &Xc_z_out, dpdx, mu, &sigma, &BIO, &bg_poiseuille](const sctl::Long r_ord, const sctl::Long theta_ord) {
+    const auto getQ = [&LPO, &R_in, &R_out, &Xc_y_in, &Xc_y_out, &Xc_z_in, &Xc_z_out, dpdx, mu, &sigma, &BIO](const sctl::Long r_ord, const sctl::Long theta_ord) {
         SCTL_ASSERT(dpdx<0.);
         
         sctl::Vector<Real> nds, wts;
@@ -672,7 +603,7 @@ void eccentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nelem
         sctl::Vector<Real> Utrg;
         LPO.SetTargetCoord(Xtrg);
         BIO(&Utrg, sigma);
-        Utrg += bg_poiseuille(Xtrg);
+        Utrg += bg_poiseuille(dpdx,mu,Xtrg);
 
         // Quadrature to integrate
         Real Q = 0.;
@@ -747,18 +678,6 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
     Annular<Real> straight(Xc_inner,Xc,r1,r2, comm);
     straight.Setup_mpi(Nelem, ElemOrder, FourierOrder,drdt,drdt);
 
-    // Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
-    const auto bg_poiseuille = [dpdx, mu](const sctl::Vector<Real> X) {
-        const sctl::Long N = X.Dim()/3;
-        sctl::Vector<Real> U(N*3);
-        U.SetZero();
-        for (sctl::Long i = 0; i < N; i++) {
-            sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
-            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4. / mu; // TODO: check direction
-        }
-        return U;
-    };
-
     // Make StokesBIO
     // Real min_rad = straight.GetMinRadius();
     // Real S_scal = 1./(2.*min_rad*sctl::log<Real>(1./min_rad)); // TODO: stable computation? check csbq code.
@@ -776,7 +695,6 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
     NormalOrient = 1.;
     sctl::Long size_inner = Xc.Dim() * FourierOrder;
     sctl::Long size_outer = X_annular.Dim() - size_inner;
-    // std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
     for (sctl::Long ind=0; ind<size_outer; ind++) {
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
@@ -795,14 +713,14 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
     sctl::Vector<Real> sigma;
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = straight.GetVslip_mpi(); // no EXTRA wall velocity
-    sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
+    sctl::Vector<Real> vbg = bg_poiseuille(dpdx,mu,X_annular);
 
     // Solve gmres
     solver(&sigma, BIO, vslip-vbg, gmres_tol, -1, false, nullptr, &ksp);
 
     // Compute Q by doing integral over outlet flow
     // r1 and r2 differ at different theta's!
-    const auto getQ = [&LPO, &R_in, &R_out, &Xc_y_in, &Xc_y_out, &Xc_z_in, &Xc_z_out, dpdx, mu, &sigma, &BIO, &bg_poiseuille](const sctl::Long r_ord, const sctl::Long theta_ord) {
+    const auto getQ = [&LPO, &R_in, &R_out, &Xc_y_in, &Xc_y_out, &Xc_z_in, &Xc_z_out, dpdx, mu, &sigma, &BIO](const sctl::Long r_ord, const sctl::Long theta_ord) {
         SCTL_ASSERT(dpdx<0.);
         
         sctl::Vector<Real> nds, wts;
@@ -814,13 +732,9 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
                 std::cout << "discreminant in r_max finding is negative, fails." << std::endl;
                 return 0.0; // no real solution
             }
-
-            // std::cout << "b = " << b << ", c = " << c << ", disc = " << disc << ", sqrt(disc) = " << sctl::sqrt<Real>(disc) << ", std sqrt: " << std::sqrt(disc) << std::endl;
-            
             double r1 = (-b + std::sqrt(disc)) / (2.*a);
             double r2 = (-b - std::sqrt(disc)) / (2.*a);
             double rmax = std::max(r1,r2);
-            // std::cout << "max of two roots is " << rmax << ", min of two roots is " << r1+r2-rmax << std::endl;
             return rmax;
         };
 
@@ -838,23 +752,17 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
 
         for (int i=0; i<theta_ord; i++) {
             Real theta_val = theta_wt * i;
-            // Real dy = R_out*sctl::cos<Real>(theta_val) + Xc_y_out - Xc_y_in;
-            // Real dz = R_out*sctl::sin<Real>(theta_val) + Xc_z_out - Xc_z_in;
-            // Real r_out = sctl::sqrt<Real>((dz*dz) + (dy*dy));
 
             Real cosT = sctl::cos<Real>(theta_val);
             Real sinT = sctl::sin<Real>(theta_val);
             double b = 2.*(d1*cosT + d2*sinT);
-            // std::cout << "theta = " << theta_val << ", cosT = " << cosT << ", sinT = " << sinT << std::endl;
             double c = d2sq - R_out*R_out;
             double rho_max = positiveRoot(1.0, b, c);
 
-            Real r_out = rho_max; // DEBUGGING: whether the Cheb integral didn't work purely becuase of r_out.
+            Real r_out = rho_max; 
 
             sctl::Vector<Real> r_nodes = nds * (r_out - R_in) + R_in;
             sctl::Vector<Real> r_wts = wts * (r_out - R_in);
-            
-            // Real drho = (rho_max - R_in) / r_ord;
 
             r_out_trg[i] = r_out;
 
@@ -866,36 +774,14 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
 
                 r_wts_trg[node_ind] = r_wts[j];
                 r_nds_trg[node_ind] = r_nodes[j];
-
-                // // DEBUG equidist
-                // double rho = R_in + (j + 0.5) * drho; // midpoint
-                // double x = Xc_y_in + rho * cosT;
-                // double y = Xc_z_in + rho * sinT;
-                // Q_eq += rho * drho * theta_wt;
-                // Xtrg[3*node_ind + 1] = x;
-                // Xtrg[3*node_ind + 2] = y;
-                // // std::cout << "X,Y from equidist: " << x <<", " << y <<std::endl;
-                // r_wts_trg[node_ind] = drho;
-                // r_nds_trg[node_ind] = rho;
             }
         }
-        // std::cout << "Q surface area from equidist points is " << Q_eq << "; SA is " << sctl::const_pi<Real>() * (R_out*R_out - R_in*R_in) << std::endl;
-
-        // std::cout << "Debugging surface integral." << std::endl;
-        // Real Q1 = 0.;
-        // for (int i=0; i<theta_ord; i++) {
-        //     for (int j=0; j<r_ord; j++) {
-        //         sctl::Long node_ind = i*r_ord + j;
-        //         Q1 += theta_wt * r_wts_trg[node_ind] * r_nds_trg[node_ind];
-        //     }
-        // }
-        // std::cout << "Q1 from quadrature is " << Q1 << "; SA is " << sctl::const_pi<Real>() * (R_out*R_out - R_in*R_in) << std::endl;
 
         // Compute U at meshgrid:
         sctl::Vector<Real> Utrg;
         LPO.SetTargetCoord(Xtrg);
         BIO(&Utrg, sigma);
-        Utrg += bg_poiseuille(Xtrg);
+        Utrg += bg_poiseuille(dpdx,mu,Xtrg);
 
         // Quadrature to integrate
         Real Q = 0.;
@@ -970,18 +856,6 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
     Annular<Real> sinusoid(Xc,Xc,r1,r2);
     sinusoid.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);
 
-    // Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
-    const auto bg_poiseuille = [dpdx, mu](const sctl::Vector<Real> X) {
-        const sctl::Long N = X.Dim()/3;
-        sctl::Vector<Real> U(N*3);
-        U.SetZero();
-        for (sctl::Long i = 0; i < N; i++) {
-            sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
-            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; // TODO: check direction
-        }
-        return U;
-    };
-
     // Make StokesBIO
     // Real min_rad = straight.GetMinRadius();
     // Real S_scal = 1./(2.*min_rad*sctl::log<Real>(1./min_rad)); // TODO: stable computation? check csbq code.
@@ -999,7 +873,6 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
     NormalOrient = 1.;
     sctl::Long size_inner = Nelem*ElemOrder*FourierOrder*3;
     sctl::Long size_outer = X_annular.Dim() - size_inner;
-    // std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
     for (sctl::Long ind=0; ind<size_outer; ind++) {
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
@@ -1024,13 +897,13 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
     sctl::Vector<Real> sigma;
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = sinusoid.GetVslip(); // no EXTRA wall velocity
-    sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
+    sctl::Vector<Real> vbg = bg_poiseuille(dpdx,mu,X_annular);
 
     // Solve gmres
     solver(&sigma, BIO, vslip-vbg, gmres_tol, -1, false, nullptr, &ksp);
 
     // Compute Q by doing integral over outlet flow
-    const auto getQ = [&LPO, &R_in_x1, &R_out_x1, dpdx, mu, &sigma, &BIO, &bg_poiseuille](const sctl::Long r_ord, const sctl::Long theta_ord) {
+    const auto getQ = [&LPO, &R_in_x1, &R_out_x1, dpdx, mu, &sigma, &BIO](const sctl::Long r_ord, const sctl::Long theta_ord) {
         SCTL_ASSERT(dpdx<0.);
         
         sctl::Vector<Real> nds, wts;
@@ -1059,7 +932,7 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
         sctl::Vector<Real> Utrg;
         LPO.SetTargetCoord(Xtrg);
         BIO(&Utrg, sigma);
-        Utrg += bg_poiseuille(Xtrg);
+        Utrg += bg_poiseuille(dpdx,mu,Xtrg);
 
         // Quadrature to integrate
         Real Q = 0.;
@@ -1069,11 +942,8 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
                 sctl::Long node_ind = i*theta_ord + j;
                 Real u = Utrg[3*node_ind + 0];
                 Q += u * r_nodes[i] * theta_wt * r_wts[i];
-                // Qsa += r_nodes[i] * theta_wt * r_wts[i];
             }
         }
-        // std::cout << "Debug Qintegral: surface area calculated to be " << Qsa << ", exact is " << sctl::const_pi<Real>() * (0.336*0.336 - 0.13*0.13) << std::endl; // hardcoded to check downstream SA specifically for channel2 geom.
-
         Real Q2 = Q * mu / (-dpdx) / R_in_x1 / R_in_x1 / R_in_x1 / R_in_x1; // Q in paper = mu/-dp/R_in^4 * int u_code dA
 
         return Q2;
@@ -1110,13 +980,10 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
     BIO(&U_inner, sigma);
     LPO.SetTargetCoord(X_outer);
     BIO(&U_outer, sigma);
-    U_inner += bg_poiseuille(X_inner);
-    U_outer += bg_poiseuille(X_outer);
+    U_inner += bg_poiseuille(dpdx,mu,X_inner);
+    U_outer += bg_poiseuille(dpdx,mu,X_outer);
 
     // write to file or read and compare for error. 
-    // std::string filename_in = "../out/SelfConv/Concentric_sin_"+std::to_string(Nelem)+"_"+std::to_string(FourierOrder)+"_U_exact_"+std::to_string(comm.Rank())+"_inner.txt";
-    // std::string filename_out = "../out/SelfConv/Concentric_sin_"+std::to_string(Nelem)+"_"+std::to_string(FourierOrder)+"_U_exact_"+std::to_string(comm.Rank())+"_outer.txt";
-    // std::string filename_q = "../out/SelfConv/Concentric_sin_"+std::to_string(Nelem)+"_"+std::to_string(FourierOrder)+"_Q_exact_"+std::to_string(comm.Rank())+".txt";
     std::string filename_in = "../out/SelfConv/Concentric_sin_4_32_U_exact_"+std::to_string(comm.Rank())+"_inner.txt";
     std::string filename_out = "../out/SelfConv/Concentric_sin_4_32_U_exact_"+std::to_string(comm.Rank())+"_outer.txt";
     std::string filename_q = "../out/SelfConv/Concentric_sin_4_32_Q_exact_"+std::to_string(comm.Rank())+".txt";
@@ -1163,9 +1030,6 @@ void concentric_sine_selfconv(const Real dpdx, const Real mu, const sctl::Long N
 
         if (!comm.Rank()) {
             std::cout << "Nelem = " << Nelem << ", Fourier order = " << FourierOrder << "; max error = " << std::setprecision(10) << err_all[0] << "; max relative error = " << err_all[0] / u_all[0] << "; relative error of flux Q is " << Qerr << std::endl;
-            // std::cout<<"Max error = "<< std::setprecision(10) << err_all[0] << std::endl;
-            // std::cout<<"Max relative error = "<< std::setprecision(10) << err_all[0] / u_all[0] << std::endl;
-            // std::cout << "Relative error of flux Q = " << std::setprecision(10) << Qerr << std::endl;
         }
     }
 
@@ -1219,18 +1083,6 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
     Annular<Real> sinusoid(Xc,Xc,r1,r2, comm);
     sinusoid.Setup_mpi(Nelem, ElemOrder, FourierOrder,drdt,drdt);
 
-    // Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right
-    const auto bg_poiseuille = [dpdx, mu](const sctl::Vector<Real> X) {
-        const sctl::Long N = X.Dim()/3;
-        sctl::Vector<Real> U(N*3);
-        U.SetZero();
-        for (sctl::Long i = 0; i < N; i++) {
-            sctl::Vector<Real> x(3, (sctl::Iterator<Real>) X.begin() + i*3, false);
-            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; // TODO: check direction
-        }
-        return U;
-    };
-
     // Make StokesBIO
     // Real min_rad = straight.GetMinRadius();
     // Real S_scal = 1./(2.*min_rad*sctl::log<Real>(1./min_rad)); // TODO: stable computation? check csbq code.
@@ -1248,7 +1100,6 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
     NormalOrient = 1.;
     sctl::Long size_inner = Xc.Dim() * FourierOrder;
     sctl::Long size_outer = X_annular.Dim() - size_inner;
-    // std::cout << "size inner = " << size_inner << ", size outer = " << size_outer << std::endl;
     for (sctl::Long ind=0; ind<size_outer; ind++) {
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
@@ -1257,7 +1108,6 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
     sctl::Vector<Real> X1temp, X2temp;
     sinusoid.GetInnerCoord(&X1temp, nullptr);
     sinusoid.GetOuterCoord(&X2temp, nullptr);
-    // std::cout << "size of X1 temp: " << X1temp.Dim() << ", size of X2 temp: " << X2temp.Dim() << std::endl;
     sinusoid.WriteVTK("../vis/sine_channel_inner", "../vis/sine_channel_outer", X1temp, X2temp, comm);
 
     // Create lambda function
@@ -1273,13 +1123,13 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
     sctl::Vector<Real> sigma;
     // Utot = Ubg + Uwall = 0 on wall. 
     sctl::Vector<Real> vslip = sinusoid.GetVslip_mpi(); // no EXTRA wall velocity
-    sctl::Vector<Real> vbg = bg_poiseuille(X_annular);
+    sctl::Vector<Real> vbg = bg_poiseuille(dpdx,mu,X_annular);
 
     // Solve gmres
     solver(&sigma, BIO, vslip-vbg, gmres_tol, -1, false, nullptr, &ksp);
 
     // Compute Q by doing integral over outlet flow
-    const auto getQ = [&LPO, &R_in_x1, &R_out_x1, dpdx, mu, &sigma, &BIO, &bg_poiseuille](const sctl::Long r_ord, const sctl::Long theta_ord) {
+    const auto getQ = [&LPO, &R_in_x1, &R_out_x1, dpdx, mu, &sigma, &BIO](const sctl::Long r_ord, const sctl::Long theta_ord) {
         SCTL_ASSERT(dpdx<0.);
         
         sctl::Vector<Real> nds, wts;
@@ -1308,7 +1158,7 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
         sctl::Vector<Real> Utrg;
         LPO.SetTargetCoord(Xtrg);
         BIO(&Utrg, sigma);
-        Utrg += bg_poiseuille(Xtrg);
+        Utrg += bg_poiseuille(dpdx,mu,Xtrg);
 
         // Quadrature to integrate
         Real Q = 0.;
@@ -1321,8 +1171,7 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
                 // Qsa += r_nodes[i] * theta_wt * r_wts[i];
             }
         }
-        // std::cout << "Debug Qintegral: surface area calculated to be " << Qsa << ", exact is " << sctl::const_pi<Real>() * (0.336*0.336 - 0.13*0.13) << std::endl; // hardcoded to check downstream SA specifically for channel2 geom.
-
+        
         Real Q2 = Q * mu / (-dpdx) / R_in_x1 / R_in_x1 / R_in_x1 / R_in_x1; // Q in paper = mu/-dp/R_in^4 * int u_code dA
 
         return Q2;
@@ -1362,11 +1211,10 @@ void concentric_sine_selfconv_mpi(const Real dpdx, const Real mu, const sctl::Lo
     BIO(&U_inner, sigma);
     LPO.SetTargetCoord(X_outer);
     BIO(&U_outer, sigma);
-    U_inner += bg_poiseuille(X_inner);
-    U_outer += bg_poiseuille(X_outer);
+    U_inner += bg_poiseuille(dpdx,mu,X_inner);
+    U_outer += bg_poiseuille(dpdx,mu,X_outer);
 
     // write to file or read and compare for error. 
-    // TODO: check. If Xtrg same on each process, all U's should be the same, so only one process needs to check them.
     std::string filename_in = "../out/SelfConv/Concentric_sin_4_32_U_exact_0_inner.txt";
     std::string filename_out = "../out/SelfConv/Concentric_sin_4_32_U_exact_0_outer.txt";
     std::string filename_q = "../out/SelfConv/Concentric_sin_4_32_Q_exact_0.txt";
@@ -1426,17 +1274,17 @@ int main(int argc, char** argv)
         double mu = 1.0;
         double dpdx = -1.;
 
-        concentric_poiseuille_mpi<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm); 
+        concentric_poiseuille<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm); 
 
-        eccentric_poiseuille_mpi<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm);
+        eccentric_poiseuille<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm);
 
-        // if (Nelem==4 && FourierOrder == 32) {
-        //     concentric_sine_selfconv<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 1);
-        //     concentric_sine_selfconv_mpi<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 1);
-        // } else {
-        //     concentric_sine_selfconv<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 0);
-        //     concentric_sine_selfconv_mpi<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 0);
-        // }
+        if (Nelem==4 && FourierOrder == 32) {
+            concentric_sine_selfconv<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 1);
+            // concentric_sine_selfconv_mpi<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 1);
+        } else {
+            concentric_sine_selfconv<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 0);
+            // concentric_sine_selfconv_mpi<Real>(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, 0);
+        }
         
         
     }
