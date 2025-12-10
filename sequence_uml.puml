@@ -17,16 +17,16 @@ activate Wall
 
 Wall -> Wall : GetTimeSeries()
 
-Wall --> Environment : Xc, r, drdx
+Wall --> Environment : Xc, r, drdt
 
-Environment -> Annular : Annular(Xc, r, drdx)
+Environment -> Annular : Annular(Xc, r, drdt)
 activate Annular
 
 group One Time Step 
 
     Annular -> Annular : Setup()
 
-    Annular --> Environment : Xc_updated, r_updated, drdx_updated
+    Annular --> Environment : Xc_updated, r_updated, drdt_updated
 
     Environment -> Annular : GetMinRadius()
     Annular --> Environment : aspect_ratio
@@ -56,7 +56,7 @@ group One Time Step
     Environment -> StokesBIO : ComputePotential(X, sigma)
     StokesBIO --> Environment : Uwall (velocity at wall nodes.) [necessary?]
 
-    Environment --> Wall : Xc_updated, r_updated, drdx_updated, Uwall
+    Environment --> Wall : Xc_updated, r_updated, drdt_updated, Uwall
 
 end
 
