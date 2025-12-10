@@ -109,7 +109,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    Xc[6] = <span class="keyword">static_cast&lt;</span>Real<span class="keyword">&gt;</span>(0.6913417);</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    Xc[9] = <span class="keyword">static_cast&lt;</span>Real<span class="keyword">&gt;</span>(0.9619398);</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="comment">// Cheb from code</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    sctl::Vector&lt;Real&gt; Xc_code = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    sctl::Vector&lt;Real&gt; Xc_code = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    SCTL_ASSERT(Xc.Dim() == Xc_code.Dim());</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordflow">for</span> (sctl::Long ind=0; ind&lt;Xc.Dim(); ind++) {</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        ASSERT_NEAR(Xc[ind], Xc_code[ind], 1e-6);</div>
@@ -158,11 +158,11 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    r1 = 0.3;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    sctl::Vector&lt;Real&gt; r2(ElemOrder);</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    r2 = 0.5;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    sctl::Vector&lt;Real&gt; drdx(ElemOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    drdx = 0.;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    sctl::Vector&lt;Real&gt; drdt(ElemOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    drdt = 0.;</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc,Xc,r1,r2);</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx); <span class="comment">// TODO: there are some std::cout comments here, should also check. E.g. here &quot;cursory check ...&quot; should print. </span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt); <span class="comment">// TODO: there are some std::cout comments here, should also check. E.g. here &quot;cursory check ...&quot; should print. </span></div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    </div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    Real rad_out = straight.GetMinRadius();</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    ASSERT_NEAR(rad_out, r1[0], 1e-6);</div>
@@ -232,11 +232,11 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    r1 = 0.3;</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    sctl::Vector&lt;Real&gt; r2(1);</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    r2 = 0.5;</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    sctl::Vector&lt;Real&gt; drdx(1); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    drdx = 0.;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    sctl::Vector&lt;Real&gt; drdt(1); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    drdt = 0.;</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc,Xc,r1,r2);</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="keyword">auto</span> [Xc1new, Xc2new, r1new, r2new, drdx1new, drdx2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="keyword">auto</span> [Xc1new, Xc2new, r1new, r2new, drdt1new, drdt2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);</div>
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    Real rad_out = straight.GetMinRadius();</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    ASSERT_NEAR(rad_out, r1new[0], 1e-6);</div>
@@ -245,8 +245,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    SCTL_ASSERT(Xc2new.Dim()==3*ElemOrder);</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    SCTL_ASSERT(r1new.Dim()==ElemOrder);</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    SCTL_ASSERT(r2new.Dim()==ElemOrder);</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    SCTL_ASSERT(drdx1new.Dim()==ElemOrder);</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    SCTL_ASSERT(drdx2new.Dim()==ElemOrder);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    SCTL_ASSERT(drdt1new.Dim()==ElemOrder);</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    SCTL_ASSERT(drdt2new.Dim()==ElemOrder);</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    </div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    sctl::Vector&lt;Real&gt; X_inner, X_outer, X_all, Xn_inner, Xn_outer, Xn_all;</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    straight.GetInnerCoord(&amp;X_inner, &amp;Xn_inner);</div>
@@ -326,16 +326,16 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    <span class="comment">// Centerline and radii information that don&#39;t match the Cheb nodes</span></div>
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    sctl::Long OldOrder = 16;</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    sctl::Vector&lt;Real&gt; Xc = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, OldOrder);</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    sctl::Vector&lt;Real&gt; Xc = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, OldOrder);</div>
 <div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    sctl::Vector&lt;Real&gt; r1 = r1f(Xc);</div>
 <div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    sctl::Vector&lt;Real&gt; r2 = r2f(Xc);</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    sctl::Vector&lt;Real&gt; drdx(1 * OldOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    drdx = 0.;</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    sctl::Vector&lt;Real&gt; drdt(1 * OldOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    drdt = 0.;</div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span> </div>
 <div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc,Xc,r1,r2);</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <span class="keyword">auto</span> [Xc1new, Xc2new, r1new, r2new, drdx1new, drdx2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx,<span class="keyword">true</span>);</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <span class="keyword">auto</span> [Xc1new, Xc2new, r1new, r2new, drdt1new, drdt2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt,<span class="keyword">true</span>);</div>
 <div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    </div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    sctl::Vector&lt;Real&gt; Xc_code = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    sctl::Vector&lt;Real&gt; Xc_code = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
 <div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    sctl::Vector&lt;Real&gt; r3 = r1f(Xc_code);</div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    sctl::Vector&lt;Real&gt; r4 = r2f(Xc_code);</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
@@ -387,16 +387,16 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
 <div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    <span class="comment">// Centerline and radii information that don&#39;t match the Cheb nodes</span></div>
 <div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    sctl::Long OldOrder = 12;</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    sctl::Vector&lt;Real&gt; Xc = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, OldOrder);</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    sctl::Vector&lt;Real&gt; Xc = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, OldOrder);</div>
 <div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    sctl::Vector&lt;Real&gt; r1 = r1f(Xc);</div>
 <div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    sctl::Vector&lt;Real&gt; r2 = r2f(Xc);</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    sctl::Vector&lt;Real&gt; drdx(1 * OldOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    drdx = 0.;</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    sctl::Vector&lt;Real&gt; drdt(1 * OldOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    drdt = 0.;</div>
 <div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span> </div>
 <div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc,Xc,r1,r2);</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    <span class="keyword">auto</span> [Xc1new, Xc2new, r1new, r2new, drdx1new, drdx2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx,<span class="keyword">true</span>);</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    <span class="keyword">auto</span> [Xc1new, Xc2new, r1new, r2new, drdt1new, drdt2new] = straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt,<span class="keyword">true</span>);</div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    </div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    sctl::Vector&lt;Real&gt; Xc_code = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    sctl::Vector&lt;Real&gt; Xc_code = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
 <div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    sctl::Vector&lt;Real&gt; r3 = r1f(Xc_code);</div>
 <div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>    sctl::Vector&lt;Real&gt; r4 = r2f(Xc_code);</div>
 <div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
@@ -439,11 +439,11 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    r1 = 0.3;</div>
 <div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    sctl::Vector&lt;Real&gt; r2(ElemOrder);</div>
 <div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    r2 = 0.5;</div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    sctl::Vector&lt;Real&gt; drdx(ElemOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    drdx = 0.;</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    sctl::Vector&lt;Real&gt; drdt(ElemOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    drdt = 0.;</div>
 <div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span> </div>
 <div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc,Xc,r1,r2);</div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);</div>
 <div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span> </div>
 <div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    sctl::Vector&lt;Real&gt; Xtrg(3);</div>
 <div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>    Xtrg = {0.75,0.75,0.75};</div>
@@ -471,12 +471,12 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>    r1 = 0.3;</div>
 <div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>    sctl::Vector&lt;Real&gt; r2(ElemOrder);</div>
 <div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>    r2 = 0.5;</div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>    sctl::Vector&lt;Real&gt; drdx(ElemOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>    sctl::Vector&lt;Real&gt; drdt(ElemOrder*Nelem); <span class="comment">// no outward velocity on wall.</span></div>
 <div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>    </div>
 <div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>    <span class="comment">// First, this should return all zeros.</span></div>
-<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>    drdx = 0.;</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>    drdt = 0.;</div>
 <div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc,Xc,r1,r2);</div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx);</div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt);</div>
 <div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>    sctl::Vector&lt;Real&gt; v1 = straight.GetVslip();</div>
 <div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;v1.Dim(); i++) {</div>
 <div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>        ASSERT_NEAR(v1[i], 0., 1e-6);</div>
@@ -484,10 +484,10 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;passed first all 0 test.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span> </div>
 <div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    <span class="comment">//Next, nonzero radial change. FourierOrder = 4 ==&gt; just four directions</span></div>
-<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    drdx = 0.5;</div>
-<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx, <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    drdt = 0.5;</div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt, <span class="keyword">true</span>);</div>
 <div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    sctl::Vector&lt;Real&gt; v2 = straight.GetVslip();</div>
-<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    sctl::Vector&lt;Real&gt; vfile = read_from_file&lt;Real&gt;(<span class="stringliteral">&quot;../../tests/Annular_tests_files/straight_channel_drdx.txt&quot;</span>); </div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    sctl::Vector&lt;Real&gt; vfile = read_from_file&lt;Real&gt;(<span class="stringliteral">&quot;../../tests/Annular_tests_files/straight_channel_drdt.txt&quot;</span>); </div>
 <div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span> </div>
 <div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>    <span class="comment">// std::cout &lt;&lt; &quot;====================== get vslip values: &quot; &lt;&lt; std::endl;</span></div>
 <div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>    <span class="comment">// for (int i=0; i&lt;v2.Dim(); i++) {</span></div>
@@ -538,7 +538,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>    </div>
 <div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>    <span class="keywordflow">return</span> 0; </div>
 <div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span>}</div>
-<div class="ttc" id="aclassAnnular_html"><div class="ttname"><a href="classAnnular.html">Annular</a></div><div class="ttdef"><b>Definition</b> <a href="Annular_8hpp_source.html#l00008">Annular.hpp:8</a></div></div>
+<div class="ttc" id="aclassAnnular_html"><div class="ttname"><a href="classAnnular.html">Annular</a></div><div class="ttdoc">Implements a class for the annular space between two channels using the Convergent slender-body quadr...</div><div class="ttdef"><b>Definition</b> <a href="Annular_8hpp_source.html#l00016">Annular.hpp:16</a></div></div>
+<div class="ttc" id="aclassAnnular_html_a6563fdc6b912372b7104b525ddc5cedf"><div class="ttname"><a href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular::GetCenterLine</a></div><div class="ttdeci">static sctl::Vector&lt; Real &gt; GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_)</div><div class="ttdoc">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5)</div><div class="ttdef"><b>Definition</b> <a href="Annular_8cpp_source.html#l00480">Annular.cpp:480</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

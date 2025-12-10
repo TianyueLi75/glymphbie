@@ -99,9 +99,9 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    sctl::Long ElemOrder = 4;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    sctl::Long Nelem = 2;</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="comment">// Cheb from serial code</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keyword">auto</span> Xc_serial = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keyword">auto</span> Xc_serial = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="comment">// Cheb from mpi</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_function" href="classAnnular.html#a8a41794cdf8d5c3daf162c3334a66327">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="comment">// std::cout &lt;&lt; &quot;DEBUGGING, Check size. Xc mpi size on rank &quot; &lt;&lt; comm.Rank() &lt;&lt; &quot; is &quot; &lt;&lt; Xc_mpi.Dim() &lt;&lt; &quot;, constructor says elem count is &quot; &lt;&lt; cnt &lt;&lt; &quot;, displacement is &quot; &lt;&lt; dsp &lt;&lt; &quot;; size of serial is &quot; &lt;&lt; Xc_serial.Dim() &lt;&lt; std::endl;</span></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
@@ -125,26 +125,26 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    sctl::Long Nelem = 2;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    sctl::Long FourierOrder = 4;</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">// Make Xc and r</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keyword">auto</span> Xc_serial = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keyword">auto</span> Xc_serial = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    sctl::Vector&lt;Real&gt; r1(Xc_serial.Dim()/3);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    r1 = 0.3;</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    sctl::Vector&lt;Real&gt; r2(Xc_serial.Dim()/3);</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    r2 = 0.5;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    sctl::Vector&lt;Real&gt; drdx(Xc_serial.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    drdx = 0.;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    sctl::Vector&lt;Real&gt; drdt(Xc_serial.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    drdt = 0.;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc_serial,Xc_serial,r1,r2);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx); </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt); </div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_function" href="classAnnular.html#a8a41794cdf8d5c3daf162c3334a66327">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// std::cout &lt;&lt; &quot;on rank &quot; &lt;&lt; comm.Rank() &lt;&lt; &quot;, cnt is &quot; &lt;&lt; cnt &lt;&lt; &quot;, dsp is &quot; &lt;&lt; dsp &lt;&lt; &quot;, size of Xc_mpi here is &quot; &lt;&lt; Xc_mpi.Dim() &lt;&lt; std::endl;</span></div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    sctl::Vector&lt;Real&gt; r1_mpi(Xc_mpi.Dim()/3);</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    r1_mpi = 0.3;</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    sctl::Vector&lt;Real&gt; r2_mpi(Xc_mpi.Dim()/3);</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    r2_mpi = 0.5;</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    sctl::Vector&lt;Real&gt; drdx_mpi(Xc_mpi.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    drdx_mpi = 0.;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    sctl::Vector&lt;Real&gt; drdt_mpi(Xc_mpi.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    drdt_mpi = 0.;</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight_mpi(Xc_mpi,Xc_mpi,r1_mpi,r2_mpi, comm);</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder,drdx_mpi,drdx_mpi);</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder,drdt_mpi,drdt_mpi);</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    </div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    Real rad_out = straight.GetMinRadius();</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="comment">// MPI Reduce to collect min of all min radii on each process</span></div>
@@ -191,15 +191,15 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    sctl::Long Nelem = 2;</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    sctl::Long FourierOrder = 4;</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_function" href="classAnnular.html#a8a41794cdf8d5c3daf162c3334a66327">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    sctl::Vector&lt;Real&gt; r1_mpi(Xc_mpi.Dim()/3);</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    r1_mpi = 0.3;</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    sctl::Vector&lt;Real&gt; r2_mpi(Xc_mpi.Dim()/3);</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    r2_mpi = 0.5;</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    sctl::Vector&lt;Real&gt; drdx_mpi(Xc_mpi.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    drdx_mpi = 0.;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    sctl::Vector&lt;Real&gt; drdt_mpi(Xc_mpi.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    drdt_mpi = 0.;</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight_mpi(Xc_mpi,Xc_mpi,r1_mpi,r2_mpi, comm);</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdx_mpi, drdx_mpi);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdt_mpi, drdt_mpi);</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    sctl::Vector&lt;Real&gt; Xtrg(3);</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    Xtrg = {0.75,0.75,0.75};</div>
@@ -228,27 +228,27 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    sctl::Long Nelem = 2;</div>
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    sctl::Long FourierOrder = 4;</div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    <span class="keyword">auto</span> Xc_serial = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    <span class="keyword">auto</span> Xc_serial = <a class="code hl_function" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular&lt;Real&gt;::GetCenterLine</a>(Nelem, ElemOrder);</div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    sctl::Vector&lt;Real&gt; r1(Xc_serial.Dim()/3);</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    r1 = 0.3;</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    sctl::Vector&lt;Real&gt; r2(Xc_serial.Dim()/3);</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    r2 = 0.5;</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    sctl::Vector&lt;Real&gt; drdx(Xc_serial.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    drdx = 0.5;</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    sctl::Vector&lt;Real&gt; drdt(Xc_serial.Dim()/3); <span class="comment">// no outward velocity on wall.</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    drdt = 0.5;</div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight(Xc_serial,Xc_serial,r1,r2);</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdx,drdx); </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    straight.Setup(Nelem, ElemOrder, FourierOrder,drdt,drdt); </div>
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    sctl::Vector&lt;Real&gt; v2 = straight.GetVslip();</div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    <span class="keyword">auto</span> [cnt, dsp, Xc_mpi] = <a class="code hl_function" href="classAnnular.html#a8a41794cdf8d5c3daf162c3334a66327">Annular&lt;Real&gt;::GetCenterLine_mpi</a>(Nelem, ElemOrder, comm);</div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="comment">// std::cout &lt;&lt; &quot;on rank &quot; &lt;&lt; comm.Rank() &lt;&lt; &quot;, cnt is &quot; &lt;&lt; cnt &lt;&lt; &quot;, dsp is &quot; &lt;&lt; dsp &lt;&lt; &quot;, size of Xc_mpi here is &quot; &lt;&lt; Xc_mpi.Dim() &lt;&lt; std::endl;</span></div>
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    sctl::Vector&lt;Real&gt; r1_mpi(Xc_mpi.Dim()/3);</div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    r1_mpi = 0.3;</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    sctl::Vector&lt;Real&gt; r2_mpi(Xc_mpi.Dim()/3);</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    r2_mpi = 0.5;</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    sctl::Vector&lt;Real&gt; drdx_mpi(Xc_mpi.Dim()/3); </div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    drdx_mpi = 0.5;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    sctl::Vector&lt;Real&gt; drdt_mpi(Xc_mpi.Dim()/3); </div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    drdt_mpi = 0.5;</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> straight_mpi(Xc_mpi,Xc_mpi,r1_mpi,r2_mpi, comm);</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdx_mpi, drdx_mpi);</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    straight_mpi.Setup_mpi(Nelem, ElemOrder, FourierOrder, drdt_mpi, drdt_mpi);</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    sctl::Vector&lt;Real&gt; v2_mpi = straight_mpi.GetVslip_mpi();</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    sctl::Long offset = dsp*ElemOrder*3*FourierOrder;</div>
@@ -277,7 +277,9 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    sctl::Comm::MPI_Finalize();</div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <span class="keywordflow">return</span> 0; </div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>}</div>
-<div class="ttc" id="aclassAnnular_html"><div class="ttname"><a href="classAnnular.html">Annular</a></div><div class="ttdef"><b>Definition</b> <a href="Annular_8hpp_source.html#l00008">Annular.hpp:8</a></div></div>
+<div class="ttc" id="aclassAnnular_html"><div class="ttname"><a href="classAnnular.html">Annular</a></div><div class="ttdoc">Implements a class for the annular space between two channels using the Convergent slender-body quadr...</div><div class="ttdef"><b>Definition</b> <a href="Annular_8hpp_source.html#l00016">Annular.hpp:16</a></div></div>
+<div class="ttc" id="aclassAnnular_html_a6563fdc6b912372b7104b525ddc5cedf"><div class="ttname"><a href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular::GetCenterLine</a></div><div class="ttdeci">static sctl::Vector&lt; Real &gt; GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_)</div><div class="ttdoc">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5)</div><div class="ttdef"><b>Definition</b> <a href="Annular_8cpp_source.html#l00480">Annular.cpp:480</a></div></div>
+<div class="ttc" id="aclassAnnular_html_a8a41794cdf8d5c3daf162c3334a66327"><div class="ttname"><a href="classAnnular.html#a8a41794cdf8d5c3daf162c3334a66327">Annular::GetCenterLine_mpi</a></div><div class="ttdeci">static std::tuple&lt; sctl::Long, sctl::Long, sctl::Vector&lt; Real &gt; &gt; GetCenterLine_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, sctl::Comm comm)</div><div class="ttdoc">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5), MPI support.</div><div class="ttdef"><b>Definition</b> <a href="Annular_8cpp_source.html#l00497">Annular.cpp:497</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -76,50 +76,74 @@ $(function() {
   <div class="headertitle"><div class="title">Annular&lt; Real &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Implements a class for the annular space between two channels using the Convergent slender-body quadrature (CSBQ): csbq.readthedocs.io Both serial and with MPI support using SCTL (sctl.readthedocs.io/en/latest/)  
+ <a href="classAnnular.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="Annular_8hpp_source.html">Annular.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a14994ccab6bac5dd4570026c4e03baea" id="r_a14994ccab6bac5dd4570026c4e03baea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a14994ccab6bac5dd4570026c4e03baea">Annular</a> (const sctl::Vector&lt; Real &gt; Xc_inner_, const sctl::Vector&lt; Real &gt; Xc_outer_, const sctl::Vector&lt; Real &gt; r_inner_, const sctl::Vector&lt; Real &gt; r_outer_)</td></tr>
+<tr class="memdesc:a14994ccab6bac5dd4570026c4e03baea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (serial)  <br /></td></tr>
 <tr class="separator:a14994ccab6bac5dd4570026c4e03baea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7b95d62d81b6141382241fb4c5def3c" id="r_ab7b95d62d81b6141382241fb4c5def3c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#ab7b95d62d81b6141382241fb4c5def3c">Annular</a> (const sctl::Vector&lt; Real &gt; Xc_inner_, const sctl::Vector&lt; Real &gt; Xc_outer_, const sctl::Vector&lt; Real &gt; r_inner_, const sctl::Vector&lt; Real &gt; r_outer_, sctl::Comm comm_)</td></tr>
+<tr class="memdesc:ab7b95d62d81b6141382241fb4c5def3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (with MPI).  <br /></td></tr>
 <tr class="separator:ab7b95d62d81b6141382241fb4c5def3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d559c1ce8fa70c19424c11436dd7203" id="r_a6d559c1ce8fa70c19424c11436dd7203"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a6d559c1ce8fa70c19424c11436dd7203">~Annular</a> ()</td></tr>
+<tr class="memdesc:a6d559c1ce8fa70c19424c11436dd7203"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <br /></td></tr>
+<tr class="separator:a6d559c1ce8fa70c19424c11436dd7203"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a38d46066c7755b8a9aec181c42139f" id="r_a2a38d46066c7755b8a9aec181c42139f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a2a38d46066c7755b8a9aec181c42139f">SetInnerXc</a> (const sctl::Vector&lt; Real &gt; X_in)</td></tr>
+<tr class="memdesc:a2a38d46066c7755b8a9aec181c42139f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the centerline nodes for the inner channel.  <br /></td></tr>
 <tr class="separator:a2a38d46066c7755b8a9aec181c42139f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14c9111e28db50faf62a94abf67e861b" id="r_a14c9111e28db50faf62a94abf67e861b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a14c9111e28db50faf62a94abf67e861b">SetOuterXc</a> (const sctl::Vector&lt; Real &gt; X_in)</td></tr>
+<tr class="memdesc:a14c9111e28db50faf62a94abf67e861b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the centerline nodes for the outer channel.  <br /></td></tr>
 <tr class="separator:a14c9111e28db50faf62a94abf67e861b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bed0c38c61fe7326e6eaba52341dc04" id="r_a9bed0c38c61fe7326e6eaba52341dc04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a9bed0c38c61fe7326e6eaba52341dc04">SetInnerR</a> (const sctl::Vector&lt; Real &gt; r_in)</td></tr>
+<tr class="memdesc:a9bed0c38c61fe7326e6eaba52341dc04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the radii for the inner channel.  <br /></td></tr>
 <tr class="separator:a9bed0c38c61fe7326e6eaba52341dc04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acea4c624467a237f03fac8f9462e2797" id="r_acea4c624467a237f03fac8f9462e2797"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#acea4c624467a237f03fac8f9462e2797">SetOuterR</a> (const sctl::Vector&lt; Real &gt; r_in)</td></tr>
+<tr class="memdesc:acea4c624467a237f03fac8f9462e2797"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the radii for the outer channel.  <br /></td></tr>
 <tr class="separator:acea4c624467a237f03fac8f9462e2797"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad28bdc271ea22cc007d60f972568c77c" id="r_ad28bdc271ea22cc007d60f972568c77c"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#ad28bdc271ea22cc007d60f972568c77c">Setup</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdx_inner, sctl::Vector&lt; Real &gt; drdx_outer, bool force_setup=false)</td></tr>
-<tr class="separator:ad28bdc271ea22cc007d60f972568c77c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40e62ca7e745a71da4bc4efaf5fd5f18" id="r_a40e62ca7e745a71da4bc4efaf5fd5f18"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a40e62ca7e745a71da4bc4efaf5fd5f18">Setup_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdx_inner_, sctl::Vector&lt; Real &gt; drdx_outer_, bool force_setup=false)</td></tr>
-<tr class="separator:a40e62ca7e745a71da4bc4efaf5fd5f18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a617f2338358675d54bd50c6a847fdde9" id="r_a617f2338358675d54bd50c6a847fdde9"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a617f2338358675d54bd50c6a847fdde9">SetupInner</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdx_inner, bool force_setup=false)</td></tr>
-<tr class="separator:a617f2338358675d54bd50c6a847fdde9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a030094649823f96bc4bf42f0eaa0be8e" id="r_a030094649823f96bc4bf42f0eaa0be8e"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a030094649823f96bc4bf42f0eaa0be8e">SetupOuter</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdx_outer, bool force_setup=false)</td></tr>
-<tr class="separator:a030094649823f96bc4bf42f0eaa0be8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa68edc9248fc92548ec0cbb401de181d" id="r_aa68edc9248fc92548ec0cbb401de181d"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#aa68edc9248fc92548ec0cbb401de181d">SetupInner_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdx_inner, bool force_setup=false)</td></tr>
-<tr class="separator:aa68edc9248fc92548ec0cbb401de181d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab57ea9b6d92fc8083671e6c42963a97" id="r_aab57ea9b6d92fc8083671e6c42963a97"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#aab57ea9b6d92fc8083671e6c42963a97">SetupOuter_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdx_outer, bool force_setup=false)</td></tr>
-<tr class="separator:aab57ea9b6d92fc8083671e6c42963a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c7f2a18a3bf7c46a78ffddce154d776" id="r_a8c7f2a18a3bf7c46a78ffddce154d776"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a8c7f2a18a3bf7c46a78ffddce154d776">Setup</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdt_inner, sctl::Vector&lt; Real &gt; drdt_outer, bool force_setup=false)</td></tr>
+<tr class="memdesc:a8c7f2a18a3bf7c46a78ffddce154d776"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the annular geometry.  <br /></td></tr>
+<tr class="separator:a8c7f2a18a3bf7c46a78ffddce154d776"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57dac694331c1f9b8031db3a1b3bd186" id="r_a57dac694331c1f9b8031db3a1b3bd186"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a57dac694331c1f9b8031db3a1b3bd186">Setup_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdt_inner_, sctl::Vector&lt; Real &gt; drdt_outer_, bool force_setup=false)</td></tr>
+<tr class="memdesc:a57dac694331c1f9b8031db3a1b3bd186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the annular geometry, with MPI support.  <br /></td></tr>
+<tr class="separator:a57dac694331c1f9b8031db3a1b3bd186"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5c6d1c2f3893510a074170261c4fa40" id="r_ae5c6d1c2f3893510a074170261c4fa40"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#ae5c6d1c2f3893510a074170261c4fa40">SetupInner</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdt_inner, bool force_setup=false)</td></tr>
+<tr class="memdesc:ae5c6d1c2f3893510a074170261c4fa40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the inner channel.  <br /></td></tr>
+<tr class="separator:ae5c6d1c2f3893510a074170261c4fa40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c34b313fdf9dd944ff1670514a5c56f" id="r_a8c34b313fdf9dd944ff1670514a5c56f"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a8c34b313fdf9dd944ff1670514a5c56f">SetupOuter</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdt_outer, bool force_setup=false)</td></tr>
+<tr class="memdesc:a8c34b313fdf9dd944ff1670514a5c56f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the outer channel.  <br /></td></tr>
+<tr class="separator:a8c34b313fdf9dd944ff1670514a5c56f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae85add002d213ff0ae7d2744343986fe" id="r_ae85add002d213ff0ae7d2744343986fe"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#ae85add002d213ff0ae7d2744343986fe">SetupInner_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdt_inner, bool force_setup=false)</td></tr>
+<tr class="separator:ae85add002d213ff0ae7d2744343986fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa616b7fa71056663ba15fe185953fe7" id="r_aaa616b7fa71056663ba15fe185953fe7"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt;, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#aaa616b7fa71056663ba15fe185953fe7">SetupOuter_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, const sctl::Long FourierOrder_, sctl::Vector&lt; Real &gt; drdt_outer, bool force_setup=false)</td></tr>
+<tr class="separator:aaa616b7fa71056663ba15fe185953fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2291c096f2c8f2b2b2db72e0035bd9c1" id="r_a2291c096f2c8f2b2b2db72e0035bd9c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a2291c096f2c8f2b2b2db72e0035bd9c1">GetInnerCoord</a> (sctl::Vector&lt; Real &gt; *X_out, sctl::Vector&lt; Real &gt; *Xn_out)</td></tr>
+<tr class="memdesc:a2291c096f2c8f2b2b2db72e0035bd9c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the inner channel node coordinates and normal vectors.  <br /></td></tr>
 <tr class="separator:a2291c096f2c8f2b2b2db72e0035bd9c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cc11adcef64975932d5f0a77cfafc6f" id="r_a0cc11adcef64975932d5f0a77cfafc6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a0cc11adcef64975932d5f0a77cfafc6f">GetOuterCoord</a> (sctl::Vector&lt; Real &gt; *X_out, sctl::Vector&lt; Real &gt; *Xn_out)</td></tr>
 <tr class="separator:a0cc11adcef64975932d5f0a77cfafc6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f653dec00b7d593da35973ce97c19e4" id="r_a1f653dec00b7d593da35973ce97c19e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a1f653dec00b7d593da35973ce97c19e4">GetNodeCoord</a> (sctl::Vector&lt; Real &gt; *X, sctl::Vector&lt; Real &gt; *Xn)</td></tr>
+<tr class="memdesc:a1f653dec00b7d593da35973ce97c19e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all channel node coordinates and normal vectors, order: X_inner then X_outer.  <br /></td></tr>
 <tr class="separator:a1f653dec00b7d593da35973ce97c19e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53488cf4897ef9381da83bbb75cafb86" id="r_a53488cf4897ef9381da83bbb75cafb86"><td class="memItemLeft" align="right" valign="top">Real&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a53488cf4897ef9381da83bbb75cafb86">GetMinRadius</a> ()</td></tr>
+<tr class="memdesc:a53488cf4897ef9381da83bbb75cafb86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minimum radius <em>over local segment if using MPI</em> of the inner channel.  <br /></td></tr>
 <tr class="separator:a53488cf4897ef9381da83bbb75cafb86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b2e4ad6db99325ebccee4f587fcc3fa" id="r_a7b2e4ad6db99325ebccee4f587fcc3fa"><td class="memItemLeft" align="right" valign="top">sctl::Vector&lt; sctl::Long &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a7b2e4ad6db99325ebccee4f587fcc3fa">InDomain</a> (sctl::Vector&lt; Real &gt; X_)</td></tr>
+<tr class="memdesc:a7b2e4ad6db99325ebccee4f587fcc3fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if a given point is in between the <em>local segments if using MPI</em> channels.  <br /></td></tr>
 <tr class="separator:a7b2e4ad6db99325ebccee4f587fcc3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb08a43b4d91df0f383225f9d720e610" id="r_abb08a43b4d91df0f383225f9d720e610"><td class="memItemLeft" align="right" valign="top">sctl::Vector&lt; sctl::Long &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#abb08a43b4d91df0f383225f9d720e610">InDomain_mpi</a> (sctl::Vector&lt; Real &gt; X_)</td></tr>
 <tr class="separator:abb08a43b4d91df0f383225f9d720e610"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a065c24cdf139a58bd5dc6cf6d00f70b1" id="r_a065c24cdf139a58bd5dc6cf6d00f70b1"><td class="memItemLeft" align="right" valign="top">sctl::SlenderElemList&lt; Real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a065c24cdf139a58bd5dc6cf6d00f70b1">GetInnerElemList</a> ()</td></tr>
+<tr class="memdesc:a065c24cdf139a58bd5dc6cf6d00f70b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Inner SlenderElemList object for the inner channel.  <br /></td></tr>
 <tr class="separator:a065c24cdf139a58bd5dc6cf6d00f70b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e43ad9eea8d667d3f2acdb5bb0006b9" id="r_a3e43ad9eea8d667d3f2acdb5bb0006b9"><td class="memItemLeft" align="right" valign="top">sctl::SlenderElemList&lt; Real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a3e43ad9eea8d667d3f2acdb5bb0006b9">GetOuterElemList</a> ()</td></tr>
 <tr class="separator:a3e43ad9eea8d667d3f2acdb5bb0006b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85cfb5ce39f448b422e3881b5a6a9549" id="r_a85cfb5ce39f448b422e3881b5a6a9549"><td class="memItemLeft" align="right" valign="top">sctl::Vector&lt; Real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a85cfb5ce39f448b422e3881b5a6a9549">GetVslip</a> ()</td></tr>
+<tr class="memdesc:a85cfb5ce39f448b422e3881b5a6a9549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the time derivative on surface nodes of both the inner and outer channel radii from the given dr/dt at centerline nodes.  <br /></td></tr>
 <tr class="separator:a85cfb5ce39f448b422e3881b5a6a9549"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fef97ca64c7bbc7f754256e190e670a" id="r_a7fef97ca64c7bbc7f754256e190e670a"><td class="memItemLeft" align="right" valign="top">sctl::Vector&lt; Real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a7fef97ca64c7bbc7f754256e190e670a">GetVslip_mpi</a> ()</td></tr>
 <tr class="separator:a7fef97ca64c7bbc7f754256e190e670a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,20 +155,30 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0b92a5128562362e6c256fe1f0a459d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda8dc186f3b80b3b3eda9d220ca6f76" id="r_acda8dc186f3b80b3b3eda9d220ca6f76"><td class="memItemLeft" align="right" valign="top">sctl::Vector&lt; Real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#acda8dc186f3b80b3b3eda9d220ca6f76">GetVslipOuter_mpi</a> ()</td></tr>
 <tr class="separator:acda8dc186f3b80b3b3eda9d220ca6f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9c656ca6ea1b7a00d39d21cfa3e52b3" id="r_aa9c656ca6ea1b7a00d39d21cfa3e52b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#aa9c656ca6ea1b7a00d39d21cfa3e52b3">WriteVTK</a> (std::string filename_inner, std::string filename_outer, sctl::Vector&lt; Real &gt; F_inner, sctl::Vector&lt; Real &gt; F_outer, sctl::Comm comm)</td></tr>
-<tr class="separator:aa9c656ca6ea1b7a00d39d21cfa3e52b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bf9aa657ae0fa43ba6f2bb8d7b0e26f" id="r_a0bf9aa657ae0fa43ba6f2bb8d7b0e26f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a0bf9aa657ae0fa43ba6f2bb8d7b0e26f">WriteVTK</a> (std::string filename_inner, std::string filename_outer, sctl::Vector&lt; Real &gt; F_inner, sctl::Vector&lt; Real &gt; F_outer, sctl::Comm comm_)</td></tr>
+<tr class="memdesc:a0bf9aa657ae0fa43ba6f2bb8d7b0e26f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the inner and outer channel geometry along with the given fields &lt;F_inner&gt;, &lt;F_outer&gt;, into vtk format, using the WriteVTK functions in SlenderElemList.  <br /></td></tr>
+<tr class="separator:a0bf9aa657ae0fa43ba6f2bb8d7b0e26f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6563fdc6b912372b7104b525ddc5cedf" id="r_a6563fdc6b912372b7104b525ddc5cedf"><td class="memItemLeft" align="right" valign="top">static sctl::Vector&lt; Real &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">GetCenterLine</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_)</td></tr>
+<tr class="memdesc:a6563fdc6b912372b7104b525ddc5cedf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5)  <br /></td></tr>
 <tr class="separator:a6563fdc6b912372b7104b525ddc5cedf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a41794cdf8d5c3daf162c3334a66327" id="r_a8a41794cdf8d5c3daf162c3334a66327"><td class="memItemLeft" align="right" valign="top">static std::tuple&lt; sctl::Long, sctl::Long, sctl::Vector&lt; Real &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAnnular.html#a8a41794cdf8d5c3daf162c3334a66327">GetCenterLine_mpi</a> (const sctl::Long Nelem_, const sctl::Long ElemOrder_, sctl::Comm comm)</td></tr>
+<tr class="memdesc:a8a41794cdf8d5c3daf162c3334a66327"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5), MPI support.  <br /></td></tr>
 <tr class="separator:a8a41794cdf8d5c3daf162c3334a66327"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class Real&gt;<br />
-class Annular&lt; Real &gt;</div>
-<p class="definition">Definition at line <a class="el" href="Annular_8hpp_source.html#l00008">8</a> of file <a class="el" href="Annular_8hpp_source.html">Annular.hpp</a>.</p>
+class Annular&lt; Real &gt;</div><p>Implements a class for the annular space between two channels using the Convergent slender-body quadrature (CSBQ): csbq.readthedocs.io Both serial and with MPI support using SCTL (sctl.readthedocs.io/en/latest/) </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Real</td><td>double or float. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Annular_8hpp_source.html#l00016">16</a> of file <a class="el" href="Annular_8hpp_source.html">Annular.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a14994ccab6bac5dd4570026c4e03baea" name="a14994ccab6bac5dd4570026c4e03baea"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a14994ccab6bac5dd4570026c4e03baea">&#9670;&#160;</a></span>Annular() <span class="overload">[1/2]</span></h2>
@@ -185,6 +219,17 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Constructor (serial) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Xc_inner_</td><td>: 3D coordinates of the centerline of the inner channel, ordered [x1;y1;z1;x2;y2;z2;...] (for periodic channel, whole channel must be within unit box [0,1]^3) </td></tr>
+    <tr><td class="paramname">Xc_outer_</td><td>: 3D coordinates of the centerline of the outer channel, same as above. </td></tr>
+    <tr><td class="paramname">r_inner_</td><td>: vector of radius values of the inner channel, at each centerline node </td></tr>
+    <tr><td class="paramname">r_outer_</td><td>: vector of radius values of the outer channel, at each centerline node </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00008">8</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -236,6 +281,18 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Constructor (with MPI). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Xc_inner_</td><td>: 3D coordinates of the centerline of the inner channel, ordered [x1;y1;z1;x2;y2;z2;...] (for periodic channel, whole channel must be within unit box [0,1]^3) </td></tr>
+    <tr><td class="paramname">Xc_outer_</td><td>: 3D coordinates of the centerline of the outer channel, same as above. </td></tr>
+    <tr><td class="paramname">r_inner_</td><td>: vector of radius values of the inner channel, at each centerline node </td></tr>
+    <tr><td class="paramname">r_outer_</td><td>: vector of radius values of the outer channel, at each centerline node </td></tr>
+    <tr><td class="paramname">comm_</td><td>: MPI Communicator in the SCTL library </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00016">16</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -256,6 +313,8 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Destructor. </p>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00024">24</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -297,6 +356,18 @@ template&lt;class Real &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5) </p>
+<pre class="fragment">   Panels are set equidistant with size 1/&lt;Nelem_&gt;. On each, x nodes are order &lt;ElemOrder_&gt; Chebyshev nodes
+   More complicated centerlines can be achieved by taking only the x coordinates and resetting y and z.
+</pre> <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Nelem_</td><td>: Total number of panels </td></tr>
+    <tr><td class="paramname">ElemOrder_</td><td>: Chebyshev order on each panel. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>sctl::Vector&lt;Real&gt; </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00480">480</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -344,6 +415,20 @@ template&lt;class Real &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5), MPI support. </p>
+<pre class="fragment">   Split the total number of panels &lt;Nelem_&gt; evenly by the number of MPI processes first,
+   only the local segment of the centerline is returned. 
+   The number of panels on current process and the global indexing of the first panel on this process are returned as well.
+</pre> <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Nelem_</td><td></td></tr>
+    <tr><td class="paramname">ElemOrder_</td><td></td></tr>
+    <tr><td class="paramname">comm</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;sctl::Long, sctl::Long, sctl::Vector&lt;Real&gt;&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00497">497</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -376,6 +461,15 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Get the inner channel node coordinates and normal vectors. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X_out</td><td>: location to load node coordinates, order [x1;y1;z1;x2;y2;z2;...] </td></tr>
+    <tr><td class="paramname">Xn_out</td><td>: location to load normal vectors. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00431">431</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -397,6 +491,10 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Get the Inner SlenderElemList object for the inner channel. </p>
+<dl class="section see"><dt>See also</dt><dd>SlenderElemList</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>sctl::SlenderElemList&lt;Real&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00628">628</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -417,6 +515,10 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Returns the minimum radius <em>over local segment if using MPI</em> of the inner channel. </p>
+<pre class="fragment">   This value can be used for scaled (convergent) BIO for slender-body objects.
+</pre> <dl class="section return"><dt>Returns</dt><dd>Real </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00524">524</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -449,6 +551,15 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Get all channel node coordinates and normal vectors, order: X_inner then X_outer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X</td><td>: location to load node coordinates, order [x1;y1;z1;x2;y2;z2;...] </td></tr>
+    <tr><td class="paramname">Xn</td><td>: location to load normal vectors. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00450">450</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -523,6 +634,9 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Evaluate the time derivative on surface nodes of both the inner and outer channel radii from the given dr/dt at centerline nodes. </p>
+<dl class="section return"><dt>Returns</dt><dd>sctl::Vector&lt;Real&gt; </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00638">638</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -651,6 +765,15 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Determines if a given point is in between the <em>local segments if using MPI</em> channels. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X_</td><td>: Vector of target to determine </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>sctl::Vector&lt;sctl::Long&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00530">530</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -695,6 +818,14 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set the radii for the inner channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">r_in</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00040">40</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -716,6 +847,14 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the centerline nodes for the inner channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X_in</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00028">28</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
@@ -739,6 +878,14 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set the radii for the outer channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">r_in</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00046">46</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
@@ -761,12 +908,20 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set the centerline nodes for the outer channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X_in</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00034">34</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ad28bdc271ea22cc007d60f972568c77c" name="ad28bdc271ea22cc007d60f972568c77c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad28bdc271ea22cc007d60f972568c77c">&#9670;&#160;</a></span>Setup()</h2>
+<a id="a8c7f2a18a3bf7c46a78ffddce154d776" name="a8c7f2a18a3bf7c46a78ffddce154d776"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c7f2a18a3bf7c46a78ffddce154d776">&#9670;&#160;</a></span>Setup()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -795,13 +950,13 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_inner</em>, </td>
+          <td class="paramname"><em>drdt_inner</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_outer</em>, </td>
+          <td class="paramname"><em>drdt_outer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -817,12 +972,27 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set up the annular geometry. </p>
+<p>Using centerline and radius information, creates circular cross-sectional channels with the number of Fourier nodes specified.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Nelem_</td><td>: Total number of panels along axial direction </td></tr>
+    <tr><td class="paramname">ElemOrder_</td><td>: Order of Chebyshev quadrature nodes on each panel </td></tr>
+    <tr><td class="paramname">FourierOrder_</td><td>: Number of Fourier nodes in azimuthal direction </td></tr>
+    <tr><td class="paramname">drdt_inner</td><td>: time derivatve of radius of the inner wall, for slip velocity calculations </td></tr>
+    <tr><td class="paramname">drdt_outer</td><td>: time derivatve of radius of the outer wall, for slip velocity calculations </td></tr>
+    <tr><td class="paramname">force_setup</td><td>: If true, recompute the centerline nodes of specified order using interpolation even if the setup booleans are true. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00052">52</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a40e62ca7e745a71da4bc4efaf5fd5f18" name="a40e62ca7e745a71da4bc4efaf5fd5f18"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a40e62ca7e745a71da4bc4efaf5fd5f18">&#9670;&#160;</a></span>Setup_mpi()</h2>
+<a id="a57dac694331c1f9b8031db3a1b3bd186" name="a57dac694331c1f9b8031db3a1b3bd186"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57dac694331c1f9b8031db3a1b3bd186">&#9670;&#160;</a></span>Setup_mpi()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -851,13 +1021,13 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_inner_</em>, </td>
+          <td class="paramname"><em>drdt_inner_</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_outer_</em>, </td>
+          <td class="paramname"><em>drdt_outer_</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -873,12 +1043,27 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set up the annular geometry, with MPI support. </p>
+<p>Using centerline and radius information, creates circular cross-sectional channels with the number of Fourier nodes specified. Divide the total number of panels evenly among the available MPI processes. Only the local segment information is stored.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Nelem_</td><td>: Total number of panels along axial direction </td></tr>
+    <tr><td class="paramname">ElemOrder_</td><td>: Order of Chebyshev quadrature nodes on each panel </td></tr>
+    <tr><td class="paramname">FourierOrder_</td><td>: Number of Fourier nodes in azimuthal direction </td></tr>
+    <tr><td class="paramname">drdt_inner</td><td>: time derivatve of radius of the inner wall, for slip velocity calculations </td></tr>
+    <tr><td class="paramname">drdt_outer</td><td>: time derivatve of radius of the outer wall, for slip velocity calculations </td></tr>
+    <tr><td class="paramname">force_setup</td><td>: If true, recompute the centerline nodes of specified order using interpolation even if the setup booleans are true. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00086">86</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a617f2338358675d54bd50c6a847fdde9" name="a617f2338358675d54bd50c6a847fdde9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a617f2338358675d54bd50c6a847fdde9">&#9670;&#160;</a></span>SetupInner()</h2>
+<a id="ae5c6d1c2f3893510a074170261c4fa40" name="ae5c6d1c2f3893510a074170261c4fa40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5c6d1c2f3893510a074170261c4fa40">&#9670;&#160;</a></span>SetupInner()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -907,7 +1092,7 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_inner</em>, </td>
+          <td class="paramname"><em>drdt_inner</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -923,12 +1108,26 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set up the inner channel. </p>
+<p>If only the inner channel is changed, with different slip conditions, or have a different order, only SetupInner needs to be called.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Nelem_</td><td>: Total number of panels along axial direction </td></tr>
+    <tr><td class="paramname">ElemOrder_</td><td>: Order of Chebyshev quadrature nodes on each panel </td></tr>
+    <tr><td class="paramname">FourierOrder_</td><td>: Number of Fourier nodes in azimuthal direction </td></tr>
+    <tr><td class="paramname">drdt_inner</td><td>: time derivatve of radius of the inner wall, for slip velocity calculations </td></tr>
+    <tr><td class="paramname">force_setup</td><td>: If true, recompute the centerline nodes of specified order using interpolation even if the setup booleans are true. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00134">134</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aa68edc9248fc92548ec0cbb401de181d" name="aa68edc9248fc92548ec0cbb401de181d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa68edc9248fc92548ec0cbb401de181d">&#9670;&#160;</a></span>SetupInner_mpi()</h2>
+<a id="ae85add002d213ff0ae7d2744343986fe" name="ae85add002d213ff0ae7d2744343986fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae85add002d213ff0ae7d2744343986fe">&#9670;&#160;</a></span>SetupInner_mpi()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -957,7 +1156,7 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_inner</em>, </td>
+          <td class="paramname"><em>drdt_inner</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -977,8 +1176,8 @@ template&lt;class Real &gt; </div>
 
 </div>
 </div>
-<a id="a030094649823f96bc4bf42f0eaa0be8e" name="a030094649823f96bc4bf42f0eaa0be8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a030094649823f96bc4bf42f0eaa0be8e">&#9670;&#160;</a></span>SetupOuter()</h2>
+<a id="a8c34b313fdf9dd944ff1670514a5c56f" name="a8c34b313fdf9dd944ff1670514a5c56f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c34b313fdf9dd944ff1670514a5c56f">&#9670;&#160;</a></span>SetupOuter()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1007,7 +1206,7 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_outer</em>, </td>
+          <td class="paramname"><em>drdt_outer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1023,12 +1222,26 @@ template&lt;class Real &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Set up the outer channel. </p>
+<p>If only the outer channel is changed, with different slip conditions, or have a different order, only SetupOuter needs to be called.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Nelem_</td><td>: Total number of panels along axial direction </td></tr>
+    <tr><td class="paramname">ElemOrder_</td><td>: Order of Chebyshev quadrature nodes on each panel </td></tr>
+    <tr><td class="paramname">FourierOrder_</td><td>: Number of Fourier nodes in azimuthal direction </td></tr>
+    <tr><td class="paramname">drdt_outer</td><td>: time derivatve of radius of the inner wall, for slip velocity calculations </td></tr>
+    <tr><td class="paramname">force_setup</td><td>: If true, recompute the centerline nodes of specified order using interpolation even if the setup booleans are true. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;, sctl::Vector&lt;Real&gt;&gt; </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00287">287</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aab57ea9b6d92fc8083671e6c42963a97" name="aab57ea9b6d92fc8083671e6c42963a97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab57ea9b6d92fc8083671e6c42963a97">&#9670;&#160;</a></span>SetupOuter_mpi()</h2>
+<a id="aaa616b7fa71056663ba15fe185953fe7" name="aaa616b7fa71056663ba15fe185953fe7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa616b7fa71056663ba15fe185953fe7">&#9670;&#160;</a></span>SetupOuter_mpi()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1057,7 +1270,7 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Vector&lt; Real &gt;&#160;</td>
-          <td class="paramname"><em>drdx_outer</em>, </td>
+          <td class="paramname"><em>drdt_outer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1077,8 +1290,8 @@ template&lt;class Real &gt; </div>
 
 </div>
 </div>
-<a id="aa9c656ca6ea1b7a00d39d21cfa3e52b3" name="aa9c656ca6ea1b7a00d39d21cfa3e52b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9c656ca6ea1b7a00d39d21cfa3e52b3">&#9670;&#160;</a></span>WriteVTK()</h2>
+<a id="a0bf9aa657ae0fa43ba6f2bb8d7b0e26f" name="a0bf9aa657ae0fa43ba6f2bb8d7b0e26f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bf9aa657ae0fa43ba6f2bb8d7b0e26f">&#9670;&#160;</a></span>WriteVTK()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1113,7 +1326,7 @@ template&lt;class Real &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">sctl::Comm&#160;</td>
-          <td class="paramname"><em>comm</em>&#160;</td>
+          <td class="paramname"><em>comm_</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1122,6 +1335,19 @@ template&lt;class Real &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Writes the inner and outer channel geometry along with the given fields &lt;F_inner&gt;, &lt;F_outer&gt;, into vtk format, using the WriteVTK functions in SlenderElemList. </p>
+<dl class="section see"><dt>See also</dt><dd>SlenderElemList</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename_inner</td><td></td></tr>
+    <tr><td class="paramname">filename_outer</td><td></td></tr>
+    <tr><td class="paramname">F_inner</td><td>: Field to be written on the inner channel element_list nodes </td></tr>
+    <tr><td class="paramname">F_outer</td><td>: Field to be written on the outer channel element_list nodes </td></tr>
+    <tr><td class="paramname">comm_</td><td>: SCTL communicator </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="Annular_8cpp_source.html#l00762">762</a> of file <a class="el" href="Annular_8cpp_source.html">Annular.cpp</a>.</p>
 
