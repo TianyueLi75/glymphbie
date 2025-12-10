@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.16)
 
 project(GlymphBIE VERSION 0.1.0 LANGUAGES CXX)
@@ -250,7 +249,7 @@ add_subdirectory(tests)
 set(EXAMPLE_SOURCES
     "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
     "${CMAKE_SOURCE_DIR}/examples/FuncWall_SpatialSolver_ex.cpp" # example with functional walls
-    "${CMAKE_SOURCE_DIR}/examples/Slip_vis.cpp" # Visualize flow when drdt not zero.
+    # "${CMAKE_SOURCE_DIR}/examples/Slip_vis.cpp" # Visualize flow when drdt not zero.
 )
 
 foreach(src ${EXAMPLE_SOURCES})
