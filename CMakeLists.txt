@@ -206,14 +206,24 @@ endif()
 #   "src/Annular.cpp"
 #   "src/Particle.cpp"
 #   "src/StokesBIO.cpp"
-#   "src/Wall.cpp"
 # )
+
+set(GLYMPHBIE_HEADERS
+    "include/Annular.hpp"
+    "include/FuncWall.hpp"
+    "include/detail/FuncWall.tpp"
+    "include/Particle.hpp"
+    "include/Wall.hpp"
+    "include/detail/Wall.tpp"
+    "include/IntegratorWall.hpp"
+    "include/detail/IntegratorWall.tpp"
+)
 set(GLYMPHBIE_SOURCES
     "src/Annular.cpp"
     "src/StokesBIO.cpp"
 )
 
-add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES})
+add_library(GLYMPHBIE SHARED ${GLYMPHBIE_SOURCES} ${GLYMPHBIE_HEADERS})
 
 target_include_directories(GLYMPHBIE
   PUBLIC
@@ -237,6 +247,7 @@ add_subdirectory(tests)
 # Include examples
 set(EXAMPLE_SOURCES
     "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
+    "${CMAKE_SOURCE_DIR}/examples/FuncWall_SpatialSolver_ex.cpp" # example with functional walls
 )
 
 foreach(src ${EXAMPLE_SOURCES})

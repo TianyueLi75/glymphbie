@@ -1,0 +1,35 @@
+name: Deploy Documentation
+
+on:
+  # Only run this on pushes to the main branch
+  push:
+    branches:
+      - annular
+      - wall_dynamics
+      - main
+
+# This permission is REQUIRED to allow the Action to push to the gh-pages branch
+permissions:
+  contents: write
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen & Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Build Doxygen
+        # This assumes your Doxyfile is in the root of the repo
+        run: doxygen Doxyfile
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/html
