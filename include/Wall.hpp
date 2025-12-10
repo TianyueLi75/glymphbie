@@ -4,7 +4,17 @@
 #include <csbq.hpp>
 #include <stdexcept>
 
-//** */
+/**
+ * @brief Wall class template for wall dynamics in glymphatic flow simulations.
+ * 
+ * @tparam Real 
+ * @param dt Time step size for wall dynamics.
+ * @param center_out Vector of outer wall center coordinates (size: 3 * number of grid points).
+ * @param center_in Vector of inner wall center coordinates (size: 3 * number of grid points).
+ * @param radius_out Vector of outer wall radii (size: number of grid points).
+ * @param radius_in Vector of inner wall radii (size: number of grid points).
+ * @note The wall dynamics (update of radii and their time derivatives) are to be defined in derived classes.
+ */
 template <class Real>
 class Wall
 {
