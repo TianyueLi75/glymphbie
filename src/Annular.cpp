@@ -588,8 +588,8 @@ sctl::Vector<sctl::Long> Annular<Real>::InDomain_mpi(sctl::Vector<Real> X_) {
             in_domain[nd] = 0;
         } else {
             const auto search_panel = [](Real x, sctl::Long loc_elem_dsp_, sctl::Long loc_elem_cnt_, sctl::Long ElemOrder_, sctl::Vector<Real> Xc_) {
-                for (sctl::Long ind=loc_elem_dsp_; ind<loc_elem_dsp_ + loc_elem_cnt_; ind++) {
-                    if (x < Xc_[(ind+1)*ElemOrder_*3 - 3]) {// extra assumption that all elements hve order ElemOrder_
+                for (sctl::Long ind=0; ind<loc_elem_cnt_; ind++) {
+                    if (x < Xc_[(ind+1)*ElemOrder_*3 - 3]) {// extra assumption that all elements have order ElemOrder_
                         // x smaller than right end of this interval, return  element index.
                         return ind; 
                     }

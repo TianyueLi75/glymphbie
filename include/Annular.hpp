@@ -110,7 +110,7 @@ template <class Real> class Annular {
          * @brief Set up the inner channel
          * 
          * If only the inner channel is changed, with different slip conditions, or have a different order, 
-         * only SetupInner needs to be called.
+         * only SetupInner should to be called.
          * 
          * @param Nelem_ : Total number of panels along axial direction
          * @param ElemOrder_ : Order of Chebyshev quadrature nodes on each panel
@@ -126,7 +126,7 @@ template <class Real> class Annular {
          * @brief Set up the outer channel
          * 
          * If only the outer channel is changed, with different slip conditions, or have a different order, 
-         * only SetupOuter needs to be called.
+         * only SetupOuter should to be called.
          * 
          * @param Nelem_ : Total number of panels along axial direction
          * @param ElemOrder_ : Order of Chebyshev quadrature nodes on each panel

@@ -35,6 +35,7 @@ option(ENABLE_LAPACK "Enable LAPACK support" ON)
 option(ENABLE_FFTW "Enable FFTW (double) support" ON)
 option(ENABLE_FFTWF "Enable FFTW (float) support" ON)
 option(ENABLE_FFTWL "Enable FFTW (long double) support" OFF)
+option(ENABLE_GCOV "Enable code coverage report" OFF)
 
 # Paths
 message("Setting path to pvfmm and sctl")
@@ -189,6 +190,14 @@ else()
     add_compile_definitions(NDEBUG)
 endif()
 
+if(ENABLE_GCOV)
+    message(STATUS "Test coverage enabled")
+    add_compile_options(--coverage)
+    # GLYMPHBIE_add_cxx_compiler_flag("--coverage") # this will remove one hyphen and confuse cxx.
+    add_link_options(--coverage)
+endif()
+    
+
 # platform stack-trace flags
 GLYMPHBIE_add_cxx_compiler_flag("-rdynamic")
 if(APPLE)
@@ -200,13 +209,6 @@ endif()
 #===============================================================================
 # Create the library
 #===============================================================================
-
-# Source files
-# set(GLYMPHBIE_SOURCES
-#   "src/Annular.cpp"
-#   "src/Particle.cpp"
-#   "src/StokesBIO.cpp"
-# )
 
 set(GLYMPHBIE_HEADERS
     "include/Annular.hpp"
@@ -248,6 +250,7 @@ add_subdirectory(tests)
 set(EXAMPLE_SOURCES
     "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
     "${CMAKE_SOURCE_DIR}/examples/FuncWall_SpatialSolver_ex.cpp" # example with functional walls
+    "${CMAKE_SOURCE_DIR}/examples/Slip_vis.cpp" # Visualize flow when drdt not zero.
 )
 
 foreach(src ${EXAMPLE_SOURCES})
