@@ -32,7 +32,8 @@ class FuncWall: public Wall<Real>{
                             sctl::Vector<Real>& radius, 
                             sctl::Vector<Real>& rdot, 
                             Real t, 
-                            sctl::Vector<Real>& coords);
+                            sctl::Vector<Real>& coords,
+                            sctl::Vector<Real>& cdot);
 
     public:
         FuncWall( const Real dt, 

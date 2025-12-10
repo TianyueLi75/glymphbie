@@ -11,7 +11,7 @@ struct ConstantFunctor {
 
     ConstantFunctor(Real r) : _target_radius(r) {}
 
-    void operator()(sctl::Vector<Real>& radius, Real time) const {
+    void operator()(sctl::Vector<Real>& radius) const {
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
             radius[i] = _target_radius; 
         }

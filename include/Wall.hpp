@@ -15,7 +15,8 @@ class Wall
         size_t _time_step = 0;
         sctl::Vector<Real> _center_coords_out;
         sctl::Vector<Real> _center_coords_in;
-
+        sctl::Vector<Real> _cdot_in;
+        sctl::Vector<Real> _cdot_out; 
         sctl::Vector<Real> _radius_out;
         sctl::Vector<Real> _radius_in;
         sctl::Vector<Real> _rdot_out;
@@ -56,6 +57,8 @@ class Wall
         Real getTime() const { return _time_step*_dt; }
         const sctl::Vector<Real>& centerCoordsOut() const { return _center_coords_out; }
         const sctl::Vector<Real>& centerCoordsIn() const { return _center_coords_in; }
+        const sctl::Vector<Real>& cdotOut() const { return _cdot_out; }
+        const sctl::Vector<Real>& cdotIn() const { return _cdot_in; }
         const sctl::Vector<Real>& radiusOut() const { return _radius_out; }
         const sctl::Vector<Real>& radiusIn() const { return _radius_in; }
         const sctl::Vector<Real>& rdotOut() const { return _rdot_out; }

@@ -28,6 +28,6 @@ cmake --build . -j18 &&
 # 1) Fix Rin, Rout to be straight cylindrical channels, check convergence to true solution.
 for n in {1..3}; do # Nelem
     for m in {4..40..4}; do # FourierOrder
-        	mpirun -n 1 --map-by slot:pe=${OMP_NUM_THREADS} ./bin/FuncWall_SpatialSolver_tests $n 10 $m 
+        	mpirun -n 1 --map-by slot:pe=${OMP_NUM_THREADS} ./bin/FuncWall_SpatialSolver_ex $n 10 $m 
     	done
 done

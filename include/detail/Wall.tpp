@@ -36,6 +36,8 @@ Wall<Real>::Wall(const Real dt,
 
     _rdot_in.SetZero();
     _rdot_out.SetZero();
+    _cdot_in.SetZero();
+    _cdot_out.SetZero();
 }
 
 template <class Real>
