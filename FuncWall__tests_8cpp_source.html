@@ -123,8 +123,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">// 1. Constant Functor (2 Arguments: Radius, Time)</span></div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Real&gt;</div>
-<div class="foldopen" id="foldopen00043" data-start="{" data-end="};">
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="structConstantFunctor.html">   43</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor</a> {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">struct </span><a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor</a> {</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    Real _target_radius;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor</a>(Real r) : _target_radius(r) {}</div>
@@ -135,7 +134,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        }</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    }</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>};</div>
-</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment">// 2. Spatial Functor (3 Arguments: Radius, Time, Coords)</span></div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment">//    Radius varies based on the x-coordinate: R(x) = Base + Slope * x</span></div>
@@ -476,7 +474,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>    <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>}</div>
 <div class="ttc" id="aclassFuncWall_html"><div class="ttname"><a href="classFuncWall.html">FuncWall</a></div><div class="ttdoc">FuncWall class template for wall dynamics defined by user-provided functions, inherits from Wall base...</div><div class="ttdef"><b>Definition</b> <a href="FuncWall_8hpp_source.html#l00024">FuncWall.hpp:24</a></div></div>
-<div class="ttc" id="astructConstantFunctor_html"><div class="ttname"><a href="structConstantFunctor.html">ConstantFunctor</a></div><div class="ttdef"><b>Definition</b> <a href="FuncWall__tests_8cpp_source.html#l00043">FuncWall_tests.cpp:43</a></div></div>
+<div class="ttc" id="astructConstantFunctor_html"><div class="ttname"><a href="structConstantFunctor.html">ConstantFunctor</a></div><div class="ttdef"><b>Definition</b> <a href="FuncWall__SpatialSolver__ex_8cpp_source.html#l00009">FuncWall_SpatialSolver_ex.cpp:9</a></div></div>
 <div class="ttc" id="astructLinearSpatialFunctor_html"><div class="ttname"><a href="structLinearSpatialFunctor.html">LinearSpatialFunctor</a></div><div class="ttdef"><b>Definition</b> <a href="FuncWall__tests_8cpp_source.html#l00058">FuncWall_tests.cpp:58</a></div></div>
 <div class="ttc" id="astructR2SpatiotemporalFunctor_html"><div class="ttname"><a href="structR2SpatiotemporalFunctor.html">R2SpatiotemporalFunctor</a></div><div class="ttdef"><b>Definition</b> <a href="FuncWall__tests_8cpp_source.html#l00101">FuncWall_tests.cpp:101</a></div></div>
 <div class="ttc" id="astructSpatiotemporalFunctor_html"><div class="ttname"><a href="structSpatiotemporalFunctor.html">SpatiotemporalFunctor</a></div><div class="ttdef"><b>Definition</b> <a href="FuncWall__tests_8cpp_source.html#l00077">FuncWall_tests.cpp:77</a></div></div>
