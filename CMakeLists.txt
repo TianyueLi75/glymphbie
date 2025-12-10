@@ -247,6 +247,7 @@ add_subdirectory(tests)
 # Include examples
 set(EXAMPLE_SOURCES
     "${CMAKE_SOURCE_DIR}/examples/SpatialSolver_tests.cpp" # for convergence results
+    "${CMAKE_SOURCE_DIR}/examples/FuncWall_SpatialSolver_ex.cpp" # example with functional walls
 )
 
 foreach(src ${EXAMPLE_SOURCES})
