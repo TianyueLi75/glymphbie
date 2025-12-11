@@ -125,13 +125,13 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="comment">// rin_functor(r1, 0.0); // initialize wall with this Xc</span></div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="comment">// rout_functor(r2, 0.0);</span></div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="comment">// set constant radius for now not determined by functor</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    r1 = 0.3;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    r2 = 0.48;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="comment">// r1 = 0.3;</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">// r2 = 0.48;</span></div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keyword">const</span> Real dt = .01;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="classFuncWall.html">FuncWall&lt;Real, ConstantFunctor&lt;Real&gt;</a>, <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor&lt;Real&gt;</a>&gt; wall(dt, Xc, Xc, r2, r1, rin_functor, rout_functor);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <a class="code hl_class" href="classFuncWall.html">FuncWall&lt;Real, ConstantFunctor&lt;Real&gt;</a>, <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor&lt;Real&gt;</a>&gt; wall(dt, Xc, Xc, r1, r2, rin_functor, rout_functor);</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    wall.update();</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="comment">// initialize wall with this Xc</span></div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="comment">// sctl::Vector&lt;Real&gt; r1(ElemOrder*Nelem);</span></div>
@@ -146,243 +146,245 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="comment">// for (int i=0; i&lt;Xc.Dim(); i++) {</span></div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="comment">//     std::cout &lt;&lt; Xc[i] &lt;&lt; std::endl;</span></div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="comment">// }</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keyword">const</span> Real R_in = r1[0];</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keyword">const</span> Real R_out = r2[0];</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keyword">const</span> Real R_in = wall.radiusIn()[0];</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keyword">const</span> Real R_out = wall.radiusOut()[0];</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">// Function to get exact flow at location X given center Xc and other params.</span></div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="comment">// NOTE: This assumes Xvec taken as an intermediate channel with the same parameters for simplicity. Otherwise an interpolation is needed.</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keyword">const</span> <span class="keyword">auto</span> uexact = [R_in, R_out, dpdx, mu, &amp;Xc, Nelem, ElemOrder, FourierOrder](<span class="keyword">const</span> sctl::Vector&lt;Real&gt; Xvec) {</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        sctl::Long N = Xvec.Dim()/3;</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        SCTL_ASSERT(Xvec.Dim() == Nelem * ElemOrder * FourierOrder * 3);</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        sctl::Vector&lt;Real&gt; Uvec(Xvec.Dim());</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        Uvec.SetZero();</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="comment">// compute constants first -- TODO: arithemetic order to reduce numerical error</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        Real coeff = 1./4./mu;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="comment">// Get rmax</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        Real rmax_num = R_out*R_out - R_in*R_in;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        Real Rratio = R_out / R_in;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        Real rmax_denom = 2*sctl::log&lt;Real&gt;(Rratio);</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        Real rmax2 = rmax_num / rmax_denom;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="comment">// Compute u = 1/4/mu*dpdx*(R_out^2-r^2-2rmax^2ln*(R_out/r))</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">for</span> (sctl::Long i=0; i&lt;Nelem; i++) {</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>            <span class="keywordflow">for</span> (sctl::Long j=0; j&lt;ElemOrder; j++) {</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                <span class="comment">// get Xc at this index</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>                sctl::Vector&lt;Real&gt; Xc_here(3, (sctl::Iterator&lt;Real&gt;)Xc.begin() + (i*ElemOrder+j)*3, <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>                <span class="keywordflow">for</span> (sctl::Long k=0; k&lt;FourierOrder; k++) {</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                    sctl::Long starting_ind = (i*ElemOrder*FourierOrder + j*FourierOrder + k)*3;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                    sctl::Vector&lt;Real&gt; Xhere(3, (sctl::Iterator&lt;Real&gt;) Xvec.begin() + starting_ind, <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                    sctl::Vector&lt;Real&gt; Rhere = Xhere - Xc_here;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                    Real r2 = Rhere[1]*Rhere[1] + Rhere[2]*Rhere[2];</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                    Real rratio = R_out / sctl::sqrt&lt;Real&gt;(r2);</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                    Real u = -1.*coeff * dpdx * (R_out*R_out - r2 - 2. * rmax2 * sctl::log&lt;Real&gt;(rratio));</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                    Uvec[starting_ind + 0] = u; <span class="comment">// flow always just in the x direction.</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                }</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>            }</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        }</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <span class="keywordflow">return</span> Uvec;</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    };</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="comment">// Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right</span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keyword">const</span> <span class="keyword">auto</span> bg_poiseuille = [dpdx, mu](<span class="keyword">const</span> sctl::Vector&lt;Real&gt; X) {</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keyword">const</span> sctl::Long N = X.Dim()/3;</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        sctl::Vector&lt;Real&gt; U(N*3);</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        U.SetZero();</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keywordflow">for</span> (sctl::Long i = 0; i &lt; N; i++) {</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>            sctl::Vector&lt;Real&gt; x(3, (sctl::Iterator&lt;Real&gt;) X.begin() + i*3, <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        }</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        <span class="keywordflow">return</span> U;</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    };</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="comment">// Make StokesBIO</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="comment">// Real min_rad = straight.GetMinRadius();</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="comment">// Real S_scal = 1./(2.*min_rad*sctl::log&lt;Real&gt;(1./min_rad)); // TODO: stable computation? check csbq code.</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    Real S_scal = 1.0;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    Real D_scal = 1.0;</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <a class="code hl_class" href="classStokesBIO.html">StokesBIO&lt;Real&gt;</a> LPO(S_scal, D_scal, comm);</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    LPO.AddElemList(straight.GetInnerElemList(), <span class="stringliteral">&quot;inner&quot;</span>);</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    LPO.AddElemList(straight.GetOuterElemList(), <span class="stringliteral">&quot;outer&quot;</span>);</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    LPO.SetAccuracy(tol);</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    sctl::Vector&lt;Real&gt; X_annular;</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    straight.GetNodeCoord(&amp;X_annular, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    LPO.SetTargetCoord(X_annular);</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    LPO.SetPeriodicity(sctl::Periodicity::X, 1.0);</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    sctl::Vector&lt;Real&gt; NormalOrient(X_annular.Dim());</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    NormalOrient = 1.;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    sctl::Long size_inner = Nelem*ElemOrder*FourierOrder*3;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    sctl::Long size_outer = X_annular.Dim() - size_inner;</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    <span class="comment">// std::cout &lt;&lt; &quot;size inner = &quot; &lt;&lt; size_inner &lt;&lt; &quot;, size outer = &quot; &lt;&lt; size_outer &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keywordflow">for</span> (sctl::Long ind=0; ind&lt;size_outer; ind++) {</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="comment">// Normal of outer channel element list points outward by default.</span></div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        NormalOrient[size_inner + ind] = -1.;</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    }</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="comment">// Create lambda function</span></div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    <span class="keyword">const</span> <span class="keyword">auto</span> BIO = [&amp;LPO, D_scal, &amp;NormalOrient](sctl::Vector&lt;Real&gt;* U, <span class="keyword">const</span> sctl::Vector&lt;Real&gt; sigma) {</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        U-&gt;SetZero();</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>        LPO.ComputePotential(*U, sigma);</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        <span class="keywordflow">if</span> (D_scal &amp;&amp; U-&gt;Dim() == sigma.Dim()) (*U) += 0.5*sigma*D_scal*NormalOrient;</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    };</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <span class="comment">// Setup gmres</span></div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    sctl::GMRES&lt;Real&gt; solver(comm);</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    sctl::KrylovPrecond&lt;Real&gt; ksp;</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    sctl::Vector&lt;Real&gt; sigma;</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    <span class="comment">// Utot = Ubg + Uwall = 0 on wall. </span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    sctl::Vector&lt;Real&gt; vslip = straight.GetVslip(); <span class="comment">// no EXTRA wall velocity</span></div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    sctl::Vector&lt;Real&gt; vbg = bg_poiseuille(X_annular);</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    <span class="comment">// std::cout &lt;&lt; &quot;DEBUG, bg poiseuille values, should be equal in magnitude for all nodes on each channel.&quot; &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;X_annular.Dim()/3; i++) {</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        Real magv2 = vbg[i*3+0]*vbg[i*3+0] + vbg[i*3+1]*vbg[i*3+1] + vbg[i*3+2]*vbg[i*3+2];</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        <span class="comment">// std::cout &lt;&lt; &quot;vector = &quot; &lt;&lt; vbg[i*3+0] &lt;&lt; &quot;, &quot; &lt;&lt; vbg[i*3+1] &lt;&lt; &quot;, &quot; &lt;&lt; vbg[i*3+2] &lt;&lt; &quot;, magnitude = &quot; &lt;&lt; magv2 &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        <span class="comment">// std::cout &lt;&lt; &quot;vslip (shoudl be 0): &quot; &lt;&lt; vslip[i*3+0] &lt;&lt; &quot;, &quot; &lt;&lt; vslip[i*3+1] &lt;&lt; &quot;, &quot; &lt;&lt; vslip[i*3+2] &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    }</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <span class="comment">// Solve gmres</span></div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    solver(&amp;sigma, BIO, vslip-vbg, gmres_tol, -1, <span class="keyword">false</span>, <span class="keyword">nullptr</span>, &amp;ksp);</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="comment">// Compare to exact, report error.</span></div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    <span class="comment">// Create two cylindrical channels of different radius to test U at different r. (NOTE: Can do sinusoidal channel later)</span></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="comment">// this dynamics in functor wall update.</span></div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <span class="comment">// sctl::Vector&lt;Real&gt; r3(ElemOrder*Nelem);</span></div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <span class="comment">// r3 = R_in + 1./3. * (R_out - R_in); = .36 </span></div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="comment">// sctl::Vector&lt;Real&gt; r4(ElemOrder*Nelem);</span></div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <span class="comment">// r4 = R_in + 2./3. * (R_out - R_in); = .42</span></div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    wall.update();</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> channel_trg(wall.centerCoordsIn(),wall.centerCoordsOut(), wall.radiusIn(),wall.radiusOut());</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    channel_trg.Setup(Nelem, ElemOrder, FourierOrder, wall.rdotIn(),wall.rdotOut());</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    sctl::Vector&lt;Real&gt; X_inner, X_outer;</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    channel_trg.GetInnerCoord(&amp;X_inner, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    channel_trg.GetOuterCoord(&amp;X_outer, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    sctl::Vector&lt;Real&gt; U_inner, U_outer;</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    LPO.SetTargetCoord(X_inner);</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    BIO(&amp;U_inner, sigma);</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    LPO.SetTargetCoord(X_outer);</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    BIO(&amp;U_outer, sigma);</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    U_inner += bg_poiseuille(X_inner);</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    U_outer += bg_poiseuille(X_outer);</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    sctl::Vector&lt;Real&gt; Uexact_inner = uexact(X_inner);</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    sctl::Vector&lt;Real&gt; Uexact_outer = uexact(X_outer);</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    Real max_err_inner = 0.;</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    Real max_err_outer = 0.;</div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    sctl::Vector&lt;Real&gt; Diff_inner = U_inner - Uexact_inner;</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    sctl::Vector&lt;Real&gt; Diff_outer = U_outer - Uexact_outer;</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <span class="comment">// std::cout &lt;&lt; &quot; ======================= DEBUG U eval.&quot; &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    <span class="comment">// Real mag_exact2 = Uexact_inner[0]*Uexact_inner[0] + Uexact_inner[1]*Uexact_inner[1] + Uexact_inner[2]*Uexact_inner[2];</span></div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="comment">// std::cout &lt;&lt; &quot;uexact inner = &quot; &lt;&lt; Uexact_inner[0] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_inner[1] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_inner[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_exact2 &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="comment">// Real mag_solve2 = U_inner[0]*U_inner[0] + U_inner[1]*U_inner[1] + U_inner[2]*U_inner[2];</span></div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="comment">// std::cout &lt;&lt; &quot;usolve inner = &quot; &lt;&lt; U_inner[0] &lt;&lt; &quot;, &quot; &lt;&lt; U_inner[1] &lt;&lt; &quot;, &quot; &lt;&lt; U_inner[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_solve2 &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="comment">// mag_exact2 = Uexact_outer[0]*Uexact_outer[0] + Uexact_outer[1]*Uexact_outer[1] + Uexact_outer[2]*Uexact_outer[2];</span></div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    <span class="comment">// std::cout &lt;&lt; &quot;uexact outer = &quot; &lt;&lt; Uexact_outer[0] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_outer[1] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_outer[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_exact2 &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    <span class="comment">// mag_solve2 = U_outer[0]*U_outer[0] + U_outer[1]*U_outer[1] + U_outer[2]*U_outer[2];</span></div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    <span class="comment">// std::cout &lt;&lt; &quot;usolve outer = &quot; &lt;&lt; U_outer[0] &lt;&lt; &quot;, &quot; &lt;&lt; U_outer[1] &lt;&lt; &quot;, &quot; &lt;&lt; U_outer[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_solve2 &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> e : Diff_inner) max_err_inner = std::max&lt;Real&gt;(max_err_inner, sctl::fabs(e));</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> e : Diff_outer) max_err_outer = std::max&lt;Real&gt;(max_err_outer, sctl::fabs(e));</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    Real avg_max_err = 0.5*(max_err_inner + max_err_outer);</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Nelem = &quot;</span> &lt;&lt; Nelem &lt;&lt; <span class="stringliteral">&quot;, Fourier order = &quot;</span> &lt;&lt; FourierOrder &lt;&lt; <span class="stringliteral">&quot;; Averaged max error at two different r: &quot;</span>&lt;&lt; avg_max_err &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <span class="comment">// Check flux calculation against analytical solutions.</span></div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <span class="keyword">const</span> Real alpha = wall.radiusOut()[0] / wall.radiusIn()[0];</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="keyword">const</span> Real beta = alpha;</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <span class="keyword">const</span> Real K = alpha*beta - 1.0;</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keyword">const</span> Real Q_ana = sctl::const_pi&lt;Real&gt;()/8. *((K+1.)*(K+1.) - 1.0 - 2.*K*K/sctl::log&lt;Real&gt;(K+1.));</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    <span class="comment">// // Check parameters to Tithof paper analytical U</span></div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    <span class="comment">// Real rho1 = (R_in + 1./3. * (R_out - R_in)) / R_in;</span></div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <span class="comment">// Real rho2 = (R_in + 2./3. * (R_out - R_in)) / R_in;</span></div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    <span class="comment">// std::cout &lt;&lt; rho1 &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    <span class="comment">// Real U_T1 = 1/4. * (alpha*alpha - rho1*rho1 - (alpha*alpha-1)*sctl::log&lt;Real&gt;(alpha/rho1)/sctl::log&lt;Real&gt;(alpha));</span></div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <span class="comment">// Real U_T2 = 1/4. * (alpha*alpha - rho2*rho2 - (alpha*alpha-1)*sctl::log&lt;Real&gt;(alpha/rho2)/sctl::log&lt;Real&gt;(alpha));</span></div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <span class="comment">// std::cout &lt;&lt; &quot;debug U value, U eval here is &quot; &lt;&lt; U_T1 &lt;&lt; &quot;, U paper scaled by r_1^2: &quot; &lt;&lt; U_T1 * R_in * R_in * (-1 * dpdx) &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    <span class="comment">// U_T1 *= R_in * R_in * (-1 * dpdx) / mu;</span></div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    <span class="comment">// U_T2 *= R_in * R_in * (-1 * dpdx) / mu;</span></div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    </div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <span class="comment">// std::cout &lt;&lt; &quot;Difference between U in paper and U here are &quot; &lt;&lt; fabs(U_T1 - Uexact_inner[0]) &lt;&lt; &quot;, &quot; &lt;&lt; fabs(U_T2 - Uexact_outer[0]) &lt;&lt; std::endl;</span></div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span> </div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <span class="comment">// Compute Q by doing integral over outlet </span></div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    Real Rin = wall.radiusIn()[0];</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    Real Rout = wall.radiusOut()[0];</div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    <span class="keyword">const</span> <span class="keyword">auto</span> getQ = [&amp;LPO, &amp;Rin, &amp;Rout, dpdx, mu, &amp;sigma, &amp;BIO, &amp;bg_poiseuille](<span class="keyword">const</span> sctl::Long r_ord, <span class="keyword">const</span> sctl::Long theta_ord) {</div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        SCTL_ASSERT(dpdx&lt;0.);</div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        </div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>        sctl::Vector&lt;Real&gt; nds, wts;</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>        sctl::ChebQuadRule&lt;Real&gt;::ComputeNdsWts(&amp;nds, &amp;wts, r_ord); <span class="comment">// nds and wts on [0,1]</span></div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        sctl::Vector&lt;Real&gt; r_nodes = nds * (Rout - Rin) + Rin;</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        sctl::Vector&lt;Real&gt; r_wts = wts * (Rout - Rin);</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        sctl::Vector&lt;Real&gt; theta_nodes(theta_ord);</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        <span class="keyword">const</span> Real theta_wt = 2*sctl::const_pi&lt;Real&gt;()/theta_ord;</div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;theta_ord; i++) {</div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>            theta_nodes[i] = theta_wt * i;</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>        }</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span> </div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        <span class="comment">// form mesh grid of x-y points, same-r-all-thetas order.</span></div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        sctl::Vector&lt;Real&gt; Xtrg(3 * r_ord * theta_ord);</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;r_ord; i++) {</div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0; j&lt;theta_ord; j++) {</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>                sctl::Long node_ind = i*theta_ord + j;</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>                Xtrg[3*node_ind + 0] = 1.0; <span class="comment">// evaluation at x=1.0 only</span></div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                Xtrg[3*node_ind + 1] = 0.5 + r_nodes[i] * sctl::cos&lt;Real&gt;(theta_nodes[j]); </div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>                Xtrg[3*node_ind + 2] = 0.5 + r_nodes[i] * sctl::sin&lt;Real&gt;(theta_nodes[j]); </div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>            }</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        }</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>        <span class="comment">// Compute U at meshgrid:</span></div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        sctl::Vector&lt;Real&gt; Utrg;</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>        LPO.SetTargetCoord(Xtrg);</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>        BIO(&amp;Utrg, sigma);</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>        Utrg += bg_poiseuille(Xtrg);</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>        <span class="comment">// Quadrature to integrate</span></div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>        Real Q = 0.;</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;r_ord; i++) {</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0; j&lt;theta_ord; j++) {</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>                sctl::Long node_ind = i*theta_ord + j;</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>                Real u = Utrg[3*node_ind + 0];</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>                Q += u * r_nodes[i] * theta_wt * r_wts[i];</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>            }</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        }</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span> </div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>        Real Q2 = Q * mu / (-dpdx) / Rin / Rin / Rin / Rin; <span class="comment">// Q in paper = mu/-dp/R_in^4 * int u_code dA</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keyword">const</span> <span class="keyword">auto</span> uexact = [&amp;wall, dpdx, mu, &amp;Xc, Nelem, ElemOrder, FourierOrder](<span class="keyword">const</span> sctl::Vector&lt;Real&gt; Xvec) {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        Real R_in = wall.radiusIn()[0];</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        Real R_out = wall.radiusOut()[0];</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        sctl::Long N = Xvec.Dim()/3;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        SCTL_ASSERT(Xvec.Dim() == Nelem * ElemOrder * FourierOrder * 3);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        sctl::Vector&lt;Real&gt; Uvec(Xvec.Dim());</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        Uvec.SetZero();</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="comment">// compute constants first -- TODO: arithemetic order to reduce numerical error</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        Real coeff = 1./4./mu;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        <span class="comment">// Get rmax</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        Real rmax_num = R_out*R_out - R_in*R_in;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        Real Rratio = R_out / R_in;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        Real rmax_denom = 2*sctl::log&lt;Real&gt;(Rratio);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        Real rmax2 = rmax_num / rmax_denom;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="comment">// Compute u = 1/4/mu*dpdx*(R_out^2-r^2-2rmax^2ln*(R_out/r))</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        <span class="keywordflow">for</span> (sctl::Long i=0; i&lt;Nelem; i++) {</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>            <span class="keywordflow">for</span> (sctl::Long j=0; j&lt;ElemOrder; j++) {</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>                <span class="comment">// get Xc at this index</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                sctl::Vector&lt;Real&gt; Xc_here(3, (sctl::Iterator&lt;Real&gt;)Xc.begin() + (i*ElemOrder+j)*3, <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                <span class="keywordflow">for</span> (sctl::Long k=0; k&lt;FourierOrder; k++) {</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                    sctl::Long starting_ind = (i*ElemOrder*FourierOrder + j*FourierOrder + k)*3;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                    sctl::Vector&lt;Real&gt; Xhere(3, (sctl::Iterator&lt;Real&gt;) Xvec.begin() + starting_ind, <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                    sctl::Vector&lt;Real&gt; Rhere = Xhere - Xc_here;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                    Real r2 = Rhere[1]*Rhere[1] + Rhere[2]*Rhere[2];</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                    Real rratio = R_out / sctl::sqrt&lt;Real&gt;(r2);</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                    Real u = -1.*coeff * dpdx * (R_out*R_out - r2 - 2. * rmax2 * sctl::log&lt;Real&gt;(rratio));</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>                    Uvec[starting_ind + 0] = u; <span class="comment">// flow always just in the x direction.</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>                }</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            }</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        }</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">return</span> Uvec;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    };</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="comment">// Solve bg poiseuille flow -- dpdx = p(x=1)-p(x=0) = negative for flow right</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keyword">const</span> <span class="keyword">auto</span> bg_poiseuille = [dpdx, mu](<span class="keyword">const</span> sctl::Vector&lt;Real&gt; X) {</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keyword">const</span> sctl::Long N = X.Dim()/3;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        sctl::Vector&lt;Real&gt; U(N*3);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        U.SetZero();</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keywordflow">for</span> (sctl::Long i = 0; i &lt; N; i++) {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>            sctl::Vector&lt;Real&gt; x(3, (sctl::Iterator&lt;Real&gt;) X.begin() + i*3, <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>            U[i*3+0] = dpdx * ((x[1]-0.5)*(x[1]-0.5) + (x[2]-0.5)*(x[2]-0.5))/4./mu; </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        }</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        <span class="keywordflow">return</span> U;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    };</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="comment">// Make StokesBIO</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="comment">// Real min_rad = straight.GetMinRadius();</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="comment">// Real S_scal = 1./(2.*min_rad*sctl::log&lt;Real&gt;(1./min_rad)); // TODO: stable computation? check csbq code.</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    Real S_scal = 1.0;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    Real D_scal = 1.0;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <a class="code hl_class" href="classStokesBIO.html">StokesBIO&lt;Real&gt;</a> LPO(S_scal, D_scal, comm);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    LPO.AddElemList(straight.GetInnerElemList(), <span class="stringliteral">&quot;inner&quot;</span>);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    LPO.AddElemList(straight.GetOuterElemList(), <span class="stringliteral">&quot;outer&quot;</span>);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    LPO.SetAccuracy(tol);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    sctl::Vector&lt;Real&gt; X_annular;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    straight.GetNodeCoord(&amp;X_annular, <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    LPO.SetTargetCoord(X_annular);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    LPO.SetPeriodicity(sctl::Periodicity::X, 1.0);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    sctl::Vector&lt;Real&gt; NormalOrient(X_annular.Dim());</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    NormalOrient = 1.;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    sctl::Long size_inner = Nelem*ElemOrder*FourierOrder*3;</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    sctl::Long size_outer = X_annular.Dim() - size_inner;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    <span class="comment">// std::cout &lt;&lt; &quot;size inner = &quot; &lt;&lt; size_inner &lt;&lt; &quot;, size outer = &quot; &lt;&lt; size_outer &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <span class="keywordflow">for</span> (sctl::Long ind=0; ind&lt;size_outer; ind++) {</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="comment">// Normal of outer channel element list points outward by default.</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        NormalOrient[size_inner + ind] = -1.;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    }</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    <span class="comment">// Create lambda function</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keyword">const</span> <span class="keyword">auto</span> BIO = [&amp;LPO, D_scal, &amp;NormalOrient](sctl::Vector&lt;Real&gt;* U, <span class="keyword">const</span> sctl::Vector&lt;Real&gt; sigma) {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        U-&gt;SetZero();</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        LPO.ComputePotential(*U, sigma);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        <span class="keywordflow">if</span> (D_scal &amp;&amp; U-&gt;Dim() == sigma.Dim()) (*U) += 0.5*sigma*D_scal*NormalOrient;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    };</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    <span class="comment">// Setup gmres</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    sctl::GMRES&lt;Real&gt; solver(comm);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    sctl::KrylovPrecond&lt;Real&gt; ksp;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    sctl::Vector&lt;Real&gt; sigma;</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    <span class="comment">// Utot = Ubg + Uwall = 0 on wall. </span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    sctl::Vector&lt;Real&gt; vslip = straight.GetVslip(); <span class="comment">// no EXTRA wall velocity</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    sctl::Vector&lt;Real&gt; vbg = bg_poiseuille(X_annular);</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    <span class="comment">// std::cout &lt;&lt; &quot;DEBUG, bg poiseuille values, should be equal in magnitude for all nodes on each channel.&quot; &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;X_annular.Dim()/3; i++) {</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        Real magv2 = vbg[i*3+0]*vbg[i*3+0] + vbg[i*3+1]*vbg[i*3+1] + vbg[i*3+2]*vbg[i*3+2];</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        <span class="comment">// std::cout &lt;&lt; &quot;vector = &quot; &lt;&lt; vbg[i*3+0] &lt;&lt; &quot;, &quot; &lt;&lt; vbg[i*3+1] &lt;&lt; &quot;, &quot; &lt;&lt; vbg[i*3+2] &lt;&lt; &quot;, magnitude = &quot; &lt;&lt; magv2 &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        <span class="comment">// std::cout &lt;&lt; &quot;vslip (shoudl be 0): &quot; &lt;&lt; vslip[i*3+0] &lt;&lt; &quot;, &quot; &lt;&lt; vslip[i*3+1] &lt;&lt; &quot;, &quot; &lt;&lt; vslip[i*3+2] &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    }</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="comment">// Solve gmres</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    solver(&amp;sigma, BIO, vslip-vbg, gmres_tol, -1, <span class="keyword">false</span>, <span class="keyword">nullptr</span>, &amp;ksp);</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="comment">// Compare to exact, report error.</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <span class="comment">// Create two cylindrical channels of different radius to test U at different r. (NOTE: Can do sinusoidal channel later)</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <span class="comment">// this dynamics in functor wall update.</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    sctl::Vector&lt;Real&gt; r3(ElemOrder*Nelem);</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    r3 = R_in + 1./3. * (R_out - R_in); </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    sctl::Vector&lt;Real&gt; r4(ElemOrder*Nelem);</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    r4 = R_in + 2./3. * (R_out - R_in); </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    wall.update();</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <a class="code hl_class" href="classAnnular.html">Annular&lt;Real&gt;</a> channel_trg(wall.centerCoordsIn(),wall.centerCoordsOut(), r3, r4);</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    channel_trg.Setup(Nelem, ElemOrder, FourierOrder, wall.rdotIn(),wall.rdotOut());</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    sctl::Vector&lt;Real&gt; X_inner, X_outer;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    channel_trg.GetInnerCoord(&amp;X_inner, <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    channel_trg.GetOuterCoord(&amp;X_outer, <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    sctl::Vector&lt;Real&gt; U_inner, U_outer;</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    LPO.SetTargetCoord(X_inner);</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    BIO(&amp;U_inner, sigma);</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    LPO.SetTargetCoord(X_outer);</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    BIO(&amp;U_outer, sigma);</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    U_inner += bg_poiseuille(X_inner);</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    U_outer += bg_poiseuille(X_outer);</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    sctl::Vector&lt;Real&gt; Uexact_inner = uexact(X_inner);</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    sctl::Vector&lt;Real&gt; Uexact_outer = uexact(X_outer);</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    Real max_err_inner = 0.;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    Real max_err_outer = 0.;</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    sctl::Vector&lt;Real&gt; Diff_inner = U_inner - Uexact_inner;</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    sctl::Vector&lt;Real&gt; Diff_outer = U_outer - Uexact_outer;</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="comment">// std::cout &lt;&lt; &quot; ======================= DEBUG U eval.&quot; &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="comment">// Real mag_exact2 = Uexact_inner[0]*Uexact_inner[0] + Uexact_inner[1]*Uexact_inner[1] + Uexact_inner[2]*Uexact_inner[2];</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="comment">// std::cout &lt;&lt; &quot;uexact inner = &quot; &lt;&lt; Uexact_inner[0] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_inner[1] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_inner[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_exact2 &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="comment">// Real mag_solve2 = U_inner[0]*U_inner[0] + U_inner[1]*U_inner[1] + U_inner[2]*U_inner[2];</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    <span class="comment">// std::cout &lt;&lt; &quot;usolve inner = &quot; &lt;&lt; U_inner[0] &lt;&lt; &quot;, &quot; &lt;&lt; U_inner[1] &lt;&lt; &quot;, &quot; &lt;&lt; U_inner[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_solve2 &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    <span class="comment">// mag_exact2 = Uexact_outer[0]*Uexact_outer[0] + Uexact_outer[1]*Uexact_outer[1] + Uexact_outer[2]*Uexact_outer[2];</span></div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    <span class="comment">// std::cout &lt;&lt; &quot;uexact outer = &quot; &lt;&lt; Uexact_outer[0] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_outer[1] &lt;&lt; &quot;, &quot; &lt;&lt; Uexact_outer[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_exact2 &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    <span class="comment">// mag_solve2 = U_outer[0]*U_outer[0] + U_outer[1]*U_outer[1] + U_outer[2]*U_outer[2];</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="comment">// std::cout &lt;&lt; &quot;usolve outer = &quot; &lt;&lt; U_outer[0] &lt;&lt; &quot;, &quot; &lt;&lt; U_outer[1] &lt;&lt; &quot;, &quot; &lt;&lt; U_outer[2] &lt;&lt; &quot;, mag = &quot; &lt;&lt; mag_solve2 &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> e : Diff_inner) max_err_inner = std::max&lt;Real&gt;(max_err_inner, sctl::fabs(e));</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> e : Diff_outer) max_err_outer = std::max&lt;Real&gt;(max_err_outer, sctl::fabs(e));</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    Real avg_max_err = 0.5*(max_err_inner + max_err_outer);</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Nelem = &quot;</span> &lt;&lt; Nelem &lt;&lt; <span class="stringliteral">&quot;, Fourier order = &quot;</span> &lt;&lt; FourierOrder &lt;&lt; <span class="stringliteral">&quot;; Averaged max error at two different r: &quot;</span>&lt;&lt; avg_max_err &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="comment">// Check flux calculation against analytical solutions.</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <span class="keyword">const</span> Real alpha = wall.radiusOut()[0] / wall.radiusIn()[0];</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keyword">const</span> Real beta = alpha;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    <span class="keyword">const</span> Real K = alpha*beta - 1.0;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    <span class="keyword">const</span> Real Q_ana = sctl::const_pi&lt;Real&gt;()/8. *((K+1.)*(K+1.) - 1.0 - 2.*K*K/sctl::log&lt;Real&gt;(K+1.));</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span> </div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <span class="comment">// // Check parameters to Tithof paper analytical U</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    <span class="comment">// Real rho1 = (R_in + 1./3. * (R_out - R_in)) / R_in;</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    <span class="comment">// Real rho2 = (R_in + 2./3. * (R_out - R_in)) / R_in;</span></div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <span class="comment">// std::cout &lt;&lt; rho1 &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <span class="comment">// Real U_T1 = 1/4. * (alpha*alpha - rho1*rho1 - (alpha*alpha-1)*sctl::log&lt;Real&gt;(alpha/rho1)/sctl::log&lt;Real&gt;(alpha));</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    <span class="comment">// Real U_T2 = 1/4. * (alpha*alpha - rho2*rho2 - (alpha*alpha-1)*sctl::log&lt;Real&gt;(alpha/rho2)/sctl::log&lt;Real&gt;(alpha));</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    <span class="comment">// std::cout &lt;&lt; &quot;debug U value, U eval here is &quot; &lt;&lt; U_T1 &lt;&lt; &quot;, U paper scaled by r_1^2: &quot; &lt;&lt; U_T1 * R_in * R_in * (-1 * dpdx) &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    <span class="comment">// U_T1 *= R_in * R_in * (-1 * dpdx) / mu;</span></div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <span class="comment">// U_T2 *= R_in * R_in * (-1 * dpdx) / mu;</span></div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    </div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <span class="comment">// std::cout &lt;&lt; &quot;Difference between U in paper and U here are &quot; &lt;&lt; fabs(U_T1 - Uexact_inner[0]) &lt;&lt; &quot;, &quot; &lt;&lt; fabs(U_T2 - Uexact_outer[0]) &lt;&lt; std::endl;</span></div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span> </div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    <span class="comment">// Compute Q by doing integral over outlet </span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    Real Rin = wall.radiusIn()[0];</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    Real Rout = wall.radiusOut()[0];</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    <span class="keyword">const</span> <span class="keyword">auto</span> getQ = [&amp;LPO, &amp;Rin, &amp;Rout, dpdx, mu, &amp;sigma, &amp;BIO, &amp;bg_poiseuille](<span class="keyword">const</span> sctl::Long r_ord, <span class="keyword">const</span> sctl::Long theta_ord) {</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>        SCTL_ASSERT(dpdx&lt;0.);</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>        </div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        sctl::Vector&lt;Real&gt; nds, wts;</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        sctl::ChebQuadRule&lt;Real&gt;::ComputeNdsWts(&amp;nds, &amp;wts, r_ord); <span class="comment">// nds and wts on [0,1]</span></div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        sctl::Vector&lt;Real&gt; r_nodes = nds * (Rout - Rin) + Rin;</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        sctl::Vector&lt;Real&gt; r_wts = wts * (Rout - Rin);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span> </div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        sctl::Vector&lt;Real&gt; theta_nodes(theta_ord);</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        <span class="keyword">const</span> Real theta_wt = 2*sctl::const_pi&lt;Real&gt;()/theta_ord;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;theta_ord; i++) {</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>            theta_nodes[i] = theta_wt * i;</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        }</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        <span class="comment">// form mesh grid of x-y points, same-r-all-thetas order.</span></div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>        sctl::Vector&lt;Real&gt; Xtrg(3 * r_ord * theta_ord);</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;r_ord; i++) {</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0; j&lt;theta_ord; j++) {</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                sctl::Long node_ind = i*theta_ord + j;</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>                Xtrg[3*node_ind + 0] = 1.0; <span class="comment">// evaluation at x=1.0 only</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>                Xtrg[3*node_ind + 1] = 0.5 + r_nodes[i] * sctl::cos&lt;Real&gt;(theta_nodes[j]); </div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>                Xtrg[3*node_ind + 2] = 0.5 + r_nodes[i] * sctl::sin&lt;Real&gt;(theta_nodes[j]); </div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>            }</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>        }</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span> </div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>        <span class="comment">// Compute U at meshgrid:</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>        sctl::Vector&lt;Real&gt; Utrg;</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>        LPO.SetTargetCoord(Xtrg);</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        BIO(&amp;Utrg, sigma);</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>        Utrg += bg_poiseuille(Xtrg);</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span> </div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>        <span class="comment">// Quadrature to integrate</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        Real Q = 0.;</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;r_ord; i++) {</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0; j&lt;theta_ord; j++) {</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>                sctl::Long node_ind = i*theta_ord + j;</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>                Real u = Utrg[3*node_ind + 0];</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>                Q += u * r_nodes[i] * theta_wt * r_wts[i];</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>            }</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>        }</div>
 <div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span> </div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>        <span class="keywordflow">return</span> Q2;</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>        Real Q2 = Q * mu / (-dpdx) / Rin / Rin / Rin / Rin; <span class="comment">// Q in paper = mu/-dp/R_in^4 * int u_code dA</span></div>
 <div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span> </div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    };</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordflow">return</span> Q2;</div>
 <div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    Real Q = getQ(20,64);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    };</div>
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Flux difference: Q analytical = &quot;</span> &lt;&lt; std::setprecision(10) &lt;&lt; Q_ana &lt;&lt; <span class="stringliteral">&quot;, Q computed = &quot;</span> &lt;&lt; Q &lt;&lt; <span class="stringliteral">&quot;; rel error is &quot;</span> &lt;&lt; fabs(Q-Q_ana) / fabs(Q_ana) &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    Real Q = getQ(20,64);</div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>}</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Flux difference: Q analytical = &quot;</span> &lt;&lt; std::setprecision(10) &lt;&lt; Q_ana &lt;&lt; <span class="stringliteral">&quot;, Q computed = &quot;</span> &lt;&lt; Q &lt;&lt; <span class="stringliteral">&quot;; rel error is &quot;</span> &lt;&lt; fabs(Q-Q_ana) / fabs(Q_ana) &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>{</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    sctl::Comm::MPI_Init(&amp;argc, &amp;argv);</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    <span class="keyword">using </span>Real=double;</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    {</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        sctl::Comm comm = sctl::Comm::World();</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        <span class="comment">// Read parameters from input</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        <span class="keywordtype">long</span> Nelem = std::stol(argv[1]); <span class="comment">// number of elements</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>        <span class="keywordtype">long</span> ElemOrder = std::stol(argv[2]); <span class="comment">// Cheb order per element</span></div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>        <span class="keywordtype">long</span> FourierOrder = std::stol(argv[3]);  <span class="comment">// number of Fourier nodes</span></div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        <span class="comment">// Set default physical and problem parameters</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>        <span class="keywordtype">double</span> mu = 1.0;</div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>        <span class="keywordtype">double</span> dpdx = -1.;</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span> </div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor&lt;Real&gt;</a> rin_functor(0.3);</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>        <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor&lt;Real&gt;</a> rout_functor(0.48);</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>        concentric_poiseuille&lt;Real&gt;(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, rin_functor, rout_functor);</div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        <span class="comment">// eccentric_poiseuille&lt;Real&gt;(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm);</span></div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span> </div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>        </div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    }</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span> </div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    sctl::Comm::MPI_Finalize();</div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <span class="keywordflow">return</span> 0; </div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>}</div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>}</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>{</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    sctl::Comm::MPI_Init(&amp;argc, &amp;argv);</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <span class="keyword">using </span>Real=double;</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span> </div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    {</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        sctl::Comm comm = sctl::Comm::World();</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>        <span class="comment">// Read parameters from input</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>        <span class="keywordtype">long</span> Nelem = std::stol(argv[1]); <span class="comment">// number of elements</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        <span class="keywordtype">long</span> ElemOrder = std::stol(argv[2]); <span class="comment">// Cheb order per element</span></div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>        <span class="keywordtype">long</span> FourierOrder = std::stol(argv[3]);  <span class="comment">// number of Fourier nodes</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>        <span class="comment">// Set default physical and problem parameters</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>        <span class="keywordtype">double</span> mu = 1.0;</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        <span class="keywordtype">double</span> dpdx = -1.;</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span> </div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>        <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor&lt;Real&gt;</a> rin_functor(0.3);</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        <a class="code hl_struct" href="structConstantFunctor.html">ConstantFunctor&lt;Real&gt;</a> rout_functor(0.48);</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>        concentric_poiseuille&lt;Real&gt;(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm, rin_functor, rout_functor);</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>        <span class="comment">// eccentric_poiseuille&lt;Real&gt;(dpdx, mu, Nelem, ElemOrder, FourierOrder, comm);</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>        </div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    }</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span> </div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    sctl::Comm::MPI_Finalize();</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    <span class="keywordflow">return</span> 0; </div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>}</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
 <div class="ttc" id="aclassAnnular_html"><div class="ttname"><a href="classAnnular.html">Annular</a></div><div class="ttdoc">Implements a class for the annular space between two channels using the Convergent slender-body quadr...</div><div class="ttdef"><b>Definition</b> <a href="Annular_8hpp_source.html#l00016">Annular.hpp:16</a></div></div>
-<div class="ttc" id="aclassAnnular_html_a6563fdc6b912372b7104b525ddc5cedf"><div class="ttname"><a href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular::GetCenterLine</a></div><div class="ttdeci">static sctl::Vector&lt; Real &gt; GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_)</div><div class="ttdoc">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5)</div><div class="ttdef"><b>Definition</b> <a href="Annular_8cpp_source.html#l00485">Annular.cpp:485</a></div></div>
+<div class="ttc" id="aclassAnnular_html_a6563fdc6b912372b7104b525ddc5cedf"><div class="ttname"><a href="classAnnular.html#a6563fdc6b912372b7104b525ddc5cedf">Annular::GetCenterLine</a></div><div class="ttdeci">static sctl::Vector&lt; Real &gt; GetCenterLine(const sctl::Long Nelem_, const sctl::Long ElemOrder_)</div><div class="ttdoc">Get the 3D centerline coordinates on a straight line at (y=0.5,z=0.5)</div><div class="ttdef"><b>Definition</b> <a href="Annular_8cpp_source.html#l00480">Annular.cpp:480</a></div></div>
 <div class="ttc" id="aclassFuncWall_html"><div class="ttname"><a href="classFuncWall.html">FuncWall</a></div><div class="ttdoc">FuncWall class template for wall dynamics defined by user-provided functions, inherits from Wall base...</div><div class="ttdef"><b>Definition</b> <a href="FuncWall_8hpp_source.html#l00024">FuncWall.hpp:24</a></div></div>
 <div class="ttc" id="aclassStokesBIO_html"><div class="ttname"><a href="classStokesBIO.html">StokesBIO</a></div><div class="ttdef"><b>Definition</b> <a href="StokesBIO_8hpp_source.html#l00014">StokesBIO.hpp:14</a></div></div>
 <div class="ttc" id="astructConstantFunctor_html"><div class="ttname"><a href="structConstantFunctor.html">ConstantFunctor</a></div><div class="ttdef"><b>Definition</b> <a href="FuncWall__SpatialSolver__ex_8cpp_source.html#l00009">FuncWall_SpatialSolver_ex.cpp:9</a></div></div>
