@@ -35,10 +35,10 @@ class IntegratorWall: public Wall<Real>{
 
     public:
         IntegratorWall( const Real dt, 
-            const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
             const sctl::Vector<Real>& center_in,
-            const sctl::Vector<Real>& radius_out,
+            const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
             const sctl::Vector<Real>& radius_in,
+            const sctl::Vector<Real>& radius_out,
             const sctl::Vector<Real>& neuronal_activity,
             const sctl::Vector<Real>& V,
             const sctl::Vector<Real>& G,

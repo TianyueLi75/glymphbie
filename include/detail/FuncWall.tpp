@@ -4,13 +4,13 @@
 
 template <class Real, class InnerFunc, class OuterFunc>
 FuncWall<Real, InnerFunc, OuterFunc>::FuncWall( const Real dt, 
-        const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
         const sctl::Vector<Real>& center_in,
-        const sctl::Vector<Real>& radius_out,
+        const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
         const sctl::Vector<Real>& radius_in,
+        const sctl::Vector<Real>& radius_out,
         const InnerFunc& inner_func,
         const OuterFunc& outer_func)
-    :   Wall<Real>(dt, center_out, center_in, radius_out, radius_in),
+    :   Wall<Real>(dt, center_in, center_out, radius_in, radius_out),
         _inner_func(inner_func),
         _outer_func(outer_func) {}
 
