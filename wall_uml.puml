@@ -17,6 +17,8 @@ abstract class "Wall<Real>" as Wall {
     # _radius_in : sctl::Vector<Real>
     # _rdot_out : sctl::Vector<Real>
     # _rdot_in : sctl::Vector<Real>
+    # _cdot_out : sctl::Vector<Real>
+    # _cdot_in : sctl::Vector<Real>
 
     ' Constructor & Destructor
     + Wall(dt: Real, \n\
@@ -39,6 +41,8 @@ abstract class "Wall<Real>" as Wall {
     + getTime() : Real
     + centerCoordsOut() : const sctl::Vector<Real>&
     + centerCoordsIn() : const sctl::Vector<Real>&
+    + cdotOut() : const sctl::Vector<Real>&
+    + cdotIn() : const sctl::Vector<Real>&
     + radiusOut() : const sctl::Vector<Real>&
     + radiusIn() : const sctl::Vector<Real>&
     + rdotOut() : const sctl::Vector<Real>&
