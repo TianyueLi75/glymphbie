@@ -44,7 +44,7 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     r2 = 0.48;
 
     const Real dt = .01;
-    FuncWall<Real, ConstantFunctor<Real>, ConstantFunctor<Real>> wall(dt, Xc, Xc, r2, r1, rin_functor, rout_functor);
+    FuncWall<Real, ConstantFunctor<Real>, ConstantFunctor<Real>> wall(dt, Xc, Xc, r1, r2, rin_functor, rout_functor);
 
 
 

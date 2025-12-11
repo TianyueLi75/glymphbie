@@ -9,10 +9,10 @@
 
 template <class Real>
 Wall<Real>::Wall(const Real dt, 
-            const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
             const sctl::Vector<Real>& center_in,
-            const sctl::Vector<Real>& radius_out,
-            const sctl::Vector<Real>& radius_in)
+            const sctl::Vector<Real>& center_out, // Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines
+            const sctl::Vector<Real>& radius_in,
+            const sctl::Vector<Real>& radius_out)
     : _dt(dt), _center_coords_out(center_out), _center_coords_in(center_in),
       _radius_out(radius_out), _radius_in(radius_in),
       _rdot_in(radius_in.Dim()),
@@ -45,13 +45,14 @@ Wall<Real>::~Wall() {}
 
 template <class Real>
 void Wall<Real>::setGridAndData(
-                                   const sctl::Vector<Real>& center_out,
-                                   const sctl::Vector<Real>& center_in,
-                                   const sctl::Vector<Real>& radius_out,
-                                   const sctl::Vector<Real>& radius_in,
-                                   const sctl::Vector<Real>& rdot_out,
-                                   const sctl::Vector<Real>& rdot_in
-                                   ) {
+                                     
+                                const sctl::Vector<Real>& center_in,
+                                const sctl::Vector<Real>& center_out,
+                                const sctl::Vector<Real>& radius_in,
+                                const sctl::Vector<Real>& radius_out,
+                                const sctl::Vector<Real>& rdot_in,
+                                const sctl::Vector<Real>& rdot_out
+                                ) {
     if (center_out.Dim() != radius_out.Dim()*3 || center_in.Dim() != radius_in.Dim()*3) {
         throw std::invalid_argument("in/out radius and in/out center coordinate vectors must match grid size.");
     }

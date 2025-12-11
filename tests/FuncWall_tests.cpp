@@ -178,7 +178,7 @@ TEST_CASE(constant_walls)
     ConstantFunctor<Real> outer_logic(target_r_out);
 
     FuncWall<Real, ConstantFunctor<Real>, ConstantFunctor<Real>> wall(
-        dt, c_out, c_in, r_out, r_in, inner_logic, outer_logic
+        dt, c_in, c_out, r_in, r_out, inner_logic, outer_logic
     );
 
     // 2. Run Update
@@ -227,7 +227,7 @@ TEST_CASE(spatial_walls)
     LinearSpatialFunctor<Real> inner_spatial_logic(base_r, slope);
 
     FuncWall<Real, LinearSpatialFunctor<Real>, ConstantFunctor<Real>> wall(
-        dt, c_out, c_in, r_out, r_in, 
+        dt, c_in, c_out, r_in, r_out, 
         inner_spatial_logic, outer_logic
     );
 
@@ -272,7 +272,7 @@ TEST_CASE(spatiotemporal_walls)
     SpatiotemporalFunctor<Real> inner_func(base_r, slope, amplitude, omega);
     ConstantFunctor<Real> outer_func(10.0); // Keep outer far away
     FuncWall<Real, SpatiotemporalFunctor<Real>, ConstantFunctor<Real>> wall(
-        dt, c_out, c_in, r_out, r_in, 
+        dt, c_in, c_out, r_in, r_out, 
         inner_func, outer_func
     );
     // 2. Run Update
@@ -328,7 +328,7 @@ TEST_CASE(r2_spatiotemporal_walls)
     R2SpatiotemporalFunctor<Real> inner_func(R0, amplitude, L, n, omega);
     ConstantFunctor<Real> outer_func(10.0); // Keep outer far away
     FuncWall<Real, R2SpatiotemporalFunctor<Real>, ConstantFunctor<Real>> wall(
-        dt, c_out, c_in, r_out, r_in, 
+        dt, c_in, c_out, r_in, r_out, 
         inner_func, outer_func
     );
     // 2. Run Update

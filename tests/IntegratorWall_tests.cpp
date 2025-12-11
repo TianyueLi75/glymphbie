@@ -179,7 +179,7 @@ TEST_CASE(constant_walls){
     // instantiate integrator
     Real tau = 1.0; 
     Solver_t solver(
-        dt, c_out, c_in, r_out, r_in, 
+        dt, c_in, c_out, r_in, r_out, 
         activity, V, G, tau, tau, 
         f_V, f_G, f_inner, f_outer
     ); 
@@ -272,7 +272,7 @@ TEST_CASE(inner_outer_wall_integration) {
     Real tau = 1.0; 
     
     Solver_t solver(
-        dt, c_out, c_in, r_out, r_in, 
+        dt, c_in, c_out, r_in, r_out, 
         act, V, G, tau, tau, 
         f_V, f_G, f_inner, f_outer
     );
