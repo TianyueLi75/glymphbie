@@ -11,7 +11,7 @@
 #SBATCH --account=ners570f25_class
 #SBATCH --partition=standard
 #SBATCH --exclusive
-#SBATCH --output=out/concentric_poiseuille/convergence.out
+#SBATCH --output=out/concentric_poiseuille/convergence_funcwall.out
 
 # cpus per task for OpenMP originally 18
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK

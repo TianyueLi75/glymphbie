@@ -40,13 +40,13 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     // rin_functor(r1, 0.0); // initialize wall with this Xc
     // rout_functor(r2, 0.0);
     // set constant radius for now not determined by functor
-    r1 = 0.3;
-    r2 = 0.48;
+    // r1 = 0.3;
+    // r2 = 0.48;
 
     const Real dt = .01;
     FuncWall<Real, ConstantFunctor<Real>, ConstantFunctor<Real>> wall(dt, Xc, Xc, r1, r2, rin_functor, rout_functor);
 
-
+    wall.update();
 
     // initialize wall with this Xc
     // sctl::Vector<Real> r1(ElemOrder*Nelem);
@@ -61,11 +61,13 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     // for (int i=0; i<Xc.Dim(); i++) {
     //     std::cout << Xc[i] << std::endl;
     // }
-    const Real R_in = r1[0];
-    const Real R_out = r2[0];
+    const Real R_in = wall.radiusIn()[0];
+    const Real R_out = wall.radiusOut()[0];
     // Function to get exact flow at location X given center Xc and other params.
     // NOTE: This assumes Xvec taken as an intermediate channel with the same parameters for simplicity. Otherwise an interpolation is needed.
-    const auto uexact = [R_in, R_out, dpdx, mu, &Xc, Nelem, ElemOrder, FourierOrder](const sctl::Vector<Real> Xvec) {
+    const auto uexact = [&wall, dpdx, mu, &Xc, Nelem, ElemOrder, FourierOrder](const sctl::Vector<Real> Xvec) {
+        Real R_in = wall.radiusIn()[0];
+        Real R_out = wall.radiusOut()[0];
         sctl::Long N = Xvec.Dim()/3;
         SCTL_ASSERT(Xvec.Dim() == Nelem * ElemOrder * FourierOrder * 3);
         sctl::Vector<Real> Uvec(Xvec.Dim());
@@ -158,12 +160,12 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     // Compare to exact, report error.
     // Create two cylindrical channels of different radius to test U at different r. (NOTE: Can do sinusoidal channel later)
     // this dynamics in functor wall update.
-    // sctl::Vector<Real> r3(ElemOrder*Nelem);
-    // r3 = R_in + 1./3. * (R_out - R_in); = .36 
-    // sctl::Vector<Real> r4(ElemOrder*Nelem);
-    // r4 = R_in + 2./3. * (R_out - R_in); = .42
+    sctl::Vector<Real> r3(ElemOrder*Nelem);
+    r3 = R_in + 1./3. * (R_out - R_in); 
+    sctl::Vector<Real> r4(ElemOrder*Nelem);
+    r4 = R_in + 2./3. * (R_out - R_in); 
     wall.update();
-    Annular<Real> channel_trg(wall.centerCoordsIn(),wall.centerCoordsOut(), wall.radiusIn(),wall.radiusOut());
+    Annular<Real> channel_trg(wall.centerCoordsIn(),wall.centerCoordsOut(), r3, r4);
     channel_trg.Setup(Nelem, ElemOrder, FourierOrder, wall.rdotIn(),wall.rdotOut());
     sctl::Vector<Real> X_inner, X_outer;
     channel_trg.GetInnerCoord(&X_inner, nullptr);
