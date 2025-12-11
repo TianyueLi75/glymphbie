@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['linearspatialfunctor_0',['LinearSpatialFunctor',['../structLinearSpatialFunctor.html',1,'']]]
+  ['innerwallfunctor_0',['InnerWallFunctor',['../structInnerWallFunctor.html',1,'']]],
+  ['integratorwall_1',['IntegratorWall',['../classIntegratorWall.html',1,'']]]
 ];

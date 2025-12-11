@@ -703,8 +703,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span>            in_domain[nd] = 0;</div>
 <div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span>        } <span class="keywordflow">else</span> {</div>
 <div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>            <span class="keyword">const</span> <span class="keyword">auto</span> search_panel = [](Real x, sctl::Long loc_elem_dsp_, sctl::Long loc_elem_cnt_, sctl::Long ElemOrder_, sctl::Vector&lt;Real&gt; Xc_) {</div>
-<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>                <span class="keywordflow">for</span> (sctl::Long ind=0; ind&lt;loc_elem_cnt_; ind++) {</div>
-<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>                    <span class="keywordflow">if</span> (x &lt; Xc_[(ind+1)*ElemOrder_*3 - 3]) {<span class="comment">// extra assumption that all elements have order ElemOrder_</span></div>
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>                <span class="keywordflow">for</span> (sctl::Long ind=loc_elem_dsp_; ind&lt;loc_elem_dsp_ + loc_elem_cnt_; ind++) {</div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>                    <span class="keywordflow">if</span> (x &lt; Xc_[(ind+1)*ElemOrder_*3 - 3]) {<span class="comment">// extra assumption that all elements hve order ElemOrder_</span></div>
 <div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>                        <span class="comment">// x smaller than right end of this interval, return  element index.</span></div>
 <div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>                        <span class="keywordflow">return</span> ind; </div>
 <div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>                    }</div>
