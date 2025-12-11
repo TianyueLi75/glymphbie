@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['r2spatiotemporalfunctor_0',['R2SpatiotemporalFunctor',['../structR2SpatiotemporalFunctor.html',1,'']]]
+  ['spatiotemporalfunctor_0',['SpatiotemporalFunctor',['../structSpatiotemporalFunctor.html',1,'']]],
+  ['stokesbio_1',['StokesBIO',['../classStokesBIO.html',1,'']]]
 ];
