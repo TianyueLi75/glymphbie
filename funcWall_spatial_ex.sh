@@ -4,10 +4,10 @@
 #SBATCH --job-name=convergence
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --ntasks-per-node=2
+#SBATCH --cpus-per-task=18
 #SBATCH --mem-per-cpu=3g
-#SBATCH --time=01:30:00
+#SBATCH --time=00:30:00
 #SBATCH --account=ners570f25_class
 #SBATCH --partition=standard
 #SBATCH --exclusive
