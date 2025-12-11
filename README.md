@@ -39,21 +39,13 @@ make -j
 cd ../..
 ```
 
-### Compile GlymphBIE tests
-In the main directory, go through CMakeLists.txt to update source files being compiled: 
-- under "# Create the library", add in source files to GLYMPHBIE_SOURCES; 
-- under "# Source discovery, build tests", add in source files to TEST_SOURCES.
+### Compile GlymphBIE
 ```bash
 mkdir build && cd build
 cmake ..
 cmake --build .
 ```
 
-Resolve any compilation errors from source code, then find the executables in build/bin, for example:
-```bash
-./bin/Annular_tests
-```
+You can find the example executables in build/bin, see bash scripts in the main directory for examples on how to call them using MPI while enabling OpenMP. In particular, you can find a convergence study for a set of concentric cylinders under constant pressure in `examples/FuncWall_SpatialSolver_ex.cpp`
 
 
-
-Note: Makefile in main folder is NOT updated!

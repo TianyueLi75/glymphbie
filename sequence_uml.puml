@@ -4,7 +4,7 @@ participant Wall
 participant Annular
 participant StokesBIO
 participant GMRES
-participant Particle
+' participant Particle
 
 participant Environment
 activate Environment
@@ -44,19 +44,19 @@ group One Time Step
     Environment -> GMRES : Operator()(StokesBIO, vslip)
     GMRES --> Environment : sigma (density)
 
-    activate Particle
-    Environment -> Particle : GetPositions()
-    Particle --> Environment : Xp
-    Environment -> StokesBIO : ComputePotential(Xp, sigma)
-    StokesBIO --> Environment : u (velocity at Xp)
-    Environment -> Particle : EvolveTime()
-    Particle -> Particle : TimeStep()
-    Particle -> Particle : ResolveCollision()
+    ' activate Particle
+    ' Environment -> Particle : GetPositions()
+    ' Particle --> Environment : Xp
+    ' Environment -> StokesBIO : ComputePotential(Xp, sigma)
+    ' StokesBIO --> Environment : u (velocity at Xp)
+    ' Environment -> Particle : EvolveTime()
+    ' Particle -> Particle : TimeStep()
+    ' Particle -> Particle : ResolveCollision()
 
     Environment -> StokesBIO : ComputePotential(X, sigma)
-    StokesBIO --> Environment : Uwall (velocity at wall nodes.) [necessary?]
+    StokesBIO --> Environment : Utrg, Flux
 
-    Environment --> Wall : Xc_updated, r_updated, drdt_updated, Uwall
+    Environment --> Wall : Xc_updated, r_updated, drdt_updated
 
 end
 

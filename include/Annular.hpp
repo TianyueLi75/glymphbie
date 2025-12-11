@@ -181,10 +181,10 @@ template <class Real> class Annular {
          * 
          * @param Nelem_ 
          * @param ElemOrder_ 
-         * @param comm 
+         * @param comm_ 
          * @return std::tuple<sctl::Long, sctl::Long, sctl::Vector<Real>> 
          */
-        static std::tuple<sctl::Long, sctl::Long, sctl::Vector<Real>> GetCenterLine_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, sctl::Comm comm);
+        static std::tuple<sctl::Long, sctl::Long, sctl::Vector<Real>> GetCenterLine_mpi(const sctl::Long Nelem_, const sctl::Long ElemOrder_, sctl::Comm comm_);
         
         /**
          * @brief Returns the minimum radius *over local segment if using MPI* of the inner channel
@@ -251,21 +251,21 @@ template <class Real> class Annular {
 
 
     private:
-        sctl::Vector<Real> Xc_inner, Xc_outer, r_inner, r_outer; // input values
-        sctl::Vector<Real> X_inner, X_outer, Xn_inner, Xn_outer; // computed values from CSBQ; NOTE: Normal points into fluid.
-        Real min_radius = 0.; // computed value
-        sctl::Long Nelem_inner, Nelem_outer, ElemOrder_inner, ElemOrder_outer, FourierOrder_inner, FourierOrder_outer; 
-        sctl::Vector<Real> drdt_inner, drdt_outer;
+        sctl::Vector<Real> _Xc_inner, _Xc_outer, _r_inner, _r_outer; // input values
+        sctl::Vector<Real> _X_inner, _X_outer, _Xn_inner, _Xn_outer; // computed values from CSBQ; NOTE: Normal points into fluid.
+        Real _min_radius = 0.; // computed value
+        sctl::Long _Nelem_inner, _Nelem_outer, _ElemOrder_inner, _ElemOrder_outer, _FourierOrder_inner, _FourierOrder_outer; 
+        sctl::Vector<Real> _drdt_inner, _drdt_outer;
 
         // MPI specific params
-        sctl::Comm comm;
-        sctl::Long loc_elem_dsp_inner, loc_elem_dsp_outer;
-        sctl::Long loc_elem_cnt_inner, loc_elem_cnt_outer;
+        sctl::Comm _comm;
+        sctl::Long _loc_elem_dsp_inner, _loc_elem_dsp_outer;
+        sctl::Long _loc_elem_cnt_inner, _loc_elem_cnt_outer;
 
-        sctl::SlenderElemList<Real> elem_lst_outer, elem_lst_inner;
+        sctl::SlenderElemList<Real> _elem_lst_outer, _elem_lst_inner;
 
-        bool SetupInner_bool = false;
-        bool SetupOuter_bool = false;
+        bool _SetupInner_bool = false;
+        bool _SetupOuter_bool = false;
 
         void InterpR(sctl::Vector<Real>& trg_r, const sctl::Vector<Real> src_r, const sctl::Vector<Real> src_x, const sctl::Vector<Real> trg_x);
 };

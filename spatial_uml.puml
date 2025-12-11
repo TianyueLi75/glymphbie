@@ -1,102 +1,46 @@
 @startuml csbq
 
-class SlenderBodyElem {
-    - cheb_order
-    - fourier_order
-    - comm
-    - radius
-    - coord
-    - elem_dsp
+class SlenderBodyElem
+class BoundaryIntegralOp 
+class StokesBIO 
+class Comm
 
-    constructor()
-    destructor()
-    sctl::Vector CenterlineNodes()
-    sctl::Long Size()
-    void GetNodeCoord()
-    void Write()
-    void Read()
-    void WriteVTK()
-
-}
-
-class BoundaryIntegralOp {
-    constructor()
-    destructor()
-    void SetAccuracy()
-    void AddElemList()
-    void SetTargetCoord()
-    void SetTargetNormal()
-
-    void ComputePotential()
-}
-
-class GMRES {
-    constructor()
-    operator()
-}
+class GMRES 
+class KrylovPrecond 
 GMRES ..> KrylovPrecond
 
-class KrylovPrecond {
-    constructor()
-    sctl::Long Size()
-    sctl::Long Rank() 
-    void Append()
-    void Apply()
-}
-
-class StokesBIO {
-    - ker_FxU
-    - ker_DxU
-    - comm
-    - SL_scal_
-    - DL_scal_
-    - LayerPotenSL
-    - LayerPotenDL
-
-    constructor()
-    destructor()
-    void SetAccuracy()
-    void AddElemList()
-    void SetPeriodicity()
-    void SetTargetCoord()
-    void SetTargetNormal()
-    long Dim()
-    void Setup()
-    void ClearSetup()
-
-    void ComputePotential()
-}
-
-StokesBIO --> BoundaryIntegralOp
+StokesBIO *--> BoundaryIntegralOp
+StokesBIO --> SlenderBodyElem
+GMRES ..> StokesBIO
 
 class Annular {
-    - Xc_inner
-    - Xc_outer
-    - r_inner
-    - r_outer
-    - X_inner 
-    - X_outer
-    - Xn_inner
-    - Xn_outer 
-    - min_radius
+    - _Xc_inner, _Xc_outer, _r_..., _X_..., _Xn_..., _drdt_... : sctl::Vector<Real>
+    - _Nelem_inner, _Nelem_outer, _ElemOrder_..., _FourierOrder_... : sctl::Long
+    - _min_radius : Real
+    - _comm : sctl::Comm
+    - _loc_elem_dsp_..., _loc_elem_cnt_...: sctl::Long
+    - _elem_lst_inner, _elem_lst_outer : sctl::SlenderElemList
+    - _SetupInner_bool, _SetupOuter_bool : boolean
 
-    constructor() 
-    destructor()
-
-    SetInnerXc()
-    SetOuterXc()
-    SetInnerR()
-    SetOuterR()
-    SetupInner() 
-    SetupOuter() 
-    GetInnerCoord()
-    GetOuterCoord()
-    GetNoteCoord()
-    GetCenterLine()
-    GetAspectRatio()
+    + Annular(Xc_inner_ : sctl::Vector<Real>, Xc_outer_ : sctl::Vector<Real>
+              r_inner_ : sctl::Vector<Real>, r_outer_ : sctl::Vector<Real>)
+    + Annular(Xc_inner_ : sctl::Vector<Real>, Xc_outer_ : sctl::Vector<Real>
+              r_inner_ : sctl::Vector<Real>, r_outer_ : sctl::Vector<Real>, comm_ : sctl::Comm)
+    + ~Annular()
+    + SetInnerXc(), ... : void
+    + Setup(), SetupInner(), SetupOuter() : std::tuple<sctl::Vector<Real>,...> 
+    + Setup_mpi(), ... : std::tuple<sctl::Vector<Real>,...>
+    + GetNodeCoord(), ... : void
+    {static} + GetCenterLine() : sctl::Vector<Real>
+    + GetInnerElemList(), ... : sctl::SlenderElemList<Real>
+    + InDomain(), ... : sctl::Vector<sctl::Long>
+    + GetVslip(), ... : sctl::Vector<Real>
+    + WriteVTK() : void
+    - InterpR() : void
 }
 
-Annular --> SlenderBodyElem
+Annular *--> SlenderBodyElem
+Annular --> Comm
 
 
 @enduml
