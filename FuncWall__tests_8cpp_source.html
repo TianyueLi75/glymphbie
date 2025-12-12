@@ -146,7 +146,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <a class="code hl_struct" href="structLinearSpatialFunctor.html">LinearSpatialFunctor</a>(Real base, Real slope) : _base(base), _slope(slope) {}</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="comment">// This signature triggers the &#39;if constexpr&#39; true branch in FuncWall</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">void</span> operator()(sctl::Vector&lt;Real&gt;&amp; radius, Real time, <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; coords)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">void</span> operator()(sctl::Vector&lt;Real&gt;&amp; radius, <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; coords)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        <span class="keywordflow">for</span> (sctl::Long i = 0; i &lt; radius.Dim(); ++i) {</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            <span class="comment">// Coords are packed: [x0, y0, z0, x1, y1, z1, ...]</span></div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>            Real x_coord = coords[i * 3]; </div>
@@ -168,7 +168,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <a class="code hl_struct" href="structSpatiotemporalFunctor.html">SpatiotemporalFunctor</a>(Real base, Real slope, Real amplitude, Real omega) </div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        : _base(base), _slope(slope), _amplitude(amplitude), _omega(omega) {}</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="comment">// This signature triggers the &#39;if constexpr&#39; true branch in FuncWall</span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordtype">void</span> operator()(sctl::Vector&lt;Real&gt;&amp; radius, sctl::Vector&lt;Real&gt;&amp; rdot, Real time, <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; coords)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordtype">void</span> operator()(sctl::Vector&lt;Real&gt;&amp; radius, sctl::Vector&lt;Real&gt;&amp; rdot,  <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; coords, Real time)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        Real sin_term = std::sin(_omega * time);</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        Real cos_term = std::cos(_omega * time);</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordflow">for</span> (sctl::Long i = 0; i &lt; radius.Dim(); ++i) {</div>
@@ -195,7 +195,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <a class="code hl_struct" href="structR2SpatiotemporalFunctor.html">R2SpatiotemporalFunctor</a>(Real R0, Real amplitude, Real L, sctl::Long n, Real omega) </div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        : _R0(R0), _amplitude(amplitude), _L(L), _n(n), _omega(omega) {}</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <span class="comment">// This signature triggers the &#39;if constexpr&#39; true branch in FuncWall</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">void</span> operator()(sctl::Vector&lt;Real&gt;&amp; radius, sctl::Vector&lt;Real&gt;&amp; rdot, Real time, <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; coords)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">void</span> operator()(sctl::Vector&lt;Real&gt;&amp; radius, sctl::Vector&lt;Real&gt;&amp; rdot,  <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; coords, Real time)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        Real cos_omega_t = std::cos(_omega * time);</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        Real sin_omega_t = std::sin(_omega * time);</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keywordflow">for</span> (sctl::Long i = 0; i &lt; radius.Dim(); ++i) {</div>
