@@ -91,3 +91,42 @@ void IntegratorWall<Real, NonLinearFuncV, NonLinearFuncG, InnerFunc, OuterFunc>:
     this->incrementTimeStep();
 
 }
+
+template <class Real, class NonLinearFuncV, class NonLinearFuncG, class InnerFunc, class OuterFunc>
+void IntegratorWall<Real, NonLinearFuncV, NonLinearFuncG, InnerFunc, OuterFunc>::initialize() {
+    // Perform initialization step to set wall radii and velocities based on initial V and G
+    const Real dt_over_one = 1.0 / this->_dt;
+    const Real time = this->getTime();
+    for (size_t i = 0; i < this->_V.Dim(); i++) {
+        const Real N = _neuronal_activity[i];
+        const Real offsetY = this->_center_coords_in[3*i+1] - this->_center_coords_out[3*i+1];
+        const Real offsetZ = this->_center_coords_in[3*i+2] - this->_center_coords_out[3*i+2];
+        const Real delta = std::sqrt(offsetZ*offsetZ + offsetY*offsetY);
+        
+        // capture old radius values for velocity calculation
+        Real rin_old = this->_radius_in[i];
+        Real rout_old = this->_radius_out[i];
+
+        // compute new physical radii based on wall functions
+        Real rin_phys = _inner_func(this->_center_coords_in[3*i], _V[i], _G[i], time);
+        Real rout_phys = _outer_func(this->_center_coords_out[3*i], _V[i], _G[i], time);
+
+        assert(rin_phys > 0.0 && rout_phys > 0.0);
+        const Real minimum_gap = rout_phys - rin_phys - delta;
+        if (minimum_gap < this->_min_gap) {
+            // Adjust outer radius to enforce minimum gap
+            rout_phys = rin_phys + delta + this->_min_gap;
+        }
+        // // may be bad depending on initialize r values
+        // Real rin_dot = (rin_phys - rin_old) * dt_over_one;
+        // Real rout_dot = (rout_phys - rout_old) * dt_over_one;
+
+        // Update wall radii and velocities
+        this->_radius_in[i] = rin_phys;
+        this->_radius_out[i] = rout_phys;
+        // this->_rdot_in[i] = rin_dot;
+        // this->_rdot_out[i] = rout_dot;
+
+    }
+
+}

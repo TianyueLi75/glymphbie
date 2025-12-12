@@ -47,7 +47,7 @@ class FuncWall: public Wall<Real>{
         ~FuncWall() override;
 
         void update() override;
-
+        void initialize() override;
 };
 
 #include "detail/FuncWall.tpp"

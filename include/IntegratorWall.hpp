@@ -52,7 +52,7 @@ class IntegratorWall: public Wall<Real>{
         ~IntegratorWall() override;
 
         void update() override;
-
+        void initialize() override;
         void expIntStep();
 
         const sctl::Vector<Real>& getNeuronalActivity() const { return _neuronal_activity; }

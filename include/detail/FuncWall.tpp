@@ -101,3 +101,24 @@ void FuncWall<Real, InnerFunc, OuterFunc>::update() {
     // Increment time step
     this->incrementTimeStep();
 }
+
+template <class Real, class InnerFunc, class OuterFunc>
+void FuncWall<Real, InnerFunc, OuterFunc>::initialize() {
+    const Real t = this->getTime();
+    // 1. Update Inner Wall
+    apply_wall_logic(_inner_func, 
+                     this->_radius_in, 
+                     this->_rdot_in, 
+                     t, 
+                     this->_center_coords_in, this->_cdot_in);
+
+    // 2. Update Outer Wall
+    apply_wall_logic(_outer_func, 
+                     this->_radius_out, 
+                     this->_rdot_out, 
+                     t, 
+                     this->_center_coords_out, this->_cdot_out);
+
+    // Make sure wall is physical after update
+    this->enforceGapGeometry();
+}

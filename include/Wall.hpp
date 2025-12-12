@@ -44,7 +44,7 @@ class Wall
         virtual ~Wall();
 
         virtual void update() = 0;
-
+        virtual void initialize() = 0;
         void enforceGapGeometry();
         
         // Replace grid and data in case mesh is refined
