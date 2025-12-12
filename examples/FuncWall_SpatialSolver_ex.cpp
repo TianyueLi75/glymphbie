@@ -7,15 +7,16 @@
 
 template <class Real>
 struct ConstantFunctor {
-    Real _target_radius;
+    Real _base_radius;
 
-    ConstantFunctor(Real r) : _target_radius(r) {}
+    ConstantFunctor(Real r) : _base_radius(r) {}
 
     void operator()(sctl::Vector<Real>& radius) const {
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
-            radius[i] = _target_radius; 
+            radius[i] = _base_radius; 
         }
     }
+    Real getBaseRadius() const { return _base_radius; }
 };
 
 
@@ -164,7 +165,7 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
     r3 = R_in + 1./3. * (R_out - R_in); 
     sctl::Vector<Real> r4(ElemOrder*Nelem);
     r4 = R_in + 2./3. * (R_out - R_in); 
-    wall.update();
+
     Annular<Real> channel_trg(wall.centerCoordsIn(),wall.centerCoordsOut(), r3, r4);
     channel_trg.Setup(Nelem, ElemOrder, FourierOrder, wall.rdotIn(),wall.rdotOut());
     sctl::Vector<Real> X_inner, X_outer;
