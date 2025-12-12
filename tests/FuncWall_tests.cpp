@@ -62,7 +62,7 @@ struct LinearSpatialFunctor {
     LinearSpatialFunctor(Real base, Real slope) : _base(base), _slope(slope) {}
 
     // This signature triggers the 'if constexpr' true branch in FuncWall
-    void operator()(sctl::Vector<Real>& radius, Real time, const sctl::Vector<Real>& coords) const {
+    void operator()(sctl::Vector<Real>& radius, const sctl::Vector<Real>& coords) const {
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
             // Coords are packed: [x0, y0, z0, x1, y1, z1, ...]
             Real x_coord = coords[i * 3]; 
@@ -82,7 +82,7 @@ struct SpatiotemporalFunctor {
     SpatiotemporalFunctor(Real base, Real slope, Real amplitude, Real omega) 
         : _base(base), _slope(slope), _amplitude(amplitude), _omega(omega) {}
     // This signature triggers the 'if constexpr' true branch in FuncWall
-    void operator()(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot, Real time, const sctl::Vector<Real>& coords) const {
+    void operator()(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot,  const sctl::Vector<Real>& coords, Real time) const {
         Real sin_term = std::sin(_omega * time);
         Real cos_term = std::cos(_omega * time);
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {
@@ -107,7 +107,7 @@ struct R2SpatiotemporalFunctor {
     R2SpatiotemporalFunctor(Real R0, Real amplitude, Real L, sctl::Long n, Real omega) 
         : _R0(R0), _amplitude(amplitude), _L(L), _n(n), _omega(omega) {}
     // This signature triggers the 'if constexpr' true branch in FuncWall
-    void operator()(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot, Real time, const sctl::Vector<Real>& coords) const {
+    void operator()(sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot,  const sctl::Vector<Real>& coords, Real time) const {
         Real cos_omega_t = std::cos(_omega * time);
         Real sin_omega_t = std::sin(_omega * time);
         for (sctl::Long i = 0; i < radius.Dim(); ++i) {

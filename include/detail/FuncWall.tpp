@@ -30,24 +30,30 @@ void FuncWall<Real, InnerFunc, OuterFunc>::apply_wall_logic(
     sctl::Vector<Real>& coords,
     sctl::Vector<Real>& cdot) 
 {   
-    // Check: (radius, rdot, time, coords, cdot) - covers both const& and & coords
-    if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&, Real, sctl::Vector<Real>&, sctl::Vector<Real>&>) {
-        func(radius, rdot, t, coords, cdot);
+    // Check: (radius, rdot, coords, cdot, time) - covers both const& and & coords
+    if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&, sctl::Vector<Real>&, sctl::Vector<Real>&, Real>) {
+        func(radius, rdot, coords, cdot, t);
     }
 
-    // Check: (radius, rdot, time, coords) - covers both const& and & coords
-    else if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&, Real, sctl::Vector<Real>&>) {
-        func(radius, rdot, t, coords);
+    // Check: (radius, rdot, coords, time) - covers both const& and & coords
+    else if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&, sctl::Vector<Real>&, Real>) {
+        func(radius, rdot, coords, t);
         cdot = 0.;
     }
-    // Check: (radius, rdot, time)
+    // Check: (radius, rdot, coords, time)
     else if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&, Real>) {
-        func(radius, rdot, t);
+        func(radius, rdot, coords, t);
         cdot = 0.;
     }
-    // Check: (radius, time, coords) - No derivative
-    else if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, Real, sctl::Vector<Real>&>) {
-        func(radius, t, coords);
+    // Check: (radius, coords, time) - No derivative
+    else if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&, Real>) {
+        func(radius, coords, t);
+        rdot = 0.;
+        cdot = 0.;
+    }
+    // Check: (radius, coords) - No derivative
+    else if constexpr (std::is_invocable_v<Func, sctl::Vector<Real>&, sctl::Vector<Real>&>) {
+        func(radius, coords);
         rdot = 0.;
         cdot = 0.;
     }
