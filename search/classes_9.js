@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['spatiotemporalfunctor_0',['SpatiotemporalFunctor',['../structSpatiotemporalFunctor.html',1,'']]],
-  ['stokesbio_1',['StokesBIO',['../classStokesBIO.html',1,'']]]
+  ['spatialsinusoidalfunctor_0',['SpatialSinusoidalFunctor',['../structSpatialSinusoidalFunctor.html',1,'']]],
+  ['spatiotemporalfunctor_1',['SpatiotemporalFunctor',['../structSpatiotemporalFunctor.html',1,'']]],
+  ['stokesbio_2',['StokesBIO',['../classStokesBIO.html',1,'']]]
 ];
