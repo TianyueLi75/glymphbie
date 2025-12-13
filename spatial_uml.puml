@@ -1,17 +1,16 @@
 @startuml csbq
 
-class SlenderBodyElem
-class BoundaryIntegralOp 
+class sctl::SlenderBodyElem
+class sctl::BoundaryIntegralOp 
 class StokesBIO 
-class Comm
+class sctl::Comm
+class sctl::GMRES 
+class sctl::KrylovPrecond 
 
-class GMRES 
-class KrylovPrecond 
-GMRES ..> KrylovPrecond
-
-StokesBIO *--> BoundaryIntegralOp
-StokesBIO --> SlenderBodyElem
-GMRES ..> StokesBIO
+sctl::GMRES ..> sctl::KrylovPrecond
+StokesBIO *--> sctl::BoundaryIntegralOp
+StokesBIO --> sctl::SlenderBodyElem
+sctl::GMRES ..> StokesBIO
 
 class Annular {
     - _Xc_inner, _Xc_outer, _r_..., _X_..., _Xn_..., _drdt_... : sctl::Vector<Real>
@@ -39,8 +38,8 @@ class Annular {
     - InterpR() : void
 }
 
-Annular *--> SlenderBodyElem
-Annular --> Comm
+Annular *--> sctl::SlenderBodyElem
+Annular --> sctl::Comm
 
 
 @enduml

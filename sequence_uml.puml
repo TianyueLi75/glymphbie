@@ -12,19 +12,18 @@ activate Environment
 Environment -> Annular : GetCenterline(Nelem, Order)
 Annular --> Environment : Xc
 
-Environment -> Wall : Init(Xc)
+Environment -> Wall : Wall(Xc, dt)
 activate Wall
+Wall -> Environment : Xc, r
 
-Wall -> Wall : GetTimeSeries()
-
-Wall --> Environment : Xc, r, drdt
-
-Environment -> Annular : Annular(Xc, r, drdt)
+Environment -> Annular : Annular(Xc, r)
 activate Annular
 
 group One Time Step 
+    Wall -> Environment : Xc, r, drdt
 
-    Annular -> Annular : Setup()
+    Environment -> Annular : Set(Xc, r)
+    Environment -> Annular : Setup(Nelem, Order, drdt)
 
     Annular --> Environment : Xc_updated, r_updated, drdt_updated
 
@@ -42,7 +41,7 @@ group One Time Step
     Environment -> Annular : GetVslip()
     Annular --> Environment : vslip
     Environment -> GMRES : Operator()(StokesBIO, vslip)
-    GMRES --> Environment : sigma (density)
+    GMRES --> Environment : density
 
     ' activate Particle
     ' Environment -> Particle : GetPositions()
@@ -53,7 +52,7 @@ group One Time Step
     ' Particle -> Particle : TimeStep()
     ' Particle -> Particle : ResolveCollision()
 
-    Environment -> StokesBIO : ComputePotential(X, sigma)
+    Environment -> StokesBIO : ComputePotential(X, density)
     StokesBIO --> Environment : Utrg, Flux
 
     Environment --> Wall : Xc_updated, r_updated, drdt_updated
