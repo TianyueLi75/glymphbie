@@ -7,11 +7,11 @@
 #SBATCH --ntasks-per-node=2
 #SBATCH --cpus-per-task=18
 #SBATCH --mem-per-cpu=3g
-#SBATCH --time=00:40:00
+#SBATCH --time=01:40:00
 #SBATCH --account=ners570f25_class
 #SBATCH --partition=standard
 #SBATCH --exclusive
-#SBATCH --output=out/eccentricity_sweep/ecc_sweep_CC_full.out
+#SBATCH --output=out/eccentricity_sweep/ecc_sweep_CC.out
 
 # cpus per task for OpenMP originally 18
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK

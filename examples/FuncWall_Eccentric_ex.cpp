@@ -102,7 +102,7 @@ void flux_sim(const Real dpdx, const Real mu, const sctl::Long Nelem, const sctl
     annular.GetInnerCoord(&X1temp, nullptr);
     annular.GetOuterCoord(&X2temp, nullptr);
     std::cout << "size of X1 temp: " << X1temp.Dim() << ", size of X2 temp: " << X2temp.Dim() << std::endl;
-    annular.WriteVTK("../vis/flux_sim_inner", "../vis/flux_sim_outer", X1temp, X2temp, comm);
+    annular.WriteVTK("../vis/"+ sim_name+"_inner", "../vis/" + sim_name+"_outer", X1temp, X2temp, comm);
 
     // Create lambda function
     const auto BIO = [&LPO, D_scal, &NormalOrient](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
@@ -244,25 +244,25 @@ void flux_sim(const Real dpdx, const Real mu, const sctl::Long Nelem, const sctl
 
     Real Q = getQ(45,64);
     Real eratio = eccentricity / (Rout_base- Rin_base);
-    std::cout << "Nelem = " << Nelem << ", Fourier order = " << FourierOrder <<  "Eccentricity = " << eratio << "; Flux Q computed = " << Q << " ;" sim_name << std::endl; // should be the same for all processes
-    // if (write_ref==1) {
-    //     if (comm.Rank() == 0) { // Only master process should write the final result
-    //         std::string output_dir = "../out/eccentricity_sweep/"; // Ensure this directory exists
-    //         std::string filename = output_dir + sim_name + "_Q_result.txt";
+    std::cout << "Nelem = " << Nelem << ", Fourier order = " << FourierOrder <<  "Eccentricity = " << eratio << "; Flux Q computed = " << Q << " ;" << sim_name << std::endl; // should be the same for all processes
+    if (write_ref==1) {
+        if (comm.Rank() == 0) { // Only master process should write the final result
+            std::string output_dir = "../out/eccentricity_sweep/"; // Ensure this directory exists
+            std::string filename = output_dir + sim_name + "_Q_result.txt";
             
-    //         std::ofstream outfile(filename);
-    //         if (outfile.is_open()) {
-    //             outfile << "Dynamics: " << sim_name << "\n";
-    //             outfile << "Eccentricity Ratio: " << eccentricity / (Rout_base- Rin_base) << "\n";
-    //             outfile << "Nelem: " << Nelem << ", ElemOrder: " << ElemOrder << ", FourierOrder: " << FourierOrder << "\n";
-    //             outfile << "Computed Q: " << std::fixed << std::setprecision(10) << Q << "\n";
-    //             outfile.close();
-    //             std::cout << "Wrote Q result to: " << filename << std::endl;
-    //         } else {
-    //             std::cerr << "Error: Could not open output file: " << filename << std::endl;
-    //         }
-    //     }
-    // }
+            std::ofstream outfile(filename);
+            if (outfile.is_open()) {
+                outfile << "Dynamics: " << sim_name << "\n";
+                outfile << "Eccentricity Ratio: " << eccentricity / (Rout_base- Rin_base) << "\n";
+                outfile << "Nelem: " << Nelem << ", ElemOrder: " << ElemOrder << ", FourierOrder: " << FourierOrder << "\n";
+                outfile << "Computed Q: " << std::fixed << std::setprecision(10) << Q << "\n";
+                outfile.close();
+                std::cout << "Wrote Q result to: " << filename << std::endl;
+            } else {
+                std::cerr << "Error: Could not open output file: " << filename << std::endl;
+            }
+        }
+    }
 }
     // // Set target points in between channels 
     // sctl::Long Nelem_trg = 1;
