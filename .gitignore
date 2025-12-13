@@ -1,2 +1,17 @@
 # Build directory
 build/
+
+# Slurm outputs
+*.out
+# Visualizations
+vis/
+
+# Convergence test outputs
+out/
+
+# Ignore Doxygen generated subfolders inside docs
+docs/html/
+docs/latex/
+docs/rtf/
+docs/xml/
+docs/*.db

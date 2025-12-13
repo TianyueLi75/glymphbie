@@ -1,0 +1,138 @@
+name: build-and-test
+
+on:
+  push:
+    branches: [ annular, main ]
+  pull_request:
+    branches: [ annular, main ]
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        # os: [ubuntu-22.04, macos-13]
+        os: [ubuntu-24.04]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CC: mpicc
+      CXX: mpic++
+
+    steps:
+      - name: Checkout and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # - name: Install GCC 13
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install -y software-properties-common
+      #     sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      #     sudo apt update
+      #     sudo apt install -y gcc-13 g++-13
+
+      #     echo "installed gcc 13. Before linking, versions of gcc and g++ are: "
+
+      #     gcc --version
+      #     g++ --version
+
+      #     # Make gcc/g++ point to version 13
+      #     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+      #     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+
+      #     echo "After linking, versions of gcc and g++ are: "
+
+      #     gcc --version
+      #     g++ --version
+
+      # - name: Link MPICH to gcc 13
+      #   run: |
+      #     # Tell MPICH to use gcc-13/g++-13
+      #     echo "export MPICH_CC=gcc-13"  >> $GITHUB_ENV
+      #     echo "export MPICH_CXX=g++-13" >> $GITHUB_ENV
+
+      # -------------------------------------------------------
+      # Install Dependencies (Ubuntu + macOS)
+      # Includes fallback: if apt-get fails → try module load
+      # -------------------------------------------------------
+      - name: Install Dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+
+          echo "Attempting apt-get install..."
+          if sudo apt-get update && sudo apt-get install -y \
+              build-essential cmake mpich libfftw3-dev libfftw3-mpi-dev \
+              libopenblas-dev liblapack-dev gfortran xorg-dev libquadmath0 \
+              intel-mkl autoconf automake libtool make; then
+            echo "apt-get install succeeded."
+            mpic++ --version
+          else
+            echo "apt-get failed. Trying module load..."
+            # NOTE: This assumes your machine has environment modules available.
+            # Modify module names as needed.
+            module load cmake || true
+            module load gcc/13.2.0 || true 
+            module load fftw/3.3.10 || true
+            module load mkl/2023.2.1 || true
+            module load openmpi/5.0.7 || true
+          fi
+
+      # - name: Install Dependencies (macOS)
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #     # brew update
+      #     # brew install mpich fftw openblas lapack cmake
+
+      #     # # If MKL is required on macOS: brew install mkl
+      #     # # But MKL on macOS is deprecated, so you may want OpenBLAS instead.
+      #     brew install gcc@13 llvm libomp openmpi autoconf automake libtool fftw openblas lapack
+      #     echo "PATH=$(brew --prefix llvm)/bin:$PATH" >> $GITHUB_ENV
+      #     echo "LDFLAGS=-L$(brew --prefix llvm)/lib" >> $GITHUB_ENV
+      #     echo "CPPFLAGS=-I$(brew --prefix llvm)/include" >> $GITHUB_ENV
+      #     echo "LIBRARY_PATH=$(brew --prefix llvm)/lib:$LIBRARY_PATH" >> $GITHUB_ENV
+      #     echo "LADFLAGS=-L$(brew --prefix openmpi)/lib" >> $GITHUB_ENV
+      #     echo "CPPFLAGS=-I$(brew --prefix openmpi)/include" >> $GITHUB_ENV
+      #     echo "LADFLAGS=-L$(brew --prefix fftw)/lib" >> $GITHUB_ENV
+      #     echo "CPPFLAGS=-I$(brew --prefix fftw)/include" >> $GITHUB_ENV
+      #     echo "LADFLAGS=-L$(brew --prefix openblas)/lib" >> $GITHUB_ENV
+      #     echo "CPPFLAGS=-I$(brew --prefix openblas)/include" >> $GITHUB_ENV
+      #     echo "LADFLAGS=-L$(brew --prefix lapack)/lib" >> $GITHUB_ENV
+      #     echo "CPPFLAGS=-I$(brew --prefix lapack)/include" >> $GITHUB_ENV
+
+      # -------------------------------------------------------
+      # Build PVFMM (simple Makefile)
+      # -------------------------------------------------------
+      - name: Build PVFMM
+        working-directory: extern/pvfmm
+        run: |
+          ./autogen.sh
+          ./configure
+          make -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
+
+          echo "PVFMM build complete."
+          find . -name "libpvfmm.*" || true
+
+      # -------------------------------------------------------
+      # Configure & Build main project
+      # -------------------------------------------------------
+      - name: Configure (CMake)
+        run: |
+          # cmake -B build
+          cmake -B build \
+            -DCMAKE_CXX_COMPILER=mpic++ 
+
+      - name: Build
+        run: |
+          cmake --build build -j$(sysctl -n hw.ncpu 2>/dev/null || nproc)
+
+      # -------------------------------------------------------
+      # Run CTest
+      # -------------------------------------------------------
+      - name: Run Tests
+        working-directory: build
+        run: |
+          ctest --output-on-failure
+          # ctest --verbose
