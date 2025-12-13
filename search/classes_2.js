@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['dynamicwall_0',['DynamicWall',['../classDynamicWall.html',1,'']]]
+  ['funcwall_0',['FuncWall',['../classFuncWall.html',1,'']]]
 ];

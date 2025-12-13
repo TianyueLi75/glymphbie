@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['hillfunc_0',['HillFunc',['../structHillFunc.html',1,'']]]
+  ['innerwallfunctor_0',['InnerWallFunctor',['../structInnerWallFunctor.html',1,'']]],
+  ['integratorwall_1',['IntegratorWall',['../classIntegratorWall.html',1,'']]]
 ];

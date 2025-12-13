@@ -86,10 +86,10 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Real, <span class="keyword">class</span> NonLinearFuncV, <span class="keyword">class</span> NonLinearFuncG, <span class="keyword">class</span> InnerFunc, <span class="keyword">class</span> OuterFunc&gt;</div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><a class="code hl_class" href="classIntegratorWall.html">IntegratorWall&lt;Real, NonLinearFuncV, NonLinearFuncG, InnerFunc, OuterFunc&gt;::IntegratorWall</a>( <span class="keyword">const</span> Real dt, </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_in,</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_out, <span class="comment">// Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_in,</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_out,</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_out, <span class="comment">// Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_in,</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_out,</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_in,</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; neuronal_activity,</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; V,</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; G,</div>
@@ -101,7 +101,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keyword">const</span> OuterFunc&amp; outer_func</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        )</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    :   <a class="code hl_class" href="classWall.html">Wall</a>&lt;Real&gt;(dt, center_in, center_out, radius_in, radius_out),</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    :   <a class="code hl_class" href="classWall.html">Wall</a>&lt;Real&gt;(dt, center_out, center_in, radius_out, radius_in),</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        _neuronal_activity(neuronal_activity),</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        _V(V),</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        _G(G),</div>
@@ -174,45 +174,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    this-&gt;incrementTimeStep();</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>}</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Real, <span class="keyword">class</span> NonLinearFuncV, <span class="keyword">class</span> NonLinearFuncG, <span class="keyword">class</span> InnerFunc, <span class="keyword">class</span> OuterFunc&gt;</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="keywordtype">void</span> <a class="code hl_class" href="classIntegratorWall.html">IntegratorWall&lt;Real, NonLinearFuncV, NonLinearFuncG, InnerFunc, OuterFunc&gt;::initialize</a>() {</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="comment">// Perform initialization step to set wall radii and velocities based on initial V and G</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keyword">const</span> Real dt_over_one = 1.0 / this-&gt;_dt;</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keyword">const</span> Real time = this-&gt;getTime();</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; this-&gt;_V.Dim(); i++) {</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keyword">const</span> Real N = _neuronal_activity[i];</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="keyword">const</span> Real offsetY = this-&gt;_center_coords_in[3*i+1] - this-&gt;_center_coords_out[3*i+1];</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keyword">const</span> Real offsetZ = this-&gt;_center_coords_in[3*i+2] - this-&gt;_center_coords_out[3*i+2];</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keyword">const</span> Real delta = std::sqrt(offsetZ*offsetZ + offsetY*offsetY);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="comment">// capture old radius values for velocity calculation</span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        Real rin_old = this-&gt;_radius_in[i];</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        Real rout_old = this-&gt;_radius_out[i];</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        <span class="comment">// compute new physical radii based on wall functions</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        Real rin_phys = _inner_func(this-&gt;_center_coords_in[3*i], _V[i], _G[i], time);</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        Real rout_phys = _outer_func(this-&gt;_center_coords_out[3*i], _V[i], _G[i], time);</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        assert(rin_phys &gt; 0.0 &amp;&amp; rout_phys &gt; 0.0);</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keyword">const</span> Real minimum_gap = rout_phys - rin_phys - delta;</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        <span class="keywordflow">if</span> (minimum_gap &lt; this-&gt;_min_gap) {</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>            <span class="comment">// Adjust outer radius to enforce minimum gap</span></div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>            rout_phys = rin_phys + delta + this-&gt;_min_gap;</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        }</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="comment">// // may be bad depending on initialize r values</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="comment">// Real rin_dot = (rin_phys - rin_old) * dt_over_one;</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="comment">// Real rout_dot = (rout_phys - rout_old) * dt_over_one;</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="comment">// Update wall radii and velocities</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        this-&gt;_radius_in[i] = rin_phys;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        this-&gt;_radius_out[i] = rout_phys;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <span class="comment">// this-&gt;_rdot_in[i] = rin_dot;</span></div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <span class="comment">// this-&gt;_rdot_out[i] = rout_dot;</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    }</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>}</div>
 <div class="ttc" id="aclassIntegratorWall_html"><div class="ttname"><a href="classIntegratorWall.html">IntegratorWall</a></div><div class="ttdoc">IntegratorWall class template for wall dynamics defined by vasodilation and glial swelling variables,...</div><div class="ttdef"><b>Definition</b> <a href="IntegratorWall_8hpp_source.html#l00024">IntegratorWall.hpp:24</a></div></div>
 <div class="ttc" id="aclassWall_html"><div class="ttname"><a href="classWall.html">Wall</a></div><div class="ttdoc">Wall class template for wall dynamics in glymphatic flow simulations.</div><div class="ttdef"><b>Definition</b> <a href="Wall_8hpp_source.html#l00019">Wall.hpp:20</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

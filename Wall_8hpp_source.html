@@ -96,38 +96,38 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        Real _min_gap = 1e-5;</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        Real _min_inner_radius = 1e-5;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <span class="keywordtype">size_t</span> _time_step = 0;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        sctl::Vector&lt;Real&gt; _center_coords_in;</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        sctl::Vector&lt;Real&gt; _center_coords_out;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        sctl::Vector&lt;Real&gt; _center_coords_out;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        sctl::Vector&lt;Real&gt; _center_coords_in;</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        sctl::Vector&lt;Real&gt; _cdot_in;</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        sctl::Vector&lt;Real&gt; _cdot_out; </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        sctl::Vector&lt;Real&gt; _radius_in;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        sctl::Vector&lt;Real&gt; _radius_out;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        sctl::Vector&lt;Real&gt; _rdot_in;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        sctl::Vector&lt;Real&gt; _rdot_out;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        sctl::Vector&lt;Real&gt; _radius_out;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        sctl::Vector&lt;Real&gt; _radius_in;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        sctl::Vector&lt;Real&gt; _rdot_out;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        sctl::Vector&lt;Real&gt; _rdot_in;</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <span class="keywordtype">size_t</span> _spatial_grid_size = 0;</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keyword">public</span>:</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <a class="code hl_class" href="classWall.html">Wall</a>(<span class="keyword">const</span> Real dt, </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_in,</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_out, <span class="comment">// Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_in,</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_out</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_out, <span class="comment">// Spatial grid for inner and outer walls is equivalent to the x coordinates of the centerlines</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_in,</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_out,</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_in</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>            <span class="comment">// add sctl::Comm if needed for MPI</span></div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        );</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keyword">virtual</span> <a class="code hl_class" href="classWall.html">~Wall</a>();</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> update() = 0;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> initialize() = 0;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="keywordtype">void</span> enforceGapGeometry();</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        </div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="comment">// Replace grid and data in case mesh is refined</span></div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> setGridAndData(</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_in,</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_out,</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_in, </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_out,</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdot_in,</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdot_out</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_out,</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; center_in,</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_out,</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radius_in, </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdot_out,</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                                <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdot_in</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>                                );</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        </div>
@@ -138,14 +138,14 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keywordtype">void</span> incrementTimeStep() { _time_step++; }</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        <span class="keywordtype">size_t</span> getTimeStep()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _time_step; }</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        Real getTime()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _time_step*_dt; }</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; centerCoordsIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _center_coords_in; }</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; centerCoordsOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _center_coords_out; }</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; cdotIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _cdot_in; }</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; cdotOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _cdot_out; }</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radiusIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _radius_in; }</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radiusOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _radius_out; }</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdotIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rdot_in; }</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdotOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rdot_out; }</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; centerCoordsOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _center_coords_out; }</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; centerCoordsIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _center_coords_in; }</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; cdotOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _cdot_out; }</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; cdotIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _cdot_in; }</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radiusOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _radius_out; }</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; radiusIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _radius_in; }</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdotOut()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rdot_out; }</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keyword">const</span> sctl::Vector&lt;Real&gt;&amp; rdotIn()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _rdot_in; }</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>};</div>
 </div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#include &quot;detail/Wall.tpp&quot;</span></div>

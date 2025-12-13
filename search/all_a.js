@@ -12,8 +12,7 @@ var searchData=
   ['setup_5fmpi_9',['Setup_mpi',['../classAnnular.html#a57dac694331c1f9b8031db3a1b3bd186',1,'Annular']]],
   ['setupinner_10',['SetupInner',['../classAnnular.html#ae5c6d1c2f3893510a074170261c4fa40',1,'Annular']]],
   ['setupouter_11',['SetupOuter',['../classAnnular.html#a8c34b313fdf9dd944ff1670514a5c56f',1,'Annular']]],
-  ['spatialsinusoidalfunctor_12',['SpatialSinusoidalFunctor',['../structSpatialSinusoidalFunctor.html',1,'']]],
-  ['spatiotemporalfunctor_13',['SpatiotemporalFunctor',['../structSpatiotemporalFunctor.html',1,'']]],
-  ['sqrtscaling_14',['SqrtScaling',['../classStokesBIO.html#ac04608e13421dd7c08c2c83a5a6a71e7',1,'StokesBIO']]],
-  ['stokesbio_15',['StokesBIO',['../classStokesBIO.html',1,'']]]
+  ['spatiotemporalfunctor_12',['SpatiotemporalFunctor',['../structSpatiotemporalFunctor.html',1,'']]],
+  ['sqrtscaling_13',['SqrtScaling',['../classStokesBIO.html#ac04608e13421dd7c08c2c83a5a6a71e7',1,'StokesBIO']]],
+  ['stokesbio_14',['StokesBIO',['../classStokesBIO.html',1,'']]]
 ];
