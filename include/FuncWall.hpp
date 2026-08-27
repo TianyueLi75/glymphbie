@@ -48,6 +48,28 @@ class FuncWall: public Wall<Real>{
 
         void update() override;
 
+        /**
+         * @brief Evaluate the inner-wall functor at caller-supplied coordinates.
+         *
+         * Samples the wall-function radius (and its time derivative rdot) at the
+         * given coords and time WITHOUT mutating the wall's own stored geometry.
+         * Lets an external consumer (e.g. the capped-annulus geometry builder)
+         * evaluate r(x,t)/rdot(x,t) at its own quadrature nodes. Reuses the same
+         * apply_wall_logic dispatch as update(); for functor signatures without
+         * rdot, rdot is returned as zero.
+         *
+         * @param coords [in] node coordinates, ordered [x1,y1,z1,...] (length 3N)
+         * @param t      [in] time at which to evaluate
+         * @param radius [out] radius at each node (length N)
+         * @param rdot   [out] radial velocity at each node (length N)
+         */
+        void evaluateInner(sctl::Vector<Real>& coords, Real t,
+                           sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot);
+
+        /** @brief Outer-wall counterpart of evaluateInner. */
+        void evaluateOuter(sctl::Vector<Real>& coords, Real t,
+                           sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot);
+
 };
 
 #include "detail/FuncWall.tpp"

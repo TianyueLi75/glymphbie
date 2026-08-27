@@ -95,3 +95,27 @@ void FuncWall<Real, InnerFunc, OuterFunc>::update() {
     // Increment time step
     this->incrementTimeStep();
 }
+
+template <class Real, class InnerFunc, class OuterFunc>
+void FuncWall<Real, InnerFunc, OuterFunc>::evaluateInner(
+    sctl::Vector<Real>& coords, Real t,
+    sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot)
+{
+    const sctl::Long n = coords.Dim() / 3;
+    radius.ReInit(n); radius.SetZero();
+    rdot.ReInit(n);   rdot.SetZero();
+    sctl::Vector<Real> cdot(coords.Dim()); cdot.SetZero();  // scratch; discarded
+    apply_wall_logic(_inner_func, radius, rdot, t, coords, cdot);
+}
+
+template <class Real, class InnerFunc, class OuterFunc>
+void FuncWall<Real, InnerFunc, OuterFunc>::evaluateOuter(
+    sctl::Vector<Real>& coords, Real t,
+    sctl::Vector<Real>& radius, sctl::Vector<Real>& rdot)
+{
+    const sctl::Long n = coords.Dim() / 3;
+    radius.ReInit(n); radius.SetZero();
+    rdot.ReInit(n);   rdot.SetZero();
+    sctl::Vector<Real> cdot(coords.Dim()); cdot.SetZero();  // scratch; discarded
+    apply_wall_logic(_outer_func, radius, rdot, t, coords, cdot);
+}
