@@ -1,14 +1,30 @@
 #include "StokesBIO.hpp"
 
-// StokesBIE by Dhairya Malhotra, 2025: 
+// StokesBIE by Dhairya Malhotra, 2025:
 // https://github.com/dmalhotra/stokes-periodize
 
-template <class Real> 
+// Single-layer volume-potential correction supplied to the FMM kernel.
+template <class Real> void StokesBIO<Real>::stokes_sl_volpot(sctl::Matrix<Real>& U, const sctl::Vector<Real>& X) {
+  const sctl::Long N = X.Dim() / 3;
+  SCTL_ASSERT(X.Dim() == N * 3);
+  if (U.Dim(0)!=3 || U.Dim(1)!=N*3) U.ReInit(3, N*3);
+  for (sctl::Long i = 0; i < N; i++) {
+    const auto x = X.begin() + i*3;
+    const Real rx_2 = x[1]*x[1] + x[2]*x[2];
+    const Real ry_2 = x[0]*x[0] + x[2]*x[2];
+    const Real rz_2 = x[0]*x[0] + x[1]*x[1];
+    U[0][i*3+0] = -rx_2/4; U[0][i*3+1] =       0; U[0][i*3+2] =       0;
+    U[1][i*3+0] =       0; U[1][i*3+1] = -ry_2/4; U[1][i*3+2] =       0;
+    U[2][i*3+0] =       0; U[2][i*3+1] =       0; U[2][i*3+2] = -rz_2/4;
+  }
+}
+
+template <class Real>
 StokesBIO<Real>::StokesBIO(const Real SL_scal, const Real DL_scal, const sctl::Comm comm)
   : comm_(comm), SL_scal_(SL_scal), DL_scal_(DL_scal), LayerPotenSL(ker_FxU, false, comm), LayerPotenDL(ker_DxU, false, comm) {
   LayerPotenSL.SetAccuracy(1e-14);
   LayerPotenDL.SetAccuracy(1e-14);
-  LayerPotenSL.SetFMMKer(ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU);
+  LayerPotenSL.SetFMMKer(ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, ker_FxU, stokes_sl_volpot);
   LayerPotenDL.SetFMMKer(ker_DxU, ker_DxU, ker_DxU, ker_FSxU, ker_FSxU, ker_FSxU, ker_FxU, ker_FxU);
 };
 
@@ -24,25 +40,17 @@ void StokesBIO<Real>::SetAccuracy(Real tol) {
   LayerPotenDL.SetAccuracy(tol);
 }
 
-template <class Real> 
-void StokesBIO<Real>::AddElemList(const sctl::SlenderElemList<Real>& elem_lst, const std::string& name) {
-  LayerPotenSL.AddElemList(elem_lst, name);
-  LayerPotenDL.AddElemList(elem_lst, name);
-}
+// AddElemList, GetElemList, and the type-templated DeleteElemList are member
+// templates defined in the header (StokesBIO.hpp), so they are visible wherever
+// StokesBIO is used with a concrete element-list type.
 
-template <class Real> 
+template <class Real>
 void StokesBIO<Real>::DeleteElemList(const std::string& name) {
   LayerPotenSL.DeleteElemList(name);
   LayerPotenDL.DeleteElemList(name);
 }
 
-template <class Real> 
-void StokesBIO<Real>::DeleteElemList() {
-  LayerPotenSL.template DeleteElemList<sctl::SlenderElemList<Real>>();
-  LayerPotenDL.template DeleteElemList<sctl::SlenderElemList<Real>>();
-}
-
-template <class Real> 
+template <class Real>
 void StokesBIO<Real>::SetTargetCoord(const sctl::Vector<Real>& Xtrg) {
   LayerPotenSL.SetTargetCoord(Xtrg);
   LayerPotenDL.SetTargetCoord(Xtrg);
@@ -54,9 +62,9 @@ void StokesBIO<Real>::SetTargetNormal(const sctl::Vector<Real>& Xn_trg) {
   LayerPotenDL.SetTargetNormal(Xn_trg);
 }
 
-template <class Real> 
+template <class Real>
 sctl::Long StokesBIO<Real>::Dim(sctl::Integer k) const {
-  return LayerPotenSL.Dim(k);
+  return LayerPotenDL.Dim(k);
 }
 
 template <class Real> 
@@ -71,11 +79,26 @@ void StokesBIO<Real>::ClearSetup() const {
   LayerPotenDL.ClearSetup();
 }
 
-template <class Real> 
+template <class Real>
 void StokesBIO<Real>::ComputePotential(sctl::Vector<Real>& U, const sctl::Vector<Real>& F) const {
   sctl::Vector<Real> Us, Ud;
-  if (SL_scal_) LayerPotenSL.ComputePotential(Us, F);
-  if (DL_scal_) LayerPotenDL.ComputePotential(Ud, F);
+  if (SL_scal_ && LayerPotenSL.Dim(0)) {
+    if (LayerPotenSL.Dim(0) != F.Dim()) {
+      sctl::Vector<Real> subF(LayerPotenSL.Dim(0), (sctl::Iterator<Real>) F.begin(), true);
+      LayerPotenSL.ComputePotential(Us, subF);
+    } else {
+      LayerPotenSL.ComputePotential(Us, F);
+    }
+  } else {
+    Us.ReInit(LayerPotenSL.Dim(1));
+    Us.SetZero();
+  }
+  if (DL_scal_ && LayerPotenDL.Dim(0)) {
+    LayerPotenDL.ComputePotential(Ud, F);
+  } else {
+    Ud.ReInit(LayerPotenDL.Dim(1));
+    Ud.SetZero();
+  }
 
   if (SL_scal_ && DL_scal_) U = Us * SL_scal_ + Ud * DL_scal_;
   else if (SL_scal_) U = Us * SL_scal_;
@@ -83,7 +106,17 @@ void StokesBIO<Real>::ComputePotential(sctl::Vector<Real>& U, const sctl::Vector
   else U.SetZero();
 }
 
-template <class Real> 
+template <class Real>
+void StokesBIO<Real>::ComputeSL(sctl::Vector<Real>& U, const sctl::Vector<Real>& F) const {
+  LayerPotenSL.ComputePotential(U, F);
+}
+
+template <class Real>
+void StokesBIO<Real>::ComputeDL(sctl::Vector<Real>& U, const sctl::Vector<Real>& F) const {
+  LayerPotenDL.ComputePotential(U, F);
+}
+
+template <class Real>
 void StokesBIO<Real>::SqrtScaling(sctl::Vector<Real>& U) const {
   LayerPotenSL.SqrtScaling(U);
 }

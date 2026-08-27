@@ -4,6 +4,8 @@
 // #include "csbq.hpp"
 #include "csbq/slender_element.hpp"
 #include "csbq/slender_element.cpp"
+#include <string>
+#include <typeinfo>
 
 // StokesBIE by Dhairya Malhotra, 2025: 
 // https://github.com/dmalhotra/stokes-periodize
@@ -13,6 +15,10 @@
  */
 template <class Real> class StokesBIO {
   public:
+
+    StokesBIO() = delete;
+    StokesBIO(const StokesBIO&) = delete;
+    StokesBIO& operator= (const StokesBIO&) = delete;
 
     StokesBIO(const Real SL_scal, const Real DL_scal, const sctl::Comm comm);
 
@@ -39,12 +45,26 @@ template <class Real> class StokesBIO {
      * Add an element-list.
      *
      * @param[in] elem_lst an object (of type ElemLstType, derived from the
-     * base class ElementListBase) that contains the description of a list of
-     * elements.
+     * base class sctl::ElementListBase) that contains the description of a list
+     * of elements. Any element-list type is accepted (e.g.
+     * sctl::SlenderElemList for slender tubes, sctl::QuadElemList for quad
+     * surface patches / caps), so a single operator can mix them.
      *
      * @param[in] name a string name for this element list: note that this will be ordered alphabetically or numerically.
+     *
+     * @param[in] sl, dl whether the element list is added to the single-layer
+     * and/or double-layer operator.
      */
-    void AddElemList(const sctl::SlenderElemList<Real>& elem_lst, const std::string& name);
+    template <class ElemLstType> void AddElemList(const ElemLstType& elem_lst, const std::string& name = std::to_string(typeid(ElemLstType).hash_code()), const bool sl = true, const bool dl = true);
+
+    /**
+     * Get a const reference to a named element-list.
+     *
+     * @param[in] name name of the element-list to return.
+     *
+     * @return const reference to the element-list, cast to ElemLstType.
+     */
+    template <class ElemLstType> const ElemLstType& GetElemList(const std::string& name = std::to_string(typeid(ElemLstType).hash_code())) const;
 
     /**
      * Delete an element-list.
@@ -54,9 +74,9 @@ template <class Real> class StokesBIO {
     void DeleteElemList(const std::string& name);
 
     /**
-     * Delete an element-list.
+     * Delete all element-lists of the given type.
      */
-    void DeleteElemList();
+    template <class ElemLstType> void DeleteElemList();
 
     /**
      * Set target point coordinates.
@@ -102,6 +122,28 @@ template <class Real> class StokesBIO {
     void ComputePotential(sctl::Vector<Real>& U, const sctl::Vector<Real>& F) const;
 
     /**
+     * Evaluate only the single-layer potential.
+     *
+     * @param[out] U the potential computed at each target point in
+     * array-of-struct order.
+     *
+     * @param[in] F the charge density at each surface discretization node in
+     * array-of-struct order.
+     */
+    void ComputeSL(sctl::Vector<Real>& U, const sctl::Vector<Real>& F) const;
+
+    /**
+     * Evaluate only the double-layer potential.
+     *
+     * @param[out] U the potential computed at each target point in
+     * array-of-struct order.
+     *
+     * @param[in] F the charge density at each surface discretization node in
+     * array-of-struct order.
+     */
+    void ComputeDL(sctl::Vector<Real>& U, const sctl::Vector<Real>& F) const;
+
+    /**
      * Scale input vector by sqrt of the area of the element.
      * TODO: replace by sqrt of surface quadrature weights (not sure if it makes a difference though)
      */
@@ -116,6 +158,10 @@ template <class Real> class StokesBIO {
 
   private:
 
+    // In 3-periodic, this allows adding a uniform volume potential to balance
+    // the total force density on the surface.
+    static void stokes_sl_volpot(sctl::Matrix<Real>& U, const sctl::Vector<Real>& X);
+
     const sctl::Stokes3D_FxU ker_FxU;
     const sctl::Stokes3D_DxU ker_DxU;
     const sctl::Stokes3D_FxUP ker_FxUP;
@@ -126,5 +172,26 @@ template <class Real> class StokesBIO {
     sctl::BoundaryIntegralOp<Real, sctl::Stokes3D_FxU> LayerPotenSL;
     sctl::BoundaryIntegralOp<Real, sctl::Stokes3D_DxU> LayerPotenDL;
 };
+
+// Template member definitions must be visible at the call site because the
+// class is explicitly instantiated (for float/double) in src/StokesBIO.cpp,
+// which does not instantiate member templates for arbitrary ElemLstType.
+
+template <class Real> template <class ElemLstType>
+void StokesBIO<Real>::AddElemList(const ElemLstType& elem_lst, const std::string& name, const bool sl, const bool dl) {
+  if (sl) LayerPotenSL.AddElemList(elem_lst, name);
+  if (dl) LayerPotenDL.AddElemList(elem_lst, name);
+}
+
+template <class Real> template <class ElemLstType>
+const ElemLstType& StokesBIO<Real>::GetElemList(const std::string& name) const {
+  return LayerPotenDL.template GetElemList<ElemLstType>(name);
+}
+
+template <class Real> template <class ElemLstType>
+void StokesBIO<Real>::DeleteElemList() {
+  LayerPotenSL.template DeleteElemList<ElemLstType>();
+  LayerPotenDL.template DeleteElemList<ElemLstType>();
+}
 
 #endif

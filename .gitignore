@@ -15,3 +15,5 @@ docs/latex/
 docs/rtf/
 docs/xml/
 docs/*.db
+# CSBQ log-singular quadrature cache (geometry-independent, regenerated)
+data/

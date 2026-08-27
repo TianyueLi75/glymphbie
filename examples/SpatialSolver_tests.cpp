@@ -130,11 +130,23 @@ void concentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nele
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
     }
+    // Periodic single-layer nullspace: far-field quadrature weights and total
+    // surface area, used to remove the surface-mean density during the solve.
+    sctl::SlenderElemList<Real> elem_inner = straight.GetInnerElemList();
+    sctl::SlenderElemList<Real> elem_outer = straight.GetOuterElemList();
+    sctl::Vector<Real> wts_inner, wts_outer;
+    Real surface_area;
+    GetSurfWtsArea<Real>(elem_inner, elem_outer, wts_inner, wts_outer, surface_area, comm, tol);
 
-    const auto BIO = [&LPO, D_scal, &NormalOrient](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+    const auto BIO = [&LPO, D_scal, &NormalOrient, &elem_inner, &elem_outer, size_inner, &wts_inner, &wts_outer, surface_area, &comm](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+        // Remove the surface-mean density (periodic single-layer nullspace).
+        sctl::Vector<Real> sigma_mean = ComputeSigmaMean<Real>(sigma, elem_inner, elem_outer, size_inner, wts_inner, wts_outer, surface_area, comm);
+        sctl::Vector<Real> sigma0 = sigma;
+        AddConstVec<Real>(sigma0, sigma_mean*(Real)(-1));
         U->SetZero();
-        LPO.ComputePotential(*U, sigma);
-        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma*D_scal*NormalOrient; // double layer jump condition on surface.
+        LPO.ComputePotential(*U, sigma0);
+        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma0*D_scal*NormalOrient; // double-layer jump condition on surface.
+        AddConstVec<Real>(*U, sigma_mean); // add back surface-mean density.
     };
 
     // ==========================
@@ -333,11 +345,23 @@ void concentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long 
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
     }
+    // Periodic single-layer nullspace: far-field quadrature weights and total
+    // surface area, used to remove the surface-mean density during the solve.
+    sctl::SlenderElemList<Real> elem_inner = straight.GetInnerElemList();
+    sctl::SlenderElemList<Real> elem_outer = straight.GetOuterElemList();
+    sctl::Vector<Real> wts_inner, wts_outer;
+    Real surface_area;
+    GetSurfWtsArea<Real>(elem_inner, elem_outer, wts_inner, wts_outer, surface_area, comm, tol);
 
-    const auto BIO = [&LPO, D_scal, &NormalOrient](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+    const auto BIO = [&LPO, D_scal, &NormalOrient, &elem_inner, &elem_outer, size_inner, &wts_inner, &wts_outer, surface_area, &comm](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+        // Remove the surface-mean density (periodic single-layer nullspace).
+        sctl::Vector<Real> sigma_mean = ComputeSigmaMean<Real>(sigma, elem_inner, elem_outer, size_inner, wts_inner, wts_outer, surface_area, comm);
+        sctl::Vector<Real> sigma0 = sigma;
+        AddConstVec<Real>(sigma0, sigma_mean*(Real)(-1));
         U->SetZero();
-        LPO.ComputePotential(*U, sigma);
-        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma*D_scal*NormalOrient;
+        LPO.ComputePotential(*U, sigma0);
+        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma0*D_scal*NormalOrient; // double-layer jump condition on surface.
+        AddConstVec<Real>(*U, sigma_mean); // add back surface-mean density.
     };
 
     // ==========================
@@ -530,12 +554,24 @@ void eccentric_poiseuille(const Real dpdx, const Real mu, const sctl::Long Nelem
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
     }
+    // Periodic single-layer nullspace: far-field quadrature weights and total
+    // surface area, used to remove the surface-mean density during the solve.
+    sctl::SlenderElemList<Real> elem_inner = straight.GetInnerElemList();
+    sctl::SlenderElemList<Real> elem_outer = straight.GetOuterElemList();
+    sctl::Vector<Real> wts_inner, wts_outer;
+    Real surface_area;
+    GetSurfWtsArea<Real>(elem_inner, elem_outer, wts_inner, wts_outer, surface_area, comm, tol);
 
     // Create lambda function
-    const auto BIO = [&LPO, D_scal, &NormalOrient](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+    const auto BIO = [&LPO, D_scal, &NormalOrient, &elem_inner, &elem_outer, size_inner, &wts_inner, &wts_outer, surface_area, &comm](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+        // Remove the surface-mean density (periodic single-layer nullspace).
+        sctl::Vector<Real> sigma_mean = ComputeSigmaMean<Real>(sigma, elem_inner, elem_outer, size_inner, wts_inner, wts_outer, surface_area, comm);
+        sctl::Vector<Real> sigma0 = sigma;
+        AddConstVec<Real>(sigma0, sigma_mean*(Real)(-1));
         U->SetZero();
-        LPO.ComputePotential(*U, sigma);
-        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma*D_scal*NormalOrient;
+        LPO.ComputePotential(*U, sigma0);
+        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma0*D_scal*NormalOrient; // double-layer jump condition on surface.
+        AddConstVec<Real>(*U, sigma_mean); // add back surface-mean density.
     };
 
     // Setup gmres
@@ -740,12 +776,24 @@ void eccentric_poiseuille_mpi(const Real dpdx, const Real mu, const sctl::Long N
         // Normal of outer channel element list points outward by default.
         NormalOrient[size_inner + ind] = -1.;
     }
+    // Periodic single-layer nullspace: far-field quadrature weights and total
+    // surface area, used to remove the surface-mean density during the solve.
+    sctl::SlenderElemList<Real> elem_inner = straight.GetInnerElemList();
+    sctl::SlenderElemList<Real> elem_outer = straight.GetOuterElemList();
+    sctl::Vector<Real> wts_inner, wts_outer;
+    Real surface_area;
+    GetSurfWtsArea<Real>(elem_inner, elem_outer, wts_inner, wts_outer, surface_area, comm, tol);
 
     // Create lambda function
-    const auto BIO = [&LPO, D_scal, &NormalOrient](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+    const auto BIO = [&LPO, D_scal, &NormalOrient, &elem_inner, &elem_outer, size_inner, &wts_inner, &wts_outer, surface_area, &comm](sctl::Vector<Real>* U, const sctl::Vector<Real> sigma) {
+        // Remove the surface-mean density (periodic single-layer nullspace).
+        sctl::Vector<Real> sigma_mean = ComputeSigmaMean<Real>(sigma, elem_inner, elem_outer, size_inner, wts_inner, wts_outer, surface_area, comm);
+        sctl::Vector<Real> sigma0 = sigma;
+        AddConstVec<Real>(sigma0, sigma_mean*(Real)(-1));
         U->SetZero();
-        LPO.ComputePotential(*U, sigma);
-        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma*D_scal*NormalOrient;
+        LPO.ComputePotential(*U, sigma0);
+        if (D_scal && U->Dim() == sigma.Dim()) (*U) += 0.5*sigma0*D_scal*NormalOrient; // double-layer jump condition on surface.
+        AddConstVec<Real>(*U, sigma_mean); // add back surface-mean density.
     };
 
     // Setup gmres

@@ -4,6 +4,7 @@
 #include "Annular.hpp"
 #include "Particle.hpp"
 #include "StokesBIO.hpp"
+#include "PeriodicBIO.hpp"
 #include "Wall.hpp"
 #include "FuncWall.hpp"
 #include "IntegratorWall.hpp"
